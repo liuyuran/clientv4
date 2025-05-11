@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3 uid="uid://b8yf3o3365mk0"]
+
+[ext_resource type="Script" uid="uid://cib1l5oergo4j" path="res://scripts/EntityRender.cs" id="1_j5px3"]
+[ext_resource type="MultiMesh" uid="uid://crmpswomfs65n" path="res://prefabs/blockMesh.tres" id="2_twpsu"]
+[ext_resource type="PackedScene" uid="uid://dqxxh7ygrtvuk" path="res://prefabs/player.tscn" id="3_sqa0i"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_lrqlo"]
+
+[node name="root" type="Node3D"]
+
+[node name="Spawner" type="Node" parent="."]
+script = ExtResource("1_j5px3")
+
+[node name="BlockSpawner" type="MultiMeshInstance3D" parent="Spawner"]
+multimesh = ExtResource("2_twpsu")
+
+[node name="Player" parent="." instance=ExtResource("3_sqa0i")]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.64407, 0.764966, 0, -0.764966, 0.64407, 0, 2.39634, 2.47844)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.07533, 0, -2.93387)
+mesh = SubResource("CylinderMesh_lrqlo")
