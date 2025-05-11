@@ -19,6 +19,6 @@ multimesh = ExtResource("2_twpsu")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.64407, 0.764966, 0, -0.764966, 0.64407, 0, 2.39634, 2.47844)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="test" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.07533, 0, -2.93387)
 mesh = SubResource("CylinderMesh_lrqlo")
