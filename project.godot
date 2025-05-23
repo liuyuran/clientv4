@@ -14,8 +14,13 @@ config/name="无尽魔方"
 config/version="0.0.1-beta"
 run/main_scene="uid://b8yf3o3365mk0"
 config/features=PackedStringArray("4.4", "C#", "Double Precision", "Forward Plus")
+boot_splash/show_image=false
 config/icon="res://icon.svg"
 
 [dotnet]
 
 project/assembly_name="Clientv4"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"

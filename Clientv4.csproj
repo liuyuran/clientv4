@@ -4,4 +4,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>game</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Friflo.Engine.ECS" Version="3.3.2" />
+  </ItemGroup>
 </Project>

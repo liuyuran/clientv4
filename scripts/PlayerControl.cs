@@ -36,6 +36,12 @@ public partial class PlayerControl : CharacterBody3D {
 				case Key.D:
 					Velocity += Basis.X * 10;
 					break;
+				case Key.Space:
+					Velocity += Basis.Y * 10;
+					break;
+				case Key.Ctrl:
+					Velocity += -Basis.Y * 10;
+					break;
 			}
 
 			MoveAndSlide();
