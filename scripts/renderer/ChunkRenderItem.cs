@@ -16,25 +16,26 @@ public partial class ChunkRenderItem : MeshInstance3D {
             UpdateMesh();
             _isDirty = false;
         }
-        
-        if (_readyMesh != null && Mesh != _readyMesh && !_isDirty) {
-            Mesh = _readyMesh;
-            if (_readyMesh._Surfaces.Count > 0) {
-                _readyMesh.SurfaceSetMaterial(0, _material);
-                UpdateCollider();
-            }
-            _readyMesh = null;
+
+        if (_readyMesh == null || Mesh == _readyMesh || _isDirty) return;
+        Mesh = _readyMesh;
+        if (_readyMesh._Surfaces.Count > 0) {
+            _readyMesh.SurfaceSetMaterial(0, _material);
+            UpdateCollider();
         }
+        _readyMesh = null;
     }
 
     public void InitData(Vector3I chunkPosition, BlockData[][][] blockData) {
-        _material = MaterialManager.instance.GetMaterial();;
+        _material = MaterialManager.instance.GetMaterial();
         _blockData = blockData;
         Name = $"Chunk_{chunkPosition.X}_{chunkPosition.Y}_{chunkPosition.Z}";
         _isDirty = true;
     }
 
-    public void SetBlock(Vector3I pos, ulong blockId, Direction direction) {
+    [Rpc(CallLocal = true)]
+    private void SetBlock(Vector3I pos, ulong blockId, int directionInt) {
+        var direction = (Direction)directionInt;
         if (!IsValidPositionInChunk(pos)) {
             GD.PrintErr($"Invalid position: {pos}");
             return;
@@ -50,12 +51,12 @@ public partial class ChunkRenderItem : MeshInstance3D {
         }
     }
 
-    public void DestroyBlock(Vector3I pos) {
-        SetBlock(pos, 0, Direction.None);
+    private void DestroyBlock(Vector3I pos) {
+        SetBlock(pos, 0, (int)Direction.None);
     }
 
-    public void PlaceBlock(Vector3I pos, ulong blockId, Direction direction) {
-        SetBlock(pos, blockId, direction);
+    private void PlaceBlock(Vector3I pos, ulong blockId, Direction direction) {
+        SetBlock(pos, blockId, (int)direction);
     }
     
     private static bool IsValidPositionInChunk(Vector3I pos) {

@@ -1,30 +1,30 @@
 [gd_scene load_steps=6 format=3 uid="uid://b8yf3o3365mk0"]
 
-[ext_resource type="Script" uid="uid://cib1l5oergo4j" path="res://scripts/EntityRender.cs" id="1_j5px3"]
-[ext_resource type="MultiMesh" uid="uid://crmpswomfs65n" path="res://prefabs/blockMesh.tres" id="2_twpsu"]
-[ext_resource type="PackedScene" uid="uid://dqxxh7ygrtvuk" path="res://prefabs/player.tscn" id="3_sqa0i"]
+[ext_resource type="PackedScene" uid="uid://dqxxh7ygrtvuk" path="res://prefabs/player.tscn" id="2_jh1ax"]
+[ext_resource type="Script" uid="uid://cx4s2ugh011ah" path="res://scripts/server/MultiPlayerSupportNode.cs" id="3_lrqlo"]
+[ext_resource type="Script" uid="uid://bsay7c7kar51o" path="res://scripts/gui/InGamingUI.cs" id="4_jh1ax"]
 [ext_resource type="Script" uid="uid://dr80u08hsiex2" path="res://scripts/renderer/WorldRender.cs" id="4_sqa0i"]
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_lrqlo"]
+[ext_resource type="Script" uid="uid://btdjg0kdju2lk" path="res://scripts/server/ECSBridge/ECSSystemBridge.cs" id="5_jh1ax"]
 
 [node name="root" type="Node3D"]
 
-[node name="Spawner" type="Node" parent="."]
-script = ExtResource("1_j5px3")
-
-[node name="BlockSpawner" type="MultiMeshInstance3D" parent="Spawner"]
-multimesh = ExtResource("2_twpsu")
-
-[node name="Player" parent="." instance=ExtResource("3_sqa0i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+[node name="ECSSupport" type="Node" parent="."]
+script = ExtResource("5_jh1ax")
+_playerPrototype = ExtResource("2_jh1ax")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.64407, 0.764966, 0, -0.764966, 0.64407, 0, 2.39634, 2.47844)
+shadow_enabled = true
 
-[node name="test" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.07533, 0, -2.93387)
-visible = false
-mesh = SubResource("CylinderMesh_lrqlo")
-
-[node name="Node3D" type="Node3D" parent="."]
+[node name="World" type="Node3D" parent="."]
 script = ExtResource("4_sqa0i")
+
+[node name="NetworkSupport" type="Node" parent="."]
+script = ExtResource("3_lrqlo")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+script = ExtResource("4_jh1ax")
+
+[node name="FPS" type="RichTextLabel" parent="CanvasLayer"]
+offset_right = 183.0
+offset_bottom = 40.0
