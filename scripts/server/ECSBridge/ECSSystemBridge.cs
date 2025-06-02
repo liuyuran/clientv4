@@ -5,6 +5,7 @@ using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
 using game.scripts.manager;
 using game.scripts.server.ECSBridge.block;
+using game.scripts.server.ECSBridge.gravity;
 using game.scripts.server.ECSBridge.input;
 using game.scripts.server.ECSBridge.render;
 using game.scripts.server.ECSBridge.sync;
@@ -31,8 +32,20 @@ public partial class ECSSystemBridge: Node {
         _world.OnComponentRemoved += WorldOnOnComponentRemoved;
         _systemRoot = new SystemRoot(_world) {
             new SMoveSystem(_world),
+            new SJump(_world),
             new SBlockDestroyOrPlace()
         };
+    }
+
+    public override void _PhysicsProcess(double delta) {
+        const float gravity = -9.8f; // 设置重力加速度
+        foreach (var (entity, node) in _entityNodes) {
+            if (node is not CharacterBody3D body3D) continue;
+            // 更新玩家的物理状态
+            if (body3D.IsOnFloor()) continue;
+            body3D.Velocity += new Vector3(0, gravity * delta, 0);
+            body3D.MoveAndSlide();
+        }
     }
 
     public override void _Process(double delta) {
@@ -42,6 +55,8 @@ public partial class ECSSystemBridge: Node {
                 Type = ERenderType.MainPlayer
             }, new CInputEvent(), new CTransform(), new CCamera(), new CPhysicsVelocity(), new CPeer {
                 PeerId = Multiplayer.GetUniqueId()
+            }, new CPhysicsStatus {
+                Jumping = false
             });
             inputHandler.AddSignalHandler<SignalBlockChanged>(signal => {
                 MapManager.instance.SetBlock(signal.Event.WorldId, signal.Event.Position, signal.Event.BlockId, signal.Event.Direction);
@@ -64,8 +79,14 @@ public partial class ECSSystemBridge: Node {
         _world.Query<CPhysicsVelocity>().AnyTags(Tags.Get<THasDirtData>()).ForEachEntity((ref CPhysicsVelocity velocity, Entity entity) => {
             if (_entityNodes.TryGetValue(entity, out var node)) {
                 if (node is not CharacterBody3D body3D) return;
+                var previousPosition = body3D.GlobalPosition;
                 body3D.Velocity = velocity.Velocity * (float)delta;
                 body3D.MoveAndSlide();
+                if (entity.HasComponent<CPhysicsStatus>()) {
+                    // 如果Y轴位置发生变化，说明是跳跃或下落
+                    var isJumping = Math.Abs(previousPosition.Y - body3D.GlobalPosition.Y) > 0.01f;
+                    entity.GetComponent<CPhysicsStatus>().Jumping = isJumping;
+                }
                 if (velocity.Rotation.X != 0) {
                     body3D.RotateY(velocity.Rotation.X);
                 }

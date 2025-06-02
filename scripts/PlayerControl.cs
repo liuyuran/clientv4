@@ -5,105 +5,63 @@ using Godot;
 namespace game.scripts;
 
 public partial class PlayerControl(Entity inputHandler) : CharacterBody3D {
-    private const float MouseSpeed = 0.1f;
     private CInputEvent _lastEvents;
     private CInputEvent _events;
-    private readonly CInputEvent _emptyEvents = new();
-    private Mutex _mutex = new();
-    private ulong _eventUpdateTime;
+    private Vector2 _mouseMotionAccumulator = Vector2.Zero;
 
     public override void _Ready() {
         Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 
+    public override void _Input(InputEvent @event) {
+        if (@event is InputEventMouseMotion mouseMotion) {
+            _mouseMotionAccumulator += mouseMotion.Relative;
+        }
+    }
+
     public override void _Process(double delta) {
-        // Update the input handler with the latest input events
-        _mutex.Lock();
-        if (_eventUpdateTime + 100 < Time.GetTicksMsec()) {
-            _events = _emptyEvents;
+        var currentFrameEvents = new CInputEvent {
+            ForwardVector = -_mouseMotionAccumulator
+        };
+
+        _mouseMotionAccumulator = Vector2.Zero; // Reset for the next frame
+
+        // Keyboard input
+        if (Input.IsActionPressed("ui_cancel")) { // Assuming Escape is mapped to ui_cancel
+            Input.MouseMode = Input.MouseModeEnum.Visible;
         }
 
+        currentFrameEvents.MoveForward = Input.IsKeyPressed(Key.W);
+        currentFrameEvents.MoveBackward = Input.IsKeyPressed(Key.S);
+        currentFrameEvents.MoveLeft = Input.IsKeyPressed(Key.A);
+        currentFrameEvents.MoveRight = Input.IsKeyPressed(Key.D);
+        currentFrameEvents.Jump = Input.IsKeyPressed(Key.Space);
+        currentFrameEvents.Crouch = Input.IsKeyPressed(Key.Ctrl);
+        currentFrameEvents.Digging = Input.IsMouseButtonPressed(MouseButton.Left);
+        currentFrameEvents.Placing = Input.IsMouseButtonPressed(MouseButton.Right);
+
+        if (currentFrameEvents.Digging || currentFrameEvents.Placing) {
+            currentFrameEvents.MouseClickPosition = GetViewport().GetMousePosition();
+        }
+
+        _events = currentFrameEvents;
+
         if (_events == _lastEvents) {
-            _mutex.Unlock();
             return;
         }
+        
         Rpc(MethodName.UpdateInputEvent,
             new Vector3(
                 _events.MoveLeft ? -1 : _events.MoveRight ? 1 : 0,
                 _events.Jump ? 1 : _events.Crouch ? -1 : 0,
                 _events.MoveForward ? -1 : _events.MoveBackward ? 1 : 0
             ),
-            _events.ForwardVector,
+            _events.ForwardVector, 
             _events.Digging,
             _events.Placing,
             _events.MouseClickPosition
         );
         _lastEvents = _events;
-        _mutex.Unlock();
-    }
-
-    public override void _Input(InputEvent @event) {
-        var events = new CInputEvent();
-        switch (@event) {
-            case InputEventKey eventKey when eventKey.IsPressed(): {
-                GD.Print("Key pressed: ", eventKey.Keycode);
-                if (eventKey.Keycode == Key.Escape) {
-                    Input.MouseMode = Input.MouseModeEnum.Visible;
-                }
-
-                switch (eventKey.Keycode) {
-                    case Key.W:
-                        events.MoveForward = true;
-                        break;
-                    case Key.S:
-                        events.MoveBackward = true;
-                        break;
-                    case Key.A:
-                        events.MoveLeft = true;
-                        break;
-                    case Key.D:
-                        events.MoveRight = true;
-                        break;
-                    case Key.Space:
-                        events.Jump = true;
-                        break;
-                    case Key.Ctrl:
-                        events.Crouch = true;
-                        break;
-                }
-
-                break;
-            }
-            case InputEventMouseButton eventMouseButton when eventMouseButton.IsPressed():
-                events.MouseClickPosition = eventMouseButton.Position;
-                switch (eventMouseButton.ButtonIndex) {
-                    case MouseButton.Left: {
-                        events.Digging = true;
-                        break;
-                    }
-                    case MouseButton.Right: {
-                        events.Placing = true;
-                        break;
-                    }
-                }
-
-                break;
-        }
-
-        if (@event is InputEventMouseMotion eventMouseMotion) {
-            var relative = eventMouseMotion.Relative;
-            events.ForwardVector = new Vector2(
-                -relative.X * MouseSpeed,
-                -relative.Y * MouseSpeed
-            );
-        } else {
-            events.ForwardVector = Vector2.Zero;
-        }
-
-        _mutex.Lock();
-        _eventUpdateTime = Time.GetTicksMsec();
-        _events = events;
-        _mutex.Unlock();
     }
 
     [Rpc(CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]

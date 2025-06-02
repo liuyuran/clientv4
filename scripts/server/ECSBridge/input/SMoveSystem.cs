@@ -28,13 +28,8 @@ public class SMoveSystem(EntityStore world): QuerySystem<CRenderType, CTransform
             if (inputEvent.MoveLeft) {
                 physicsForward -= transform.BasisX;
             }
-            if (inputEvent.Jump) {
-                physicsForward += Vector3.Up;
-            }
-            if (inputEvent.Crouch) {
-                physicsForward += Vector3.Down;
-            }
             physicsForward = physicsForward.Normalized() * MoveSpeed;
+            physicsForward.Y *= 3;
             if (physicsForward == velocity.Velocity && 
                 inputEvent.ForwardVector == velocity.Rotation &&
                 physicsForward == Vector3.Zero &&

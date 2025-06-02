@@ -77,7 +77,6 @@ public class SBlockDestroyOrPlace : QuerySystem<CPhysicsVelocity, CCamera, CInpu
                     target.X = Mathf.FloorToInt(targetF.X);
                     target.Y = Mathf.FloorToInt(targetF.Y);
                     target.Z = Mathf.FloorToInt(targetF.Z);
-                    GD.Print($"Right mouse button clicked at {hitPosition}, normal: {hitNormal}, collider: {collider?.Name}, target: {target}");
                     // Here you can add logic to handle the block interaction, like breaking or placing blocks
                     var blockId = MapManager.instance.GetBlockIdByPosition(target);
                     if (blockId == 0 && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
