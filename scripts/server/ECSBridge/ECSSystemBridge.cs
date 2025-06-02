@@ -37,6 +37,17 @@ public partial class ECSSystemBridge: Node {
         };
     }
 
+    public override void _PhysicsProcess(double delta) {
+        const float gravity = -9.8f; // 设置重力加速度
+        foreach (var (entity, node) in _entityNodes) {
+            if (node is not CharacterBody3D body3D) continue;
+            // 更新玩家的物理状态
+            if (body3D.IsOnFloor()) continue;
+            body3D.Velocity += new Vector3(0, gravity * delta, 0);
+            body3D.MoveAndSlide();
+        }
+    }
+
     public override void _Process(double delta) {
         if (!_isInitialized) {
             _isInitialized = true;
@@ -65,15 +76,11 @@ public partial class ECSSystemBridge: Node {
         _systemRoot.Update(new UpdateTick((float)delta, (float)((double)Time.GetTicksMsec() / 1000)));
         // 更新人物位置和旋转
         var commandBuffer = _world.GetCommandBuffer();
-        const float gravity = -9.8f; // 设置重力加速度
         _world.Query<CPhysicsVelocity>().AnyTags(Tags.Get<THasDirtData>()).ForEachEntity((ref CPhysicsVelocity velocity, Entity entity) => {
             if (_entityNodes.TryGetValue(entity, out var node)) {
                 if (node is not CharacterBody3D body3D) return;
                 var previousPosition = body3D.GlobalPosition;
                 body3D.Velocity = velocity.Velocity * (float)delta;
-                if (body3D.IsOnFloor()) {
-                    velocity.Velocity.Y -= gravity * delta;
-                }
                 body3D.MoveAndSlide();
                 if (entity.HasComponent<CPhysicsStatus>()) {
                     // 如果Y轴位置发生变化，说明是跳跃或下落
