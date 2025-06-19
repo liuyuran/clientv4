@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://d26pqi66gp0jy"]
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopMenu" type="CanvasLayer" parent="."]
+
+[node name="Menus" type="CanvasLayer" parent="."]
+
+[node name="Inventory" type="CanvasLayer" parent="Menus"]

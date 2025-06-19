@@ -1,0 +1,59 @@
+[gd_scene load_steps=4 format=3 uid="uid://d0hob8q7d1mgt"]
+
+[ext_resource type="Script" uid="uid://d4igu4hbil66m" path="res://scripts/gui/InGameUI/component/DebugInfo.cs" id="1_72yxq"]
+[ext_resource type="Script" uid="uid://cggymnu4qij1o" path="res://scripts/gui/InGameUI/component/ChatScroll.cs" id="2_a7jcy"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xry13"]
+
+[node name="PlayUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="debug" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_xry13")
+script = ExtResource("1_72yxq")
+
+[node name="FPS" type="RichTextLabel" parent="debug"]
+layout_mode = 0
+offset_right = 171.0
+offset_bottom = 40.0
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="chat" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -175.0
+offset_right = 356.0
+grow_vertical = 0
+script = ExtResource("2_a7jcy")
+
+[node name="chatHistory" type="ScrollContainer" parent="chat"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="chatBox" type="VBoxContainer" parent="chat/chatHistory"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 2

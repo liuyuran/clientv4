@@ -1,0 +1,14 @@
+[gd_scene load_steps=5 format=3 uid="uid://bkhf24nhopl67"]
+
+[ext_resource type="Script" uid="uid://bsay7c7kar51o" path="res://scripts/gui/InGameUI/InGamingUI.cs" id="1_nltto"]
+[ext_resource type="PackedScene" uid="uid://d0hob8q7d1mgt" path="res://prefabs/play_ui.tscn" id="2_ibotj"]
+[ext_resource type="PackedScene" uid="uid://cr33ml8wxb1to" path="res://prefabs/pause_ui.tscn" id="3_n5ude"]
+[ext_resource type="PackedScene" uid="uid://d26pqi66gp0jy" path="res://prefabs/menu.tscn" id="4_y4yjw"]
+
+[node name="UI" type="CanvasLayer"]
+layer = 2
+follow_viewport_enabled = true
+script = ExtResource("1_nltto")
+PlayingUI = ExtResource("2_ibotj")
+PauseUI = ExtResource("3_n5ude")
+MenusUI = ExtResource("4_y4yjw")

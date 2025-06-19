@@ -7,8 +7,9 @@ namespace game.scripts.renderer;
 
 public partial class ChunkRenderItem : MeshInstance3D {
     private BlockData[][][] _blockData;
+    private Vector3I _chunkPosition;
     private ArrayMesh _readyMesh;
-    private Material _material;
+    private ArrayMesh _colliderMesh;
     private bool _isDirty;
 
     public override void _Process(double delta) {
@@ -20,16 +21,15 @@ public partial class ChunkRenderItem : MeshInstance3D {
         if (_readyMesh == null || Mesh == _readyMesh || _isDirty) return;
         Mesh = _readyMesh;
         if (_readyMesh._Surfaces.Count > 0) {
-            _readyMesh.SurfaceSetMaterial(0, _material);
             UpdateCollider();
         }
         _readyMesh = null;
     }
 
     public void InitData(Vector3I chunkPosition, BlockData[][][] blockData) {
-        _material = MaterialManager.instance.GetMaterial();
         _blockData = blockData;
         Name = $"Chunk_{chunkPosition.X}_{chunkPosition.Y}_{chunkPosition.Z}";
+        _chunkPosition = chunkPosition;
         _isDirty = true;
     }
 
@@ -103,52 +103,128 @@ public partial class ChunkRenderItem : MeshInstance3D {
         }
         var neighborPos = pos + offset;
         if (!IsValidPositionInChunk(neighborPos)) {
-            return true;
+            var blockId = MapManager.instance.GetBlockIdByPosition(_chunkPosition * Config.ChunkSize + neighborPos);
+            if (blockId == 0) return true;
+            return BlockManager.instance.GetBlock(blockId).transparent;
         }
         var neighborBlockData = GetBlockData(neighborPos);
         if (neighborBlockData == null) {
             return true;
         }
+
+        if (neighborBlockData.Value.BlockId == 0) return true;
+        var block = BlockManager.instance.GetBlock(neighborBlockData.Value.BlockId);
+        return block.transparent;
+    }
+    
+    private bool ShouldBeRender(Vector3I pos, Direction direction) {
+        if (!IsValidPositionInChunk(pos)) {
+            return false;
+        }
+
+        var offset = new Vector3I(0, 0, 0);
+        switch (direction) {
+            case Direction.North:
+                offset = new Vector3I(0, 0, -1);
+                break;
+            case Direction.South:
+                offset = new Vector3I(0, 0, 1);
+                break;
+            case Direction.East:
+                offset = new Vector3I(1, 0, 0);
+                break;
+            case Direction.West:
+                offset = new Vector3I(-1, 0, 0);
+                break;
+            case Direction.Up:
+                offset = new Vector3I(0, 1, 0);
+                break;
+            case Direction.Down:
+                offset = new Vector3I(0, -1, 0);
+                break;
+            case Direction.None:
+            default:
+                break;
+        }
+        var neighborPos = pos + offset;
+        if (!IsValidPositionInChunk(neighborPos)) {
+            var blockId = MapManager.instance.GetBlockIdByPosition(_chunkPosition * Config.ChunkSize + neighborPos);
+            return blockId == 0;
+        }
+        var neighborBlockData = GetBlockData(neighborPos);
+        if (neighborBlockData == null) {
+            return true;
+        }
+
         return neighborBlockData.Value.BlockId == 0;
     }
     
     private void UpdateMesh() {
         var meshTool = new SurfaceTool();
+        var waterMeshTool = new SurfaceTool();
         meshTool.Begin(Mesh.PrimitiveType.Triangles);
+        meshTool.SetMaterial(MaterialManager.instance.GetMaterial());
+        waterMeshTool.Begin(Mesh.PrimitiveType.Triangles);
+        waterMeshTool.SetMaterial(MaterialManager.instance.GetWaterMaterial());
         var baseIndex = 0;
+        var waterBaseIndex = 0;
         for (var x = 0; x < Config.ChunkSize; x++) {
             for (var y = 0; y < Config.ChunkSize; y++) {
                 for (var z = 0; z < Config.ChunkSize; z++) {
                     var blockData = _blockData[x][y][z];
-                    if (blockData.BlockId == 0) {
-                        continue;
+                    if (blockData.BlockId == 0) continue;
+                    if (BlockManager.instance.GetBlock(blockData.BlockId).transparent) {
+                        // water or gas
+                        var flags = 0;
+                        var point = new Vector3I(x, y, z);
+                        if (ShouldBeRender(point, Direction.North)) {
+                            flags |= 1 << (int)Direction.North;
+                        }
+                        if (ShouldBeRender(point, Direction.South)) {
+                            flags |= 1 << (int)Direction.South;
+                        }
+                        if (ShouldBeRender(point, Direction.East)) {
+                            flags |= 1 << (int)Direction.East;
+                        }
+                        if (ShouldBeRender(point, Direction.West)) {
+                            flags |= 1 << (int)Direction.West;
+                        }
+                        if (ShouldBeRender(point, Direction.Up)) {
+                            flags |= 1 << (int)Direction.Up;
+                        }
+                        if (ShouldBeRender(point, Direction.Down)) {
+                            flags |= 1 << (int)Direction.Down;
+                        }
+                        AddCubeMesh(waterMeshTool, blockData.BlockId, flags, ref waterBaseIndex, point);
+                    } else {
+                        var flags = 0;
+                        var point = new Vector3I(x, y, z);
+                        if (ShouldBeVisible(point, Direction.North)) {
+                            flags |= 1 << (int)Direction.North;
+                        }
+                        if (ShouldBeVisible(point, Direction.South)) {
+                            flags |= 1 << (int)Direction.South;
+                        }
+                        if (ShouldBeVisible(point, Direction.East)) {
+                            flags |= 1 << (int)Direction.East;
+                        }
+                        if (ShouldBeVisible(point, Direction.West)) {
+                            flags |= 1 << (int)Direction.West;
+                        }
+                        if (ShouldBeVisible(point, Direction.Up)) {
+                            flags |= 1 << (int)Direction.Up;
+                        }
+                        if (ShouldBeVisible(point, Direction.Down)) {
+                            flags |= 1 << (int)Direction.Down;
+                        }
+                        AddCubeMesh(meshTool, blockData.BlockId, flags, ref baseIndex, point);    
                     }
-                    var flags = 0;
-                    var point = new Vector3I(x, y, z);
-                    if (ShouldBeVisible(point, Direction.North)) {
-                        flags |= 1 << (int)Direction.North;
-                    }
-                    if (ShouldBeVisible(point, Direction.South)) {
-                        flags |= 1 << (int)Direction.South;
-                    }
-                    if (ShouldBeVisible(point, Direction.East)) {
-                        flags |= 1 << (int)Direction.East;
-                    }
-                    if (ShouldBeVisible(point, Direction.West)) {
-                        flags |= 1 << (int)Direction.West;
-                    }
-                    if (ShouldBeVisible(point, Direction.Up)) {
-                        flags |= 1 << (int)Direction.Up;
-                    }
-                    if (ShouldBeVisible(point, Direction.Down)) {
-                        flags |= 1 << (int)Direction.Down;
-                    }
-                    AddCubeMesh(meshTool, blockData.BlockId, flags, ref baseIndex, point);
                 }
             }
         }
-        var newMesh = meshTool.Commit();
-        _readyMesh = newMesh;
+        _colliderMesh = meshTool.Commit();
+        var waterMesh = waterMeshTool.Commit(meshTool.Commit());
+        _readyMesh = waterMesh;
     }
 
     private static Vector2[] GetUV(ulong blockId, Direction direction) {
@@ -255,8 +331,8 @@ public partial class ChunkRenderItem : MeshInstance3D {
     }
 
     private void UpdateCollider() {
-        if (Mesh == null || Mesh.GetSurfaceCount() == 0) return;
-        var shape = Mesh.CreateTrimeshShape();
+        if (_colliderMesh == null || _colliderMesh.GetSurfaceCount() == 0) return;
+        var shape = _colliderMesh.CreateTrimeshShape();
         if (shape == null) {
             GD.Print("创建网格碰撞器失败");
             return;

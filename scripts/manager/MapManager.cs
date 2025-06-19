@@ -19,10 +19,6 @@ public class MapManager {
         _generator = new TerrainGenerator(123456);
         GD.Print("MapManager initialized.");
     }
-    
-    public IEnumerable<ulong> GetWorldIds() {
-        return _chunks.Keys;
-    }
 
     public void SetBlock(ulong worldId, Vector3 position, ulong blockId, Direction direction) {
         if (!_chunks.TryGetValue(worldId, out var chunkData)) {

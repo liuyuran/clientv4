@@ -1,6 +1,8 @@
 ﻿using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
 using game.scripts.manager;
+using game.scripts.manager.blocks;
+using game.scripts.manager.blocks.util;
 using game.scripts.server.ECSBridge.input;
 using game.scripts.utils;
 using Godot;
@@ -79,10 +81,10 @@ public class SBlockDestroyOrPlace : QuerySystem<CPhysicsVelocity, CCamera, CInpu
                     target.Z = Mathf.FloorToInt(targetF.Z);
                     // Here you can add logic to handle the block interaction, like breaking or placing blocks
                     var blockId = MapManager.instance.GetBlockIdByPosition(target);
-                    if (blockId == 0 && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
+                    if ((blockId == 0 || BlockManager.instance.GetBlock(blockId).blockType != EBlockType.Solid) && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
                         entity.EmitSignal(new SignalBlockChanged {
                             Position = target,
-                            BlockId = 1,
+                            BlockId = BlockManager.instance.GetBlockId<Dirt>(),
                             Direction = Direction.None,
                             WorldId = 0
                         });

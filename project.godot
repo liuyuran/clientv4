@@ -12,10 +12,14 @@ config_version=5
 
 config/name="无尽魔方"
 config/version="0.0.1-beta"
-run/main_scene="uid://b8yf3o3365mk0"
+run/main_scene="uid://c4l82svkvmewt"
 config/features=PackedStringArray("4.4", "C#", "Double Precision", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
+
+[autoload]
+
+StandardNetwork="*res://scripts/network/StandardNetwork.cs"
 
 [dotnet]
 

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using game.scripts.manager.blocks;
+using Godot;
 
 namespace game.scripts.manager;
 
@@ -10,18 +11,30 @@ public class BlockManager {
     public static BlockManager instance { get; private set; } = new();
     
     private readonly ConcurrentDictionary<string, ulong> _blockIds = new();
+    private readonly ConcurrentDictionary<Type, ulong> _blockCache = new();
     private readonly ConcurrentDictionary<ulong, Block> _blocks = new();
     private long _currentId;
 
     private BlockManager() {
+        Register<Water>();
         Register<Dirt>();
+        GD.Print("BlockManager initialized.");
     }
 
     private void Register<T>() where T : Block, new() {
         var block = new T();
         var id = (ulong)Interlocked.Increment(ref _currentId);
         _blocks.TryAdd(id, block);
-        _blockIds.TryAdd(block.Name, id);
+        _blockCache.TryAdd(typeof(T), id);
+        _blockIds.TryAdd(block.name, id);
+    }
+
+    public ulong GetBlockId<T>() where T : Block {
+        if (_blockCache.TryGetValue(typeof(T), out var id)) {
+            return id;
+        }
+
+        return 0;
     }
 
     public ulong GetBlockId(string name) {

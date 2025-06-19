@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
 using game.scripts.manager;
+using game.scripts.manager.player;
 using game.scripts.server.ECSBridge.block;
 using game.scripts.server.ECSBridge.gravity;
 using game.scripts.server.ECSBridge.input;
 using game.scripts.server.ECSBridge.render;
 using game.scripts.server.ECSBridge.sync;
-using game.scripts.utils;
 using Godot;
 
 namespace game.scripts.server.ECSBridge;
@@ -32,7 +31,7 @@ public partial class ECSSystemBridge: Node {
         _world.OnComponentRemoved += WorldOnOnComponentRemoved;
         _systemRoot = new SystemRoot(_world) {
             new SMoveSystem(_world),
-            new SJump(_world),
+            new SJumpAndGravity(_world),
             new SBlockDestroyOrPlace()
         };
     }
@@ -57,7 +56,7 @@ public partial class ECSSystemBridge: Node {
                 PeerId = Multiplayer.GetUniqueId()
             }, new CPhysicsStatus {
                 Jumping = false
-            });
+            }, new CJumpStatus());
             inputHandler.AddSignalHandler<SignalBlockChanged>(signal => {
                 MapManager.instance.SetBlock(signal.Event.WorldId, signal.Event.Position, signal.Event.BlockId, signal.Event.Direction);
             });
@@ -71,6 +70,9 @@ public partial class ECSSystemBridge: Node {
             entity.GetComponent<CTransform>().BasisX = node.GlobalTransform.Basis.X;
             entity.GetComponent<CTransform>().BasisY = node.GlobalTransform.Basis.Y;
             entity.GetComponent<CTransform>().BasisZ = node.GlobalTransform.Basis.Z;
+            if (node is CharacterBody3D body3D && entity.HasComponent<CPhysicsStatus>()) {
+                entity.GetComponent<CPhysicsStatus>().Jumping = !body3D.IsOnFloor();
+            }
         }
 
         _systemRoot.Update(new UpdateTick((float)delta, (float)((double)Time.GetTicksMsec() / 1000)));
@@ -78,27 +80,7 @@ public partial class ECSSystemBridge: Node {
         var commandBuffer = _world.GetCommandBuffer();
         _world.Query<CPhysicsVelocity>().AnyTags(Tags.Get<THasDirtData>()).ForEachEntity((ref CPhysicsVelocity velocity, Entity entity) => {
             if (_entityNodes.TryGetValue(entity, out var node)) {
-                if (node is not CharacterBody3D body3D) return;
-                var previousPosition = body3D.GlobalPosition;
-                body3D.Velocity = velocity.Velocity * (float)delta;
-                body3D.MoveAndSlide();
-                if (entity.HasComponent<CPhysicsStatus>()) {
-                    // 如果Y轴位置发生变化，说明是跳跃或下落
-                    var isJumping = Math.Abs(previousPosition.Y - body3D.GlobalPosition.Y) > 0.01f;
-                    entity.GetComponent<CPhysicsStatus>().Jumping = isJumping;
-                }
-                if (velocity.Rotation.X != 0) {
-                    body3D.RotateY(velocity.Rotation.X);
-                }
-
-                if (velocity.Rotation.Y != 0) {
-                    body3D.GetNode<Node3D>("head").RotateX(velocity.Rotation.Y);
-                }
-
-                if (entity.HasComponent<CPeer>()) {
-                    var peer = entity.GetComponent<CPeer>();
-                    PlayerManager.instance.UpdatePlayerPosition(peer.PeerId, body3D.GlobalPosition);
-                }
+                PlayerRenderUtil.SyncPlayerMoveStatus(node, entity, delta, ref velocity);
             }
 
             commandBuffer.RemoveTag<THasDirtData>(entity.Id);
@@ -111,25 +93,16 @@ public partial class ECSSystemBridge: Node {
         _world.OnEntityDelete -= WorldOnOnEntityDelete;
         _world.OnComponentAdded -= WorldOnOnComponentAdded;
         _world.OnComponentRemoved -= WorldOnOnComponentRemoved;
-        foreach (var pair in _entityNodes) {
-            var node = pair.Value;
-            GetTree().Root.RemoveChild(node);
+        foreach (var node in _entityNodes.Values) {
             if (node is CharacterBody3D player) {
+                PlayerManager.instance.DetachAnimationNode(player);
                 player.QueueFree();
             } else {
                 node.QueueFree();
             }
+            node.GetParent().RemoveChild(node);
         }
         _entityNodes.Clear();
-    }
-
-    /// <summary>
-    /// add or remove node by entity components.
-    /// </summary>
-    /// <param name="node">godot node instance</param>
-    /// <param name="entity">ecs entity reference</param>
-    private void UpdateNodeByComponents(Node node, Entity entity) {
-        // TODO change component
     }
     
     private void CreateNodeByComponents(Entity entity) {
@@ -137,28 +110,15 @@ public partial class ECSSystemBridge: Node {
             var renderType = entity.GetComponent<CRenderType>();
             switch (renderType.Type) {
                 case ERenderType.MainPlayer: {
-                    var player = _playerPrototype.Instantiate<CharacterBody3D>();
-                    player.Name = $"Player_{entity.Id}";
-                    GetTree().Root.AddChild(player);
-                    _entityNodes[entity] = player;
-                    entity.GetComponent<CPhysicsVelocity>().Rid = player.GetRid();
-                    var spaceState = player.GetWorld3D().DirectSpaceState;
-                    entity.GetComponent<CCamera>().SpaceState = spaceState;
-                    var camera = player.GetNode<Camera3D>("head/eyes");
-                    entity.GetComponent<CCamera>().Camera = camera;
-                    camera.Current = true;
-                    player.GlobalPosition = new Vector3(0, 3, 0);
+                    PlayerRenderUtil.CreatePlayer(true, entity, _playerPrototype, GetParent(), _entityNodes);
                     break;
                 }
                 case ERenderType.Player: {
-                    var player = _playerPrototype.Instantiate<CharacterBody3D>();
-                    player.Name = $"Player_{entity.Id}";
-                    var camera = player.GetNode<Camera3D>("head/eyes");
-                    player.GetNode<Node3D>("head").RemoveChild(camera);
-                    GetTree().Root.AddChild(player);
-                    _entityNodes[entity] = player;
+                    PlayerRenderUtil.CreatePlayer(false, entity, _playerPrototype, GetParent(), _entityNodes);
                     break;
                 }
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }
@@ -169,16 +129,17 @@ public partial class ECSSystemBridge: Node {
     private void WorldOnOnComponentRemoved(ComponentChanged obj) {
         if (!_entityNodes.TryGetValue(obj.Entity, out var node)) return;
         if (!obj.Entity.HasComponent<CRenderType>()) {
-            GetTree().Root.RemoveChild(node);
             if (node is CharacterBody3D player) {
+                PlayerManager.instance.DetachAnimationNode(player);
                 player.QueueFree();
             } else {
                 node.QueueFree();
             }
+            node.GetParent().RemoveChild(node);
             _entityNodes.Remove(obj.Entity);
             return;
         }
-        UpdateNodeByComponents(node, obj.Entity);
+        PlayerRenderUtil.UpdatePlayer(obj.Entity, node);
     }
 
     /// <summary>
@@ -187,7 +148,7 @@ public partial class ECSSystemBridge: Node {
     private void WorldOnOnComponentAdded(ComponentChanged obj) {
         if (!obj.Entity.HasComponent<CRenderType>()) return;
         if (_entityNodes.TryGetValue(obj.Entity, out var node)) {
-            UpdateNodeByComponents(node, obj.Entity);
+            PlayerRenderUtil.UpdatePlayer(obj.Entity, node);
         } else {
             CreateNodeByComponents(obj.Entity);
         }
@@ -198,12 +159,13 @@ public partial class ECSSystemBridge: Node {
     /// </summary>
     private void WorldOnOnEntityDelete(EntityDelete obj) {
         if (!_entityNodes.TryGetValue(obj.Entity, out var node)) return;
-        GetTree().Root.RemoveChild(node);
         if (node is CharacterBody3D player) {
+            PlayerManager.instance.DetachAnimationNode(player);
             player.QueueFree();
         } else {
             node.QueueFree();
         }
+        node.GetParent().RemoveChild(node);
         _entityNodes.Remove(obj.Entity);
     }
 

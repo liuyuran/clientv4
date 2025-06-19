@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using game.scripts.config;
 using game.scripts.manager;
+using game.scripts.manager.player;
 using game.scripts.utils;
 using Godot.Collections;
 
@@ -12,31 +13,31 @@ namespace game.scripts.renderer;
 /// <summary>
 /// chunk manage node but only include block data
 /// </summary>
-public partial class WorldRender : Node3D {
-    private readonly System.Collections.Generic.Dictionary<(ulong, Vector3I), ChunkRenderItem> _loadedChunks = new();
-
-    private IEnumerable<(ulong, Vector3I)> GetLoadedChunkCoordinates() {
+public partial class WorldRender(ulong worldId): Node3D {
+    private ulong _worldId = worldId;
+    private readonly System.Collections.Generic.Dictionary<Vector3I, ChunkRenderItem> _loadedChunks = new();
+    
+    private IEnumerable<Vector3I> GetLoadedChunkCoordinates() {
         return _loadedChunks.Keys;
     }
 
-    private static IEnumerable<(ulong, Vector3I)> GetRequiredChunkCoordinates(ulong worldId, Vector3 playerPosition) {
+    private IEnumerable<Vector3I> GetRequiredChunkCoordinates(Vector3 playerPosition) {
         var centerChunk = playerPosition.ToChunkPosition();
         for (var x = centerChunk.X - Config.ChunkRenderDistance; x <= centerChunk.X + Config.ChunkRenderDistance; x++)
         for (var y = centerChunk.Y - Config.ChunkRenderDistance; y <= centerChunk.Y + Config.ChunkRenderDistance; y++)
         for (var z = centerChunk.Z - Config.ChunkRenderDistance; z <= centerChunk.Z + Config.ChunkRenderDistance; z++)
-            yield return (worldId, new Vector3I(x, y, z));
+            yield return new Vector3I(x, y, z);
     }
 
     public override void _Ready() {
-        ResourcePackManager.instance.ScanResourcePacks();
-        MaterialManager.instance.GenerateMaterials();
         MapManager.instance.OnBlockChanged += OnInstanceOnOnBlockChanged;
     }
 
     private void OnInstanceOnOnBlockChanged(ulong worldId, Vector3 position, ulong blockId, Direction direction) {
+        if (worldId != _worldId) return;
         var chunkCoord = position.ToChunkPosition();
         var localPosition = position.ToLocalPosition();
-        if (_loadedChunks.TryGetValue((worldId, chunkCoord), out var chunk)) {
+        if (_loadedChunks.TryGetValue(chunkCoord, out var chunk)) {
             chunk.Rpc(ChunkRenderItem.MethodName.SetBlock, localPosition, blockId, (int) direction);
         }
     }
@@ -53,13 +54,13 @@ public partial class WorldRender : Node3D {
     public override void _Process(double delta) {
         var loadedChunks = GetLoadedChunkCoordinates().ToHashSet();
         // query local player
-        var requiredChunks = new HashSet<(ulong, Vector3I)>();
+        var requiredChunks = new HashSet<Vector3I>();
         // if master client or dedicated server, load all player's chunk
         if (PlatformUtil.isNetworkMaster) {
             var players = PlayerManager.instance.GetAllPlayers();
             foreach (var playerInfo in players) {
                 var position = PlayerManager.instance.GetPlayerPosition(playerInfo.peerId);
-                using var iter = GetRequiredChunkCoordinates(playerInfo.worldId, position).GetEnumerator();
+                using var iter = GetRequiredChunkCoordinates(position).GetEnumerator();
                 while (iter.MoveNext()) {
                     var chunkCoord = iter.Current;
                     requiredChunks.Add(chunkCoord);
@@ -71,7 +72,7 @@ public partial class WorldRender : Node3D {
             foreach (var playerInfo in players) {
                 if (playerInfo.peerId != currentPeerId) continue; // only load current player
                 var position = PlayerManager.instance.GetPlayerPosition(playerInfo.peerId);
-                using var iter = GetRequiredChunkCoordinates(playerInfo.worldId, position).GetEnumerator();
+                using var iter = GetRequiredChunkCoordinates(position).GetEnumerator();
                 while (iter.MoveNext()) {
                     var chunkCoord = iter.Current;
                     requiredChunks.Add(chunkCoord);
@@ -80,18 +81,22 @@ public partial class WorldRender : Node3D {
         }
 
         // load can be load, if not data, wait next tick
+        var createCount = 0;
         foreach (var chunkCoord in requiredChunks.Except(loadedChunks)) {
             var chunk = new ChunkRenderItem();
-            var data = GetBlockData(chunkCoord.Item1, chunkCoord.Item2);
+            var data = GetBlockData(_worldId, chunkCoord);
             if (data == null) continue;
-            chunk.InitData(chunkCoord.Item2, data);
+            chunk.InitData(chunkCoord, data);
             AddChild(chunk);
             chunk.Position = new Vector3(
-                chunkCoord.Item2.X * Config.ChunkSize,
-                chunkCoord.Item2.Y * Config.ChunkSize,
-                chunkCoord.Item2.Z * Config.ChunkSize
+                chunkCoord.X * Config.ChunkSize,
+                chunkCoord.Y * Config.ChunkSize,
+                chunkCoord.Z * Config.ChunkSize
             );
             _loadedChunks[chunkCoord] = chunk;
+            // don't create too many chunks in one frame
+            createCount++;
+            if (createCount > 1) break;
         }
 
         // unload chunks that are no longer required
@@ -99,7 +104,7 @@ public partial class WorldRender : Node3D {
             if (!_loadedChunks.TryGetValue(chunkCoord, out var chunk)) continue;
             chunk.QueueFree();
             _loadedChunks.Remove(chunkCoord);
-            if (PlatformUtil.isNetworkMaster) PlayerManager.instance.UnmarkChunkSentForAllPlayers(chunkCoord.Item1, chunkCoord.Item2);
+            if (PlatformUtil.isNetworkMaster) PlayerManager.instance.UnmarkChunkSentForAllPlayers(_worldId, chunkCoord);
         }
 
         // if not network master, don't send data. GodotObject's performance is not good

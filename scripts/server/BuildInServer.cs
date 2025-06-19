@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using game.scripts.manager;
+using game.scripts.manager.player;
 using game.scripts.utils;
 using Godot;
 

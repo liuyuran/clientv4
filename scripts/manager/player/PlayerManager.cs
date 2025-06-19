@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Godot;
 
-namespace game.scripts.manager;
+namespace game.scripts.manager.player;
 
-public class PlayerManager {
+public partial class PlayerManager {
     public static PlayerManager instance { get; private set; } = new();
     
     private readonly Dictionary<long, PlayerInfo> _playersByPeerId = new();

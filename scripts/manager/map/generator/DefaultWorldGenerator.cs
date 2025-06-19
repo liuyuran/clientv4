@@ -1,4 +1,5 @@
 ﻿using game.scripts.config;
+using game.scripts.manager.blocks;
 using game.scripts.renderer;
 using game.scripts.utils;
 using Godot;
@@ -15,6 +16,8 @@ public class DefaultWorldGenerator: IWorldGenerator {
     }
 
     public BlockData[][][] GenerateTerrain(Vector3I position) {
+        var dirtId = BlockManager.instance.GetBlockId<Dirt>();
+        var waterId = BlockManager.instance.GetBlockId<Water>();
         var data =  new BlockData[Config.ChunkSize][][];
         switch (position.Y) {
             case > 0: {
@@ -40,7 +43,7 @@ public class DefaultWorldGenerator: IWorldGenerator {
                         data[x][y] = new BlockData[Config.ChunkSize];
                         for (var z = 0; z < Config.ChunkSize; z++) {
                             data[x][y][z] = new BlockData {
-                                BlockId = (ulong)(y <= 0 ? 1 : 0),
+                                BlockId = y <= 0 ? waterId : 0,
                                 Direction = Direction.None
                             };
                         }
@@ -56,7 +59,7 @@ public class DefaultWorldGenerator: IWorldGenerator {
                         data[x][y] = new BlockData[Config.ChunkSize];
                         for (var z = 0; z < Config.ChunkSize; z++) {
                             data[x][y][z] = new BlockData {
-                                BlockId = 1,
+                                BlockId = dirtId,
                                 Direction = Direction.None
                             };
                         }

@@ -1,0 +1,10 @@
+﻿using game.scripts.manager.blocks.util;
+
+namespace game.scripts.manager.blocks;
+
+public class Water: Block {
+    public override string name => "Water";
+    public override string texturePath => "core:/texture/block/sample.png";
+    public override EBlockType blockType => EBlockType.Liquid;
+    public override bool transparent => true;
+}
