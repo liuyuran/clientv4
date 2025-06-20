@@ -56,6 +56,10 @@ public class ResourcePackManager {
                 .ToList();
         }
     }
+    
+    public ResourcePackInfo[] GetAllResourcePacks() {
+        return _resourcePackPaths.Values.SelectMany(p => p).OrderByDescending(info => info.priority).ToArray();
+    }
 
     public string GetFileAbsolutePath(string uri) {
         var parts = uri.Split(":/", 2);
@@ -87,7 +91,7 @@ public class ResourcePackManager {
         public string description { get; init; }
     }
     
-    private class ResourcePackInfo {
+    public class ResourcePackInfo {
         public string displayName { get; init; }
         public string name { get; init; }
         public ulong priority { get; init; }

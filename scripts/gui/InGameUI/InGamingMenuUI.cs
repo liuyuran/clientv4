@@ -13,7 +13,7 @@ public partial class InGamingUI {
     
     private void InitializeMenu() {
         _tween = GetTree().CreateTween();
-        AddMenuItem(Tr("inventory"), ShowInventory);
+        AddMenuItem(Tr("inventory", "menu"), ShowInventory);
     }
 
     private void SwitchMenu() {

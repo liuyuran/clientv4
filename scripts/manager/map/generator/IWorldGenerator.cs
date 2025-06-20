@@ -5,6 +5,8 @@ namespace game.scripts.manager.map.generator;
 
 public interface IWorldGenerator {
     void SetSeed(long seed);
+
+    string GetName();
     
     /// <summary>
     /// generate terrain for the specified chunk position in the world.
