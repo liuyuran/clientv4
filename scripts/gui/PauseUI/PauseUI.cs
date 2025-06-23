@@ -1,0 +1,179 @@
+﻿using System.Collections.Generic;
+using game.scripts.manager;
+using Godot;
+
+namespace game.scripts.gui.PauseUI;
+
+/// <summary>
+/// a menu that is shown when the game is paused
+/// just like FF14, a horizontal menu with buttons to switch between different vertical menus
+/// </summary>
+public partial class PauseUI: Control {
+    private readonly List<Control> _menuGroups = [];
+    private ScrollContainer _scroll;
+    private short _currentGroupIndex;
+    private short _currentFocusButtonIndex;
+    
+    public override void _Ready() {
+        _scroll = GetParent<ScrollContainer>();
+        ReloadAllMenu();
+    }
+
+    public override void _Input(InputEvent @event) {
+        if (!Visible) return;
+        switch (@event) {
+            case InputEventMouseButton { ButtonIndex: MouseButton.WheelUp or MouseButton.WheelDown } mouseEvent: {
+                if (_currentGroupIndex >= 0 && _currentGroupIndex < _menuGroups.Count) {
+                    var currentGroup = _menuGroups[_currentGroupIndex];
+                    var scrollAmount = mouseEvent.ButtonIndex == MouseButton.WheelUp ? -1 : 1;
+                    var targetIndex = _currentFocusButtonIndex + scrollAmount;
+                    if (targetIndex < 0 || targetIndex >= currentGroup.GetChildCount()) {
+                        return;
+                    }
+                    SwitchMenuGroupFocusButton((short)targetIndex);
+                    GetViewport().SetInputAsHandled();
+                }
+
+                break;
+            }
+            // Gamepad button handling
+            case InputEventJoypadButton { Pressed: true } joypadEvent:
+                switch (joypadEvent.ButtonIndex) {
+                    case JoyButton.DpadLeft:
+                        SwitchMenuGroup((short)Mathf.Max(0, _currentGroupIndex - 1));
+                        GetViewport().SetInputAsHandled();
+                        break;
+                    case JoyButton.DpadRight:
+                        SwitchMenuGroup((short)Mathf.Min(_menuGroups.Count - 1, _currentGroupIndex + 1));
+                        GetViewport().SetInputAsHandled();
+                        break;
+                    case JoyButton.DpadUp:
+                        var upIndex = (short)Mathf.Max(0, _currentFocusButtonIndex - 1);
+                        SwitchMenuGroupFocusButton(upIndex);
+                        GetViewport().SetInputAsHandled();
+                        break;
+                    case JoyButton.DpadDown:
+                        var currentGroup = _menuGroups[_currentGroupIndex];
+                        var downIndex = (short)Mathf.Min(currentGroup.GetChildCount() - 1, _currentFocusButtonIndex + 1);
+                        SwitchMenuGroupFocusButton(downIndex);
+                        GetViewport().SetInputAsHandled();
+                        break;
+                }
+
+                break;
+            // Analog stick handling
+            case InputEventJoypadMotion joypadMotion:
+                switch (joypadMotion.Axis) {
+                    // Horizontal analog stick for menu group switching
+                    case JoyAxis.LeftX when joypadMotion.AxisValue <= -0.5f:
+                        // Left
+                        SwitchMenuGroup((short)Mathf.Max(0, _currentGroupIndex - 1));
+                        GetViewport().SetInputAsHandled();
+                        break;
+                    case JoyAxis.LeftX: {
+                        if (joypadMotion.AxisValue >= 0.5f) {
+                            // Right
+                            SwitchMenuGroup((short)Mathf.Min(_menuGroups.Count - 1, _currentGroupIndex + 1));
+                            GetViewport().SetInputAsHandled();
+                        }
+
+                        break;
+                    }
+                    // Vertical analog stick for button navigation
+                    case JoyAxis.LeftY when joypadMotion.AxisValue <= -0.5f: {
+                        // Up
+                        var upIndex = (short)Mathf.Max(0, _currentFocusButtonIndex - 1);
+                        SwitchMenuGroupFocusButton(upIndex);
+                        GetViewport().SetInputAsHandled();
+                        break;
+                    }
+                    case JoyAxis.LeftY: {
+                        if (joypadMotion.AxisValue >= 0.5f) {
+                            // Down
+                            var currentGroup = _menuGroups[_currentGroupIndex];
+                            var downIndex = (short)Mathf.Min(currentGroup.GetChildCount() - 1, _currentFocusButtonIndex + 1);
+                            SwitchMenuGroupFocusButton(downIndex);
+                            GetViewport().SetInputAsHandled();
+                        }
+
+                        break;
+                    }
+                }
+
+                break;
+        }
+    }
+
+    private void ReloadAllMenu() {
+        foreach (var group in _menuGroups) {
+            RemoveChild(group);
+        }
+        _menuGroups.Clear();
+        var menu = MenuManager.instance.GetMenuGroups();
+        if (menu == null || menu.Length == 0) {
+            GD.PrintErr("No menu groups found.");
+            return;
+        }
+
+        for (short index = 0; index < menu.Length; index++) {
+            var group = menu[index];
+            LoadMenuGroup(group, index);
+        }
+    }
+
+    private void LoadMenuGroup(MenuManager.MenuItem[] menuItems, short index) {
+        var groupContainer = new VBoxContainer();
+        groupContainer.Name = "menuGroup-" + menuItems[0].Id;
+        groupContainer.Size = new Vector2(400, 100);
+        _menuGroups.Add(groupContainer);
+        foreach (var item in menuItems) {
+            LoadMenuItem(groupContainer, item);
+        }
+
+        groupContainer.MouseEntered += () => SwitchMenuGroup(index);
+    }
+
+    private void LoadMenuItem(Control parent, MenuManager.MenuItem menuItems) {
+        var menuButton = new Button();
+        parent.AddChild(menuButton);
+        menuButton.Name = "menuButton-" + menuItems.Id;
+        menuButton.Text = menuItems.Name;
+        menuButton.Size = new Vector2(350, 100);
+        menuButton.Pressed += menuItems.Action;
+    }
+
+    /// <summary>
+    /// switch to a menu group by index
+    /// can be active by mouse hover or L-left/L-right in gamepad
+    /// </summary>
+    /// <param name="index">group index</param>
+    private void SwitchMenuGroup(short index) {
+        if (_currentGroupIndex == index) return;
+        SwitchMenuGroupFocusButton(0);
+        _currentGroupIndex = index;
+
+        var targetScroll = 0;
+        
+        for (short i = 0; i < _menuGroups.Count; i++) {
+            var group = _menuGroups[i];
+            targetScroll += (int)group.GetRect().Size.X;
+        }
+
+        _scroll.ScrollHorizontal = targetScroll;
+        _currentFocusButtonIndex = 0;
+        SwitchMenuGroupFocusButton(_currentFocusButtonIndex);
+    }
+
+    /// <summary>
+    /// change the focus button of the current menu group
+    /// the focus button will show in the center of the menu vertical line
+    /// </summary>
+    /// <param name="index">menu button index</param>
+    private void SwitchMenuGroupFocusButton(short index) {
+        _currentFocusButtonIndex = index;
+        if (_currentGroupIndex < 0 || _currentGroupIndex >= _menuGroups.Count) return;
+        var currentGroup = _menuGroups[_currentGroupIndex];
+        if (index < 0 || index >= currentGroup.GetChildCount()) return;
+        currentGroup.Position = new Vector2(currentGroup.Position.X, -index * 100);
+    }
+}

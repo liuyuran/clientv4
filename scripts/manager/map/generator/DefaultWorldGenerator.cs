@@ -15,6 +15,10 @@ public class DefaultWorldGenerator: IWorldGenerator {
         _seed = seed;
     }
 
+    public string GetName() {
+        return TranslationServer.Translate("land", "world");
+    }
+
     public BlockData[][][] GenerateTerrain(Vector3I position) {
         var dirtId = BlockManager.instance.GetBlockId<Dirt>();
         var waterId = BlockManager.instance.GetBlockId<Water>();
