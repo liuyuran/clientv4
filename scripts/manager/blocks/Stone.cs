@@ -1,6 +1,6 @@
 ﻿namespace game.scripts.manager.blocks;
 
-public class Dirt: Block {
-    public override string name => "dirt";
+public class Stone: Block {
+    public override string name => "stone";
     public override string texturePath => "core:/texture/block/sample.png";
 }
