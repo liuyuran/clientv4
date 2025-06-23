@@ -10,7 +10,7 @@ namespace game.scripts.manager;
 
 public class LanguageManager {
     public static LanguageManager instance { get; private set; } = new();
-    
+
     private LanguageManager() {
         ReloadLanguageFiles();
     }
@@ -20,15 +20,37 @@ public class LanguageManager {
         foreach (var pack in allResourcePacks) {
             var languagePath = System.IO.Path.Combine(pack.path, "language");
             if (!DirAccess.DirExistsAbsolute(languagePath)) continue;
-            foreach (var file in DirAccess.GetFilesAt(languagePath)) {
-                if (file.EndsWith(".po") || file.EndsWith(".mo")) {
-                    var locale = System.IO.Path.GetFileNameWithoutExtension(file);
-                    AddTranslation(locale, System.IO.Path.Combine(languagePath, file));
-                }
+            // 如果存在相同文件名的两个翻译文件，优先使用mo文件
+            var moFiles = DirAccess.GetFilesAt(languagePath)
+                .Where(file => file.EndsWith(".mo"))
+                .ToList();
+            var moKeys = moFiles
+                .Select(System.IO.Path.GetFileNameWithoutExtension)
+                .ToHashSet();
+            var poFiles = DirAccess.GetFilesAt(languagePath)
+                .Where(file => {
+                    if (!file.EndsWith(".po")) return false;
+                    if (moKeys.Contains(System.IO.Path.GetFileNameWithoutExtension(file))) {
+                        return false;
+                    }
+
+                    return true;
+                })
+                .ToList();
+            // 先加载mo文件
+            foreach (var file in moFiles) {
+                var locale = System.IO.Path.GetFileNameWithoutExtension(file);
+                AddTranslation(locale, System.IO.Path.Combine(languagePath, file));
+            }
+
+            // 再加载po文件
+            foreach (var file in poFiles) {
+                var locale = System.IO.Path.GetFileNameWithoutExtension(file);
+                AddTranslation(locale, System.IO.Path.Combine(languagePath, file));
             }
         }
     }
-    
+
     private void AddTranslation(string locale, string path) {
         var extension = System.IO.Path.GetExtension(path);
         switch (extension) {
@@ -44,6 +66,7 @@ public class LanguageManager {
                     var value = key.Value;
                     translation.AddPluralMessage(translateKey.ID, value, translateKey.IDPlural);
                 }
+
                 TranslationServer.AddTranslation(translation);
                 break;
             }
@@ -59,6 +82,7 @@ public class LanguageManager {
                     var value = key.Value;
                     translation.AddPluralMessage(translateKey.ID, value, translateKey.IDPlural);
                 }
+
                 TranslationServer.AddTranslation(translation);
                 break;
             }
