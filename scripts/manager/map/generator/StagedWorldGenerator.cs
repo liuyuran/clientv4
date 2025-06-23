@@ -14,7 +14,9 @@ public abstract class StagedWorldGenerator: IWorldGenerator {
     public void SetSeed(long seed) {
         _noise.Seed = (int)seed;
     }
-    
+
+    public abstract string GetName();
+
     protected void AddStage(ITerrainGenerateStage stage) {
         _stages.Add(stage);
     }
