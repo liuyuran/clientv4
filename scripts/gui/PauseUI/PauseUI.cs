@@ -8,17 +8,15 @@ namespace game.scripts.gui.PauseUI;
 /// a menu that is shown when the game is paused
 /// just like FF14, a horizontal menu with buttons to switch between different vertical menus
 /// </summary>
-public partial class PauseUI: Control {
+public partial class PauseUI : Control {
     private readonly List<Control> _menuGroups = [];
     private ScrollContainer _scroll;
     private short _currentGroupIndex;
     private short _currentFocusButtonIndex;
-    
+
     public override void _Ready() {
         ProcessMode = ProcessModeEnum.Always;
         _scroll = GetParent<ScrollContainer>();
-        _scroll.VerticalScrollMode = ScrollContainer.ScrollMode.Disabled;
-        _scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.ShowNever;
         GetTree().Paused = true;
         ReloadAllMenu();
     }
@@ -27,88 +25,61 @@ public partial class PauseUI: Control {
         GetTree().Paused = false;
     }
 
-    public override void _Input(InputEvent @event) {
-        if (!Visible) return;
-        switch (@event) {
-            case InputEventMouseButton { ButtonIndex: MouseButton.WheelUp or MouseButton.WheelDown } mouseEvent: {
-                if (_currentGroupIndex >= 0 && _currentGroupIndex < _menuGroups.Count) {
-                    var currentGroup = _menuGroups[_currentGroupIndex];
-                    var scrollAmount = mouseEvent.ButtonIndex == MouseButton.WheelUp ? -1 : 1;
-                    var targetIndex = _currentFocusButtonIndex + scrollAmount;
-                    if (targetIndex < 0 || targetIndex >= currentGroup.GetChildCount()) {
-                        return;
-                    }
+    public override void _Process(double delta) {
+        if (Input.IsActionJustPressed("ui_scroll_up")) {
+            if (_currentGroupIndex >= 0 && _currentGroupIndex < _menuGroups.Count) {
+                var targetIndex = _currentFocusButtonIndex - 1;
+                if (targetIndex >= 0) {
                     SwitchMenuGroupFocusButton((short)targetIndex);
-                    GetViewport().SetInputAsHandled();
                 }
+            }
+        } else if (Input.IsActionJustPressed("ui_scroll_down")) {
+            if (_currentGroupIndex >= 0 && _currentGroupIndex < _menuGroups.Count) {
+                var currentGroup = _menuGroups[_currentGroupIndex];
+                var targetIndex = _currentFocusButtonIndex + 1;
+                if (targetIndex < currentGroup.GetChildCount()) {
+                    SwitchMenuGroupFocusButton((short)targetIndex);
+                }
+            }
+        }
 
+        if (Input.IsActionJustPressed("ui_left")) {
+            SwitchMenuGroup((short)Mathf.Max(0, _currentGroupIndex - 1));
+        } else if (Input.IsActionJustPressed("ui_right")) {
+            SwitchMenuGroup((short)Mathf.Min(_menuGroups.Count - 1, _currentGroupIndex + 1));
+        } else if (Input.IsActionJustPressed("ui_up")) {
+            var upIndex = (short)Mathf.Max(0, _currentFocusButtonIndex - 1);
+            SwitchMenuGroupFocusButton(upIndex);
+        } else if (Input.IsActionJustPressed("ui_down")) {
+            var currentGroup = _menuGroups[_currentGroupIndex];
+            var downIndex = (short)Mathf.Min(currentGroup.GetChildCount() - 1, _currentFocusButtonIndex + 1);
+            SwitchMenuGroupFocusButton(downIndex);
+        }
+
+        var leftX = Input.GetJoyAxis(0, JoyAxis.LeftX);
+        var leftY = Input.GetJoyAxis(0, JoyAxis.LeftY);
+
+        switch (leftX) {
+            case <= -0.5f:
+                SwitchMenuGroup((short)Mathf.Max(0, _currentGroupIndex - 1));
+                break;
+            case >= 0.5f:
+                SwitchMenuGroup((short)Mathf.Min(_menuGroups.Count - 1, _currentGroupIndex + 1));
+                break;
+        }
+
+        switch (leftY) {
+            case <= -0.5f: {
+                var upIndex = (short)Mathf.Max(0, _currentFocusButtonIndex - 1);
+                SwitchMenuGroupFocusButton(upIndex);
                 break;
             }
-            // Gamepad button handling
-            case InputEventJoypadButton { Pressed: true } joypadEvent:
-                switch (joypadEvent.ButtonIndex) {
-                    case JoyButton.DpadLeft:
-                        SwitchMenuGroup((short)Mathf.Max(0, _currentGroupIndex - 1));
-                        GetViewport().SetInputAsHandled();
-                        break;
-                    case JoyButton.DpadRight:
-                        SwitchMenuGroup((short)Mathf.Min(_menuGroups.Count - 1, _currentGroupIndex + 1));
-                        GetViewport().SetInputAsHandled();
-                        break;
-                    case JoyButton.DpadUp:
-                        var upIndex = (short)Mathf.Max(0, _currentFocusButtonIndex - 1);
-                        SwitchMenuGroupFocusButton(upIndex);
-                        GetViewport().SetInputAsHandled();
-                        break;
-                    case JoyButton.DpadDown:
-                        var currentGroup = _menuGroups[_currentGroupIndex];
-                        var downIndex = (short)Mathf.Min(currentGroup.GetChildCount() - 1, _currentFocusButtonIndex + 1);
-                        SwitchMenuGroupFocusButton(downIndex);
-                        GetViewport().SetInputAsHandled();
-                        break;
-                }
-
+            case >= 0.5f: {
+                var currentGroup = _menuGroups[_currentGroupIndex];
+                var downIndex = (short)Mathf.Min(currentGroup.GetChildCount() - 1, _currentFocusButtonIndex + 1);
+                SwitchMenuGroupFocusButton(downIndex);
                 break;
-            // Analog stick handling
-            case InputEventJoypadMotion joypadMotion:
-                switch (joypadMotion.Axis) {
-                    // Horizontal analog stick for menu group switching
-                    case JoyAxis.LeftX when joypadMotion.AxisValue <= -0.5f:
-                        // Left
-                        SwitchMenuGroup((short)Mathf.Max(0, _currentGroupIndex - 1));
-                        GetViewport().SetInputAsHandled();
-                        break;
-                    case JoyAxis.LeftX: {
-                        if (joypadMotion.AxisValue >= 0.5f) {
-                            // Right
-                            SwitchMenuGroup((short)Mathf.Min(_menuGroups.Count - 1, _currentGroupIndex + 1));
-                            GetViewport().SetInputAsHandled();
-                        }
-
-                        break;
-                    }
-                    // Vertical analog stick for button navigation
-                    case JoyAxis.LeftY when joypadMotion.AxisValue <= -0.5f: {
-                        // Up
-                        var upIndex = (short)Mathf.Max(0, _currentFocusButtonIndex - 1);
-                        SwitchMenuGroupFocusButton(upIndex);
-                        GetViewport().SetInputAsHandled();
-                        break;
-                    }
-                    case JoyAxis.LeftY: {
-                        if (joypadMotion.AxisValue >= 0.5f) {
-                            // Down
-                            var currentGroup = _menuGroups[_currentGroupIndex];
-                            var downIndex = (short)Mathf.Min(currentGroup.GetChildCount() - 1, _currentFocusButtonIndex + 1);
-                            SwitchMenuGroupFocusButton(downIndex);
-                            GetViewport().SetInputAsHandled();
-                        }
-
-                        break;
-                    }
-                }
-
-                break;
+            }
         }
     }
 
@@ -116,6 +87,7 @@ public partial class PauseUI: Control {
         foreach (var group in _menuGroups) {
             RemoveChild(group);
         }
+
         _menuGroups.Clear();
         var menu = MenuManager.instance.GetMenuGroups();
         if (menu == null || menu.Length == 0) {
@@ -162,7 +134,7 @@ public partial class PauseUI: Control {
         _currentGroupIndex = index;
 
         var targetScroll = 0;
-        
+
         for (short i = 0; i < _menuGroups.Count; i++) {
             var group = _menuGroups[i];
             targetScroll += (int)group.GetRect().Size.X;
