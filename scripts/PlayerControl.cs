@@ -22,11 +22,6 @@ public partial class PlayerControl(Entity inputHandler) : CharacterBody3D {
 			ForwardVector = InputManager.instance.GetLookVectorAndReset()
 		};
 
-		// Keyboard input
-		if (Input.IsActionPressed("ui_cancel")) { // Assuming Escape is mapped to ui_cancel
-			Input.MouseMode = Input.MouseModeEnum.Visible;
-		}
-
 		var moveVector = InputManager.instance.GetMoveVector();
 		currentFrameEvents.MoveForward = moveVector.Y < 0;
 		currentFrameEvents.MoveBackward = moveVector.Y > 0;

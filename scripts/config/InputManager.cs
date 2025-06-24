@@ -18,6 +18,7 @@ public class InputManager {
         RegistryKeyBind(InputKey.MoveRight, Key.D);
         RegistryKeyBind(InputKey.Jump, Key.Space);
         RegistryKeyBind(InputKey.Crouch, Key.Ctrl);
+        RegistryKeyBind(InputKey.SwitchPause, Key.Escape);
     }
     
     /// <summary>
