@@ -123,6 +123,7 @@ public partial class PauseUI: Control {
 
     private void LoadMenuGroup(MenuManager.MenuItem[] menuItems, short index) {
         var groupContainer = new VBoxContainer();
+        AddChild(groupContainer);
         groupContainer.Name = "menuGroup-" + menuItems[0].Id;
         groupContainer.Size = new Vector2(400, 100);
         _menuGroups.Add(groupContainer);

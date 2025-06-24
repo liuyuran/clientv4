@@ -71,7 +71,9 @@ public partial class WorldContainer: Control {
         viewportContainer.Name = $"ViewportContainer_{worldId}";
         var subViewport = viewportContainer.GetNode<SubViewport>("world");
         subViewport.Name = $"World_{worldId}";
-        subViewport.AddChild(new WorldRender(worldId));
+        var world = new WorldRender(worldId);
+        subViewport.AddChild(world);
+        world.InitRender();
         var light = new DirectionalLight3D();
         subViewport.AddChild(light);
         light.LightEnergy = 1.0f;

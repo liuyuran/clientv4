@@ -1,5 +1,6 @@
 ﻿namespace game.scripts.gui.InGameUI;
 
-public struct InGamingUIConfig {
+public struct InGamingUIStatus {
     public bool ShowDebugInfo;
+    public InGameUIFocus Focus;
 }
