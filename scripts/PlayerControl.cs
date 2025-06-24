@@ -11,6 +11,7 @@ public partial class PlayerControl(Entity inputHandler) : CharacterBody3D {
 
 	public override void _Ready() {
 		Input.MouseMode = Input.MouseModeEnum.Captured;
+		ProcessMode = ProcessModeEnum.Always;
 	}
 
 	public override void _Input(InputEvent @event) {
@@ -18,6 +19,18 @@ public partial class PlayerControl(Entity inputHandler) : CharacterBody3D {
 	}
 
 	public override void _Process(double delta) {
+		if (GetTree().Paused) {
+			Rpc(MethodName.UpdateInputEvent,
+				Vector3.Zero,
+				Vector3.Zero, 
+				false,
+				false,
+				Vector2.Zero
+			);
+			ProcessMode = ProcessModeEnum.Pausable;
+			return;
+		}
+		ProcessMode = ProcessModeEnum.Always;
 		var currentFrameEvents = new CInputEvent {
 			ForwardVector = InputManager.instance.GetLookVectorAndReset()
 		};

@@ -15,8 +15,16 @@ public partial class PauseUI: Control {
     private short _currentFocusButtonIndex;
     
     public override void _Ready() {
+        ProcessMode = ProcessModeEnum.Always;
         _scroll = GetParent<ScrollContainer>();
+        _scroll.VerticalScrollMode = ScrollContainer.ScrollMode.Disabled;
+        _scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.ShowNever;
+        GetTree().Paused = true;
         ReloadAllMenu();
+    }
+
+    public override void _ExitTree() {
+        GetTree().Paused = false;
     }
 
     public override void _Input(InputEvent @event) {
@@ -125,7 +133,7 @@ public partial class PauseUI: Control {
         var groupContainer = new VBoxContainer();
         AddChild(groupContainer);
         groupContainer.Name = "menuGroup-" + menuItems[0].Id;
-        groupContainer.Size = new Vector2(400, 100);
+        groupContainer.CustomMinimumSize = new Vector2(200, 100);
         _menuGroups.Add(groupContainer);
         foreach (var item in menuItems) {
             LoadMenuItem(groupContainer, item);
@@ -139,7 +147,7 @@ public partial class PauseUI: Control {
         parent.AddChild(menuButton);
         menuButton.Name = "menuButton-" + menuItems.Id;
         menuButton.Text = menuItems.Name;
-        menuButton.Size = new Vector2(350, 100);
+        menuButton.CustomMinimumSize = new Vector2(150, 100);
         menuButton.Pressed += menuItems.Action;
     }
 

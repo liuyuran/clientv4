@@ -10,8 +10,11 @@ public partial class InGamingUI: CanvasLayer {
 	[Export] public PackedScene PauseUI;
 	[Export] public PackedScene MenusUI;
 	private InGamingUIStatus _status;
+	private ulong _lastPauseTime;
+	private Control _pauseUI;
 		
 	public override void _Ready() {
+		ProcessMode = ProcessModeEnum.Always;
 		_status.Focus = InGameUIFocus.Game;
 		OpenPlayingUI();
 		MenuManager.instance.AddMenuGroup("player", 1);
@@ -28,8 +31,10 @@ public partial class InGamingUI: CanvasLayer {
 		switch (_status.Focus) {
 			case InGameUIFocus.Game:
 				UpdatePlayingUI(delta);
+				TryOpenPauseUI();
 				break;
 			case InGameUIFocus.Pause:
+				TryClosePauseUI();
 				break;
 			default:
 				throw new ArgumentOutOfRangeException();
@@ -40,34 +45,37 @@ public partial class InGamingUI: CanvasLayer {
 		switch (_status.Focus) {
 			case InGameUIFocus.Game:
 				HandleInputOnPlayerUI(@event);
-				TryOpenPauseUI(@event);
 				break;
 			case InGameUIFocus.Pause:
-				TryClosePauseUI(@event);
 				break;
 			default:
 				throw new ArgumentOutOfRangeException();
 		}
 	}
 	
-	private void TryOpenPauseUI(InputEvent @event) {
+	private void TryOpenPauseUI() {
 		if (_status.Focus == InGameUIFocus.Pause) {
 			return;
 		}
-		if (InputManager.instance.IsKeyPressed(@event, InputKey.SwitchPause)) {
+		if (InputManager.instance.IsKeyPressed(InputKey.SwitchPause) && _pauseUI == null && Time.GetTicksMsec() - _lastPauseTime > 500) {
 			Input.MouseMode = Input.MouseModeEnum.Visible;
-			AddChild(PauseUI.Instantiate<Control>());
+			_pauseUI = PauseUI.Instantiate<Control>();
+			AddChild(_pauseUI);
+			_status.Focus = InGameUIFocus.Pause;
+			_lastPauseTime = Time.GetTicksMsec();
 		}
 	}
 	
-	private void TryClosePauseUI(InputEvent @event) {
+	private void TryClosePauseUI() {
 		if (_status.Focus != InGameUIFocus.Pause) {
 			return;
 		}
-		if (InputManager.instance.IsKeyPressed(@event, InputKey.SwitchPause)) {
+		if (InputManager.instance.IsKeyPressed(InputKey.SwitchPause) && _pauseUI != null && Time.GetTicksMsec() - _lastPauseTime > 500) {
 			Input.MouseMode = Input.MouseModeEnum.Captured;
-			GetTree().Root.RemoveChild(this);
+			RemoveChild(_pauseUI);
+			_pauseUI = null;
 			_status.Focus = InGameUIFocus.Game;
+			_lastPauseTime = Time.GetTicksMsec();
 		}
 	}
 }
