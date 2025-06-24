@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://cr33ml8wxb1to"]
+[gd_scene load_steps=2 format=3 uid="uid://cr33ml8wxb1to"]
+
+[ext_resource type="Script" uid="uid://bpx4b45scy0oy" path="res://scripts/gui/PauseUI/PauseUI.cs" id="1_hctvy"]
 
 [node name="PauseUI" type="Control"]
 layout_mode = 3
@@ -7,3 +9,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+script = ExtResource("1_hctvy")
