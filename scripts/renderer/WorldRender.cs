@@ -167,4 +167,14 @@ public partial class WorldRender(ulong worldId): Node3D {
 
         MapManager.instance.OverwriteBlockData(worldId, chunkPosition, data);
     }
+
+    public void InitRender() {
+        for (var x = 0; x < Config.ChunkSize; x++) {
+            for (var y = 0; y < Config.ChunkSize; y++) {
+                for (var z = 0; z < Config.ChunkSize; z++) {
+                    _Process(0);
+                }
+            }
+        }
+    }
 }

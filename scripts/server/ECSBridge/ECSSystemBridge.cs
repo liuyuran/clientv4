@@ -50,6 +50,7 @@ public partial class ECSSystemBridge: Node {
                 MapManager.instance.SetBlock(signal.Event.WorldId, signal.Event.Position, signal.Event.BlockId, signal.Event.Direction);
             });
             GetTree().Root.AddChild(new PlayerControl(inputHandler));
+            return;
         }
 
         // 先往ECS同步一遍位置和旋转信息
