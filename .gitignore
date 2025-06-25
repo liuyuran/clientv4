@@ -1,5 +1,5 @@
-# Godot 4+ specific ignores
-.godot/
-/android/
-
-*.user
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/

@@ -1,19 +1,39 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clientv4", "Clientv4.csproj", "{14164C20-9E77-4748-B231-0EE9351C7379}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{739CD947-A779-4236-BA92-B84BD941B6FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clientv4", "src\clientv4\Clientv4.csproj", "{0CB3BA50-91F1-4A19-8024-4CA9FB967A59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModLoader", "src\ModLoader\ModLoader.csproj", "{2B2F46EA-3990-4FD9-9AED-C401B6CF58CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8069577A-A70E-48A8-A4D2-A70CD179F7CB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mods", "mods", "{CC3E7CED-1B78-4FBD-B9E6-33323AFF92A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "mods\Core\Core.csproj", "{40D94DFB-2F2F-4C7C-A847-682B40543DE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-	Debug|Any CPU = Debug|Any CPU
-	ExportDebug|Any CPU = ExportDebug|Any CPU
-	ExportRelease|Any CPU = ExportRelease|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0CB3BA50-91F1-4A19-8024-4CA9FB967A59} = {739CD947-A779-4236-BA92-B84BD941B6FD}
+		{2B2F46EA-3990-4FD9-9AED-C401B6CF58CE} = {739CD947-A779-4236-BA92-B84BD941B6FD}
+		{40D94DFB-2F2F-4C7C-A847-682B40543DE3} = {CC3E7CED-1B78-4FBD-B9E6-33323AFF92A0}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{14164C20-9E77-4748-B231-0EE9351C7379}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{14164C20-9E77-4748-B231-0EE9351C7379}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{14164C20-9E77-4748-B231-0EE9351C7379}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
-		{14164C20-9E77-4748-B231-0EE9351C7379}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
-		{14164C20-9E77-4748-B231-0EE9351C7379}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
-		{14164C20-9E77-4748-B231-0EE9351C7379}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{0CB3BA50-91F1-4A19-8024-4CA9FB967A59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CB3BA50-91F1-4A19-8024-4CA9FB967A59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CB3BA50-91F1-4A19-8024-4CA9FB967A59}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CB3BA50-91F1-4A19-8024-4CA9FB967A59}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{2B2F46EA-3990-4FD9-9AED-C401B6CF58CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B2F46EA-3990-4FD9-9AED-C401B6CF58CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B2F46EA-3990-4FD9-9AED-C401B6CF58CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B2F46EA-3990-4FD9-9AED-C401B6CF58CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40D94DFB-2F2F-4C7C-A847-682B40543DE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40D94DFB-2F2F-4C7C-A847-682B40543DE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40D94DFB-2F2F-4C7C-A847-682B40543DE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40D94DFB-2F2F-4C7C-A847-682B40543DE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

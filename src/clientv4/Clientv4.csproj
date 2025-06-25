@@ -10,4 +10,7 @@
     <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
     <PackageReference Include="SecondLanguage" Version="1.0.4" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModLoader\ModLoader.csproj" />
+  </ItemGroup>
 </Project>
