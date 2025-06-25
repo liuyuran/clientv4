@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using Godot;
+using Tomlyn;
 using FileAccess = Godot.FileAccess;
 
 namespace game.scripts.manager;
@@ -26,13 +27,13 @@ public class ResourcePackManager {
         if (!DirAccess.DirExistsAbsolute(resourcePackPath)) return;
         
         foreach (var directory in DirAccess.GetDirectoriesAt(resourcePackPath)) {
-            var metaPath = Path.Combine(resourcePackPath, directory, "meta.json");
+            var metaPath = Path.Combine(resourcePackPath, directory, "meta.toml");
             if (!FileAccess.FileExists(metaPath)) continue;
             
             try {
                 var metaContent = FileAccess.GetFileAsBytes(metaPath);
-                var metadata = JsonSerializer.Deserialize<ResourcePackMeta>(metaContent);
-                if (metadata?.name != null) {
+                var metadata = Toml.ToModel<ResourcePackMeta>(metaContent.GetStringFromUtf8()[1..]);
+                if (metadata.name != null) {
                     if (!_resourcePackPaths.ContainsKey(metadata.name)) {
                         _resourcePackPaths[metadata.name] = [];
                     }
