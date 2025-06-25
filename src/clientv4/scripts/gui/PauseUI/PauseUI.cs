@@ -167,17 +167,17 @@ public partial class PauseUI : Control {
     /// <param name="index">group index</param>
     /// <param name="ignoreCooldown">ignore input cool down</param>
     private void SwitchMenuGroup(short index, bool ignoreCooldown = false) {
-        if (Time.GetTicksMsec() - _lastSwitchTime < 500 && !ignoreCooldown) return;
+        if (Time.GetTicksMsec() - _lastSwitchTime < 200 && !ignoreCooldown) return;
         _lastSwitchTime = Time.GetTicksMsec();
         if (_currentGroupIndex == index) return;
         if (_currentGroupIndex > 0) {
-            _menuGroups[_currentGroupIndex].Position = Vector2.Zero;
+            _menuGroups[_currentGroupIndex].Position = new Vector2(_menuGroups[_currentGroupIndex].Position.X, 0);
         }
         _currentGroupIndex = index;
         var totalWidth = ButtonWidth * _menuGroups.Count + ButtonSpacing * (_menuGroups.Count - 1);
         Size = new Vector2(totalWidth, ButtonHeight);
         var initX = Mathf.Max((_parent.Size.X - totalWidth) / 2, _parent.Size.X * 0.01);
-        var minX = initX - index * (ButtonWidth + ButtonSpacing);
+        var minX = Mathf.Min(initX, _parent.Size.X * 0.99 - totalWidth);//initX - index * (ButtonWidth + ButtonSpacing);
         var target = Vector2.Zero;
         target.X = Mathf.Clamp(initX - index * (ButtonWidth + totalWidth), minX, initX);
         target.Y = (_parent.Size.Y - ButtonHeight) / 2;
@@ -192,7 +192,7 @@ public partial class PauseUI : Control {
     /// <param name="index">menu button index</param>
     /// <param name="ignoreCooldown">ignore input cool down</param>
     private void SwitchMenuGroupFocusButton(short index, bool ignoreCooldown = false) {
-        if (Time.GetTicksMsec() - _lastSwitchTime < 500 && !ignoreCooldown) return;
+        if (Time.GetTicksMsec() - _lastSwitchTime < 200 && !ignoreCooldown) return;
         _lastSwitchTime = Time.GetTicksMsec();
         if (_currentFocusButtonIndex == index) return;
         _currentFocusButtonIndex = index;
