@@ -10,6 +10,10 @@ public class InputKey {
     public const string SwitchPause = "switch_pause";
     public const string SwitchMenu = "switch_menu";
     public const string SwitchDebugInfo = "switch_debug_info";
-    public const string ScrollUp = "scroll_up";
-    public const string ScrollDown = "scroll_down";
+    public const string UIScrollUp = "ui_scroll_up";
+    public const string UIScrollDown = "ui_scroll_down";
+    public const string UILeft = "ui_left";
+    public const string UIRight = "ui_right";
+    public const string UIUp = "ui_up";
+    public const string UIDown = "ui_down";
 }

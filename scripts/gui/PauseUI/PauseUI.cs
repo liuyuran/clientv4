@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using game.scripts.config;
 using game.scripts.manager;
 using Godot;
 
@@ -10,15 +11,25 @@ namespace game.scripts.gui.PauseUI;
 /// </summary>
 public partial class PauseUI : Control {
     private readonly List<Control> _menuGroups = [];
-    private ScrollContainer _scroll;
-    private short _currentGroupIndex;
-    private short _currentFocusButtonIndex;
+    private Control _parent;
+    private short _currentGroupIndex = -1;
+    private short _currentFocusButtonIndex = -1;
+    private const int ButtonWidth = 150;
+    private const int ButtonHeight = 20;
+    private const int ButtonSpacing = 5;
+    private ulong _lastSwitchTime;
 
     public override void _Ready() {
         ProcessMode = ProcessModeEnum.Always;
-        _scroll = GetParent<ScrollContainer>();
+        _parent = GetParent<Control>();
         GetTree().Paused = true;
         ReloadAllMenu();
+        GetTree().Root.SizeChanged += OnRootOnSizeChanged;
+    }
+
+    private void OnRootOnSizeChanged() {
+        SwitchMenuGroup(_currentGroupIndex, true);
+        SwitchMenuGroupFocusButton(_currentFocusButtonIndex, true);
     }
 
     public override void _ExitTree() {
@@ -26,14 +37,14 @@ public partial class PauseUI : Control {
     }
 
     public override void _Process(double delta) {
-        if (Input.IsActionJustPressed("ui_scroll_up")) {
+        if (InputManager.instance.IsKeyPressed(InputKey.UIScrollUp)) {
             if (_currentGroupIndex >= 0 && _currentGroupIndex < _menuGroups.Count) {
                 var targetIndex = _currentFocusButtonIndex - 1;
                 if (targetIndex >= 0) {
                     SwitchMenuGroupFocusButton((short)targetIndex);
                 }
             }
-        } else if (Input.IsActionJustPressed("ui_scroll_down")) {
+        } else if (InputManager.instance.IsKeyPressed(InputKey.UIScrollDown)) {
             if (_currentGroupIndex >= 0 && _currentGroupIndex < _menuGroups.Count) {
                 var currentGroup = _menuGroups[_currentGroupIndex];
                 var targetIndex = _currentFocusButtonIndex + 1;
@@ -43,21 +54,20 @@ public partial class PauseUI : Control {
             }
         }
 
-        if (Input.IsActionJustPressed("ui_left")) {
+        if (InputManager.instance.IsKeyPressed(InputKey.UILeft)) {
             SwitchMenuGroup((short)Mathf.Max(0, _currentGroupIndex - 1));
-        } else if (Input.IsActionJustPressed("ui_right")) {
+        } else if (InputManager.instance.IsKeyPressed(InputKey.UIRight)) {
             SwitchMenuGroup((short)Mathf.Min(_menuGroups.Count - 1, _currentGroupIndex + 1));
-        } else if (Input.IsActionJustPressed("ui_up")) {
+        } else if (InputManager.instance.IsKeyPressed(InputKey.UIUp)) {
             var upIndex = (short)Mathf.Max(0, _currentFocusButtonIndex - 1);
             SwitchMenuGroupFocusButton(upIndex);
-        } else if (Input.IsActionJustPressed("ui_down")) {
+        } else if (InputManager.instance.IsKeyPressed(InputKey.UIDown)) {
             var currentGroup = _menuGroups[_currentGroupIndex];
             var downIndex = (short)Mathf.Min(currentGroup.GetChildCount() - 1, _currentFocusButtonIndex + 1);
             SwitchMenuGroupFocusButton(downIndex);
         }
 
-        var leftX = Input.GetJoyAxis(0, JoyAxis.LeftX);
-        var leftY = Input.GetJoyAxis(0, JoyAxis.LeftY);
+        var (leftX, leftY) = InputManager.instance.GetRightStickVector();
 
         switch (leftX) {
             case <= -0.5f:
@@ -97,21 +107,25 @@ public partial class PauseUI : Control {
 
         for (short index = 0; index < menu.Length; index++) {
             var group = menu[index];
-            LoadMenuGroup(group, index);
+            LoadMenuGroup(group);
         }
+
+        SwitchMenuGroup(0);
+        SwitchMenuGroupFocusButton(0);
     }
 
-    private void LoadMenuGroup(MenuManager.MenuItem[] menuItems, short index) {
+    private void LoadMenuGroup(MenuManager.MenuItem[] menuItems) {
         var groupContainer = new VBoxContainer();
         AddChild(groupContainer);
         groupContainer.Name = "menuGroup-" + menuItems[0].Id;
-        groupContainer.CustomMinimumSize = new Vector2(200, 100);
+        groupContainer.CustomMinimumSize = new Vector2(0, ButtonHeight);
         _menuGroups.Add(groupContainer);
         foreach (var item in menuItems) {
             LoadMenuItem(groupContainer, item);
         }
-
-        groupContainer.MouseEntered += () => SwitchMenuGroup(index);
+        var margin = new VBoxContainer();
+        AddChild(margin);
+        margin.CustomMinimumSize = new Vector2(ButtonSpacing, ButtonHeight);
     }
 
     private void LoadMenuItem(Control parent, MenuManager.MenuItem menuItems) {
@@ -119,7 +133,7 @@ public partial class PauseUI : Control {
         parent.AddChild(menuButton);
         menuButton.Name = "menuButton-" + menuItems.Id;
         menuButton.Text = menuItems.Name;
-        menuButton.CustomMinimumSize = new Vector2(150, 100);
+        menuButton.CustomMinimumSize = new Vector2(ButtonWidth, ButtonHeight);
         menuButton.Pressed += menuItems.Action;
     }
 
@@ -128,21 +142,21 @@ public partial class PauseUI : Control {
     /// can be active by mouse hover or L-left/L-right in gamepad
     /// </summary>
     /// <param name="index">group index</param>
-    private void SwitchMenuGroup(short index) {
+    /// <param name="ignoreCooldown">ignore input cool down</param>
+    private void SwitchMenuGroup(short index, bool ignoreCooldown = false) {
+        if (Time.GetTicksMsec() - _lastSwitchTime < 500 && !ignoreCooldown) return;
+        _lastSwitchTime = Time.GetTicksMsec();
         if (_currentGroupIndex == index) return;
-        SwitchMenuGroupFocusButton(0);
         _currentGroupIndex = index;
-
-        var targetScroll = 0;
-
-        for (short i = 0; i < _menuGroups.Count; i++) {
-            var group = _menuGroups[i];
-            targetScroll += (int)group.GetRect().Size.X;
-        }
-
-        _scroll.ScrollHorizontal = targetScroll;
-        _currentFocusButtonIndex = 0;
-        SwitchMenuGroupFocusButton(_currentFocusButtonIndex);
+        var totalWidth = ButtonWidth * _menuGroups.Count + ButtonSpacing * (_menuGroups.Count - 1);
+        Size = new Vector2(totalWidth, ButtonHeight);
+        var initX = Mathf.Max((_parent.Size.X - totalWidth) / 2, _parent.Size.X * 0.01);
+        var minX = initX - index * (ButtonWidth + ButtonSpacing);
+        var target = Vector2.Zero;
+        target.X = Mathf.Clamp(initX - index * (ButtonWidth + totalWidth), minX, initX);
+        target.Y = (_parent.Size.Y - ButtonHeight) / 2;
+        Position = target;
+        SwitchMenuGroupFocusButton(0, true);
     }
 
     /// <summary>
@@ -150,11 +164,15 @@ public partial class PauseUI : Control {
     /// the focus button will show in the center of the menu vertical line
     /// </summary>
     /// <param name="index">menu button index</param>
-    private void SwitchMenuGroupFocusButton(short index) {
+    /// <param name="ignoreCooldown">ignore input cool down</param>
+    private void SwitchMenuGroupFocusButton(short index, bool ignoreCooldown = false) {
+        if (Time.GetTicksMsec() - _lastSwitchTime < 500 && !ignoreCooldown) return;
+        _lastSwitchTime = Time.GetTicksMsec();
+        if (_currentFocusButtonIndex == index) return;
         _currentFocusButtonIndex = index;
         if (_currentGroupIndex < 0 || _currentGroupIndex >= _menuGroups.Count) return;
         var currentGroup = _menuGroups[_currentGroupIndex];
         if (index < 0 || index >= currentGroup.GetChildCount()) return;
-        currentGroup.Position = new Vector2(currentGroup.Position.X, -index * 100);
+        currentGroup.Position = new Vector2(currentGroup.Position.X, -index * (ButtonHeight + 15));
     }
 }

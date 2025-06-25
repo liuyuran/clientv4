@@ -20,7 +20,10 @@ public partial class InGamingUI: CanvasLayer {
 		MenuManager.instance.AddMenuItem("player", "player", "哈哈哈", 1, "", () => {
 			GD.Print("testA");
 		});
-		MenuManager.instance.AddMenuItem("inventory", "inventory", "你大爷的", 1, "", () => {
+		MenuManager.instance.AddMenuItem("inventory", "inventory", "你YY的", 1, "", () => {
+			GD.Print("testB");
+		});
+		MenuManager.instance.AddMenuItem("inventory", "inventory2", "你XX的", 2, "", () => {
 			GD.Print("testB");
 		});
 		MenuManager.instance.AddMenuItem("test", "test", "测试", 1, "", () => {

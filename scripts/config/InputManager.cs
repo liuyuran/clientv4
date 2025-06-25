@@ -12,17 +12,17 @@ public class InputManager {
     private readonly Dictionary<string, List<Key[]>> _keyBinds = new();
     private readonly Dictionary<string, List<(InputType type, int id, int direction)>> _extendedBinds = new();
     private Vector2 _mouseMotionAccumulator = Vector2.Zero;
-    private float _mouseWheelAccumulator = 0f;
+    private float _mouseWheelAccumulator;
 
     // Define input types
-    public enum InputType {
+    private enum InputType {
         MouseWheel, // Mouse wheel events
         JoystickButton, // Controller buttons
         DPad // Controller D-pad
     }
 
     // Define D-pad directions
-    public enum DPadDirection {
+    private enum DPadDirection {
         Up = 0,
         Right = 1,
         Down = 2,
@@ -35,22 +35,27 @@ public class InputManager {
         RegistryKeyBind(InputKey.MoveLeft, Key.A);
         RegistryKeyBind(InputKey.MoveRight, Key.D);
         RegistryKeyBind(InputKey.Jump, Key.Space);
+        RegistryJoystickButtonBind(InputKey.Jump, JoyButton.Y);
         RegistryKeyBind(InputKey.Crouch, Key.Ctrl);
+        RegistryJoystickButtonBind(InputKey.Crouch, JoyButton.B);
         RegistryKeyBind(InputKey.SwitchPause, Key.Escape);
-
-        // Example D-pad bindings
+        RegistryJoystickButtonBind(InputKey.Crouch, JoyButton.Start);
         RegistryDPadBind(InputKey.MoveForward, 0, (int)DPadDirection.Up);
         RegistryDPadBind(InputKey.MoveBackward, 0, (int)DPadDirection.Down);
         RegistryDPadBind(InputKey.MoveLeft, 0, (int)DPadDirection.Left);
         RegistryDPadBind(InputKey.MoveRight, 0, (int)DPadDirection.Right);
 
-        // Example joystick button bindings
-        RegistryJoystickButtonBind(InputKey.Jump, JoyButton.A);
-        RegistryJoystickButtonBind(InputKey.Crouch, JoyButton.B);
-
-        // Example mouse wheel bindings
-        RegistryMouseWheelBind(InputKey.ScrollUp, 1); // 1 for up
-        RegistryMouseWheelBind(InputKey.ScrollDown, -1); // -1 for down
+        // UI
+        RegistryMouseWheelBind(InputKey.UIScrollUp, 1);
+        RegistryMouseWheelBind(InputKey.UIScrollDown, -1);
+        RegistryKeyBind(InputKey.UILeft, Key.Left);
+        RegistryKeyBind(InputKey.UIRight, Key.Right);
+        RegistryKeyBind(InputKey.UIUp, Key.Up);
+        RegistryKeyBind(InputKey.UIDown, Key.Down);
+        RegistryJoystickButtonBind(InputKey.UILeft, JoyButton.DpadLeft);
+        RegistryJoystickButtonBind(InputKey.UIRight, JoyButton.DpadRight);
+        RegistryJoystickButtonBind(InputKey.UIUp, JoyButton.DpadUp);
+        RegistryJoystickButtonBind(InputKey.UIDown, JoyButton.DpadDown);
     }
 
     /// <summary>
@@ -137,13 +142,16 @@ public class InputManager {
     /// Handle mouse or controller joystick input event.
     /// </summary>
     public void HandleInputEvent(InputEvent @event) {
-        if (@event is InputEventMouseMotion mouseMotion) {
-            _mouseMotionAccumulator -= mouseMotion.Relative;
-        } else if (@event is InputEventMouseButton mouseButton &&
-                   (mouseButton.ButtonIndex == MouseButton.WheelUp || mouseButton.ButtonIndex == MouseButton.WheelDown)) {
-            // Handle mouse wheel input
-            var direction = mouseButton.ButtonIndex == MouseButton.WheelUp ? 1f : -1f;
-            _mouseWheelAccumulator += direction;
+        switch (@event) {
+            case InputEventMouseMotion mouseMotion:
+                _mouseMotionAccumulator -= mouseMotion.Relative;
+                break;
+            case InputEventMouseButton { ButtonIndex: MouseButton.WheelUp or MouseButton.WheelDown } mouseButton: {
+                // Handle mouse wheel input
+                var direction = mouseButton.ButtonIndex == MouseButton.WheelUp ? 1f : -1f;
+                _mouseWheelAccumulator += direction;
+                break;
+            }
         }
     }
 
@@ -168,12 +176,6 @@ public class InputManager {
         var stick = GetLeftStickVector();
         if (stick != Vector2.Zero) {
             temp = stick;
-        }
-
-        // Check D-pad input as well
-        var dpadVector = GetDPadVector();
-        if (dpadVector != Vector2.Zero) {
-            temp = dpadVector;
         }
 
         return temp;
@@ -350,24 +352,25 @@ public class InputManager {
         // Check extended bindings
         if (_extendedBinds.TryGetValue(keyCode, out var binds)) {
             foreach (var (type, id, direction) in binds) {
-                // Check joystick button bindings
-                if (type == InputType.JoystickButton) {
-                    if (Input.IsJoyButtonPressed(id, (JoyButton)direction)) {
+                switch (type) {
+                    // Check joystick button bindings
+                    case InputType.JoystickButton when Input.IsJoyButtonPressed(id, (JoyButton)direction):
                         return true;
-                    }
-                }
-                // Check D-pad bindings
-                else if (type == InputType.DPad) {
-                    var dpadJoyButton = direction switch {
-                        (int)DPadDirection.Up => JoyButton.DpadUp,
-                        (int)DPadDirection.Right => JoyButton.DpadRight,
-                        (int)DPadDirection.Down => JoyButton.DpadDown,
-                        (int)DPadDirection.Left => JoyButton.DpadLeft,
-                        _ => JoyButton.Invalid
-                    };
+                    // Check D-pad bindings
+                    case InputType.DPad: {
+                        var dpadJoyButton = direction switch {
+                            (int)DPadDirection.Up => JoyButton.DpadUp,
+                            (int)DPadDirection.Right => JoyButton.DpadRight,
+                            (int)DPadDirection.Down => JoyButton.DpadDown,
+                            (int)DPadDirection.Left => JoyButton.DpadLeft,
+                            _ => JoyButton.Invalid
+                        };
 
-                    if (Input.IsJoyButtonPressed(id, dpadJoyButton)) {
-                        return true;
+                        if (Input.IsJoyButtonPressed(id, dpadJoyButton)) {
+                            return true;
+                        }
+
+                        break;
                     }
                 }
                 // Mouse wheel is handled through events, not direct polling
