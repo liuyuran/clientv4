@@ -52,10 +52,14 @@ public class InputManager {
         RegistryKeyBind(InputKey.UIRight, Key.Right);
         RegistryKeyBind(InputKey.UIUp, Key.Up);
         RegistryKeyBind(InputKey.UIDown, Key.Down);
+        RegistryKeyBind(InputKey.UIConfirm, Key.Enter);
+        RegistryKeyBind(InputKey.UICancel, Key.Escape);
         RegistryJoystickButtonBind(InputKey.UILeft, JoyButton.DpadLeft);
         RegistryJoystickButtonBind(InputKey.UIRight, JoyButton.DpadRight);
         RegistryJoystickButtonBind(InputKey.UIUp, JoyButton.DpadUp);
         RegistryJoystickButtonBind(InputKey.UIDown, JoyButton.DpadDown);
+        RegistryJoystickButtonBind(InputKey.UIConfirm, JoyButton.A);
+        RegistryJoystickButtonBind(InputKey.UICancel, JoyButton.B);
     }
 
     /// <summary>

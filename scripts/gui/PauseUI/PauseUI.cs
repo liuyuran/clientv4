@@ -18,6 +18,7 @@ public partial class PauseUI : Control {
     private const int ButtonHeight = 20;
     private const int ButtonSpacing = 5;
     private ulong _lastSwitchTime;
+    private ulong _lastConfirmTime;
 
     public override void _Ready() {
         ProcessMode = ProcessModeEnum.Always;
@@ -91,6 +92,28 @@ public partial class PauseUI : Control {
                 break;
             }
         }
+
+        if (InputManager.instance.IsKeyPressed(InputKey.UIConfirm) && Time.GetTicksMsec() - _lastConfirmTime > 500) {
+            _lastConfirmTime = Time.GetTicksMsec();
+            var menu = MenuManager.instance.GetMenuGroups();
+            if (_currentGroupIndex < 0 || _currentGroupIndex >= menu.Length) {
+                GD.PrintErr("Current group index is out of range.");
+                return;
+            }
+            var currentGroup = menu[_currentGroupIndex];
+            if (_currentFocusButtonIndex < 0 || _currentFocusButtonIndex >= currentGroup.Length) {
+                GD.PrintErr("Current focus button index is out of range.");
+                return;
+            }
+            var currentButton = currentGroup[_currentFocusButtonIndex];
+            if (currentButton.Action != null) {
+                currentButton.Action.Invoke();
+            } else {
+                GD.PrintErr("Current button action is null.");
+            }
+        } else if (InputManager.instance.IsKeyPressed(InputKey.UICancel)) {
+            //
+        }
     }
 
     private void ReloadAllMenu() {
@@ -147,6 +170,9 @@ public partial class PauseUI : Control {
         if (Time.GetTicksMsec() - _lastSwitchTime < 500 && !ignoreCooldown) return;
         _lastSwitchTime = Time.GetTicksMsec();
         if (_currentGroupIndex == index) return;
+        if (_currentGroupIndex > 0) {
+            _menuGroups[_currentGroupIndex].Position = Vector2.Zero;
+        }
         _currentGroupIndex = index;
         var totalWidth = ButtonWidth * _menuGroups.Count + ButtonSpacing * (_menuGroups.Count - 1);
         Size = new Vector2(totalWidth, ButtonHeight);

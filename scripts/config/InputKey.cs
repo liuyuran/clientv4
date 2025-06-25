@@ -16,4 +16,6 @@ public class InputKey {
     public const string UIRight = "ui_right";
     public const string UIUp = "ui_up";
     public const string UIDown = "ui_down";
+    public const string UIConfirm = "ui_confirm";
+    public const string UICancel = "ui_cancel";
 }
