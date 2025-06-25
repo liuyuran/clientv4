@@ -7,7 +7,7 @@ public class InputKey {
     public const string MoveRight = "right";
     public const string Jump = "jump";
     public const string Crouch = "crouch";
-    public const string SwitchPause = "switch_pause";
+    public const string Pause = "switch_pause";
     public const string SwitchMenu = "switch_menu";
     public const string SwitchDebugInfo = "switch_debug_info";
     public const string UIScrollUp = "ui_scroll_up";

@@ -38,7 +38,7 @@ public class InputManager {
         RegistryJoystickButtonBind(InputKey.Jump, JoyButton.Y);
         RegistryKeyBind(InputKey.Crouch, Key.Ctrl);
         RegistryJoystickButtonBind(InputKey.Crouch, JoyButton.B);
-        RegistryKeyBind(InputKey.SwitchPause, Key.Escape);
+        RegistryKeyBind(InputKey.Pause, Key.Escape);
         RegistryJoystickButtonBind(InputKey.Crouch, JoyButton.Start);
         RegistryDPadBind(InputKey.MoveForward, 0, (int)DPadDirection.Up);
         RegistryDPadBind(InputKey.MoveBackward, 0, (int)DPadDirection.Down);
