@@ -21,6 +21,11 @@ config/icon="res://icon.svg"
 
 StandardNetwork="*res://scripts/network/StandardNetwork.cs"
 
+[display]
+
+window/size/viewport_width=400
+window/size/viewport_height=300
+
 [dotnet]
 
 project/assembly_name="Clientv4"
