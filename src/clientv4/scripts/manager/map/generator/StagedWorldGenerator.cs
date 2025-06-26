@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DotnetNoise;
 using game.scripts.config;
 using game.scripts.manager.map.stage;
 using game.scripts.manager.map.util;
@@ -8,11 +9,11 @@ using Godot;
 namespace game.scripts.manager.map.generator;
 
 public abstract class StagedWorldGenerator: IWorldGenerator {
-    private readonly FastNoiseLite _noise = new();
+    private FastNoise _noise;
     private readonly List<ITerrainGenerateStage> _stages = [];
     
     public void SetSeed(long seed) {
-        _noise.Seed = (int)seed;
+        _noise = new FastNoise((int)seed);
     }
 
     public abstract string GetName();

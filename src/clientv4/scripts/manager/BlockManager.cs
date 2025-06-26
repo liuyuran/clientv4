@@ -19,7 +19,6 @@ public class BlockManager {
         Register<Water>();
         Register<Dirt>();
         Register<Stone>();
-        GD.Print("BlockManager initialized.");
     }
 
     private void Register<T>() where T : Block, new() {

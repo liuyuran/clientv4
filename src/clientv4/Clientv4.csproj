@@ -5,6 +5,7 @@
     <RootNamespace>game</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="DotnetNoise" Version="1.0.0" />
     <PackageReference Include="Friflo.Engine.ECS" Version="3.4.2" />
     <PackageReference Include="Friflo.Engine.ECS.Boost" Version="3.4.2" />
     <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />

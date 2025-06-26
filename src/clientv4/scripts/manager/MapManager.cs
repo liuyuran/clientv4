@@ -17,7 +17,6 @@ public class MapManager {
     private MapManager() {
         // 初始化地图管理器
         _generator = new TerrainGenerator(123456);
-        GD.Print("MapManager initialized.");
     }
 
     public void SetBlock(ulong worldId, Vector3 position, ulong blockId, Direction direction) {

@@ -17,11 +17,19 @@ public class NoiseGroundBaseStage : ITerrainGenerateStage {
         for (var x = 0; x < Config.ChunkSize; x++) {
             data.HeightMap[x] = new int[Config.ChunkSize];
             for (var z = 0; z < Config.ChunkSize; z++) {
-                data.HeightMap[x][z] = data.Position.Y switch {
-                    > 0 => 0,
-                    0 => (int)(data.Noise.GetNoise2D(x, z) * 100),
-                    _ => Config.ChunkSize - 1
-                };
+                switch (data.Position.Y) {
+                    case > 0:
+                        data.HeightMap[x][z] = 0;
+                        break;
+                    case 0:
+                        var globalX = x + data.Position.X * Config.ChunkSize;
+                        var globalZ = z + data.Position.Z * Config.ChunkSize;
+                        data.HeightMap[x][z] = (int)((data.Noise.GetNoise(globalX, globalZ) + 1) / 2 * Config.ChunkSize);
+                        break;
+                    default:
+                        data.HeightMap[x][z] = Config.ChunkSize - 1;
+                        break;
+                }
             }
         }
         var stoneId = BlockManager.instance.GetBlockId<Stone>();

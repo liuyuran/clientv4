@@ -12,7 +12,7 @@ public class TerrainGenerator {
 
     public TerrainGenerator(long seed) {
         _seed = seed;
-        RegistryGenerator<DefaultWorldGenerator>(0);
+        RegistryGenerator<StandardWorldGenerator>(0);
     }
     
     private void RegistryGenerator<T>(ulong worldId) where T: IWorldGenerator {
@@ -23,7 +23,6 @@ public class TerrainGenerator {
         }
         generator.SetSeed(_seed);
         _generators[worldId] = generator;
-        GD.Print($"注册生成器: {typeof(T).Name}");
     }
 
     public BlockData[][][] GenerateTerrain(ulong worldId, Vector3I chunkPosition) {
