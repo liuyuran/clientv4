@@ -1,6 +1,10 @@
-﻿namespace game.scripts.manager;
+﻿using Microsoft.Extensions.Logging;
+using ModLoader.logger;
+
+namespace game.scripts.manager;
 
 public class ModManager {
+    private readonly ILogger _logger = LogManager.GetLogger<ModManager>();
     public static ModManager instance { get; private set; } = new();
     private const string ModDirectory = "ResourcePack";
     

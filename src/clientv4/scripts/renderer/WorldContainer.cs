@@ -1,11 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Globalization;
-using game.scripts.logger;
 using game.scripts.manager;
 using game.scripts.manager.player;
 using game.scripts.utils;
 using Godot;
-using Microsoft.Extensions.Logging;
 using ModLoader.logger;
 
 namespace game.scripts.renderer;
@@ -17,12 +15,9 @@ public partial class WorldContainer: Control {
     private ulong _currentWorldId;
 
     public override void _Ready() {
-        var loggerFactory = LoggerFactory.Create(loggingBuilder =>
-        {
-            loggingBuilder.SetMinimumLevel(OS.IsDebugBuild() ? LogLevel.Trace : LogLevel.Information);
-            loggingBuilder.AddProvider(new GodotLoggerProvider());
-        });
-        LogManager.SetLoggerBuilder(loggerFactory);
+        RedirectLogger.WriteLine = (level, s) => {
+            GD.Print(string.Format(CultureInfo.CurrentCulture, "[{0}] {1}", level, s));
+        };
         PlayerManager.instance.InitializeAnimation();
         ResourcePackManager.instance.ScanResourcePacks();
         MaterialManager.instance.GenerateMaterials();
