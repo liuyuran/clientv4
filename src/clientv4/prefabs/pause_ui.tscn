@@ -10,6 +10,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Description" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Text" type="RichTextLabel" parent="Description"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 0
 script = ExtResource("1_hctvy")

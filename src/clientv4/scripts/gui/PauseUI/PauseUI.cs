@@ -11,6 +11,9 @@ namespace game.scripts.gui.PauseUI;
 /// </summary>
 public partial class PauseUI : Control {
     private readonly List<Control> _menuGroups = [];
+    private MenuManager.MenuItem[][] currentData;
+    private Control _menuTip;
+    private RichTextLabel _menuTipText;
     private Control _parent;
     private short _currentGroupIndex = -1;
     private short _currentFocusButtonIndex = -1;
@@ -23,6 +26,8 @@ public partial class PauseUI : Control {
     public override void _Ready() {
         ProcessMode = ProcessModeEnum.Always;
         _parent = GetParent<Control>();
+        _menuTip = _parent.GetNode<Control>("Description");
+        _menuTipText = _menuTip.GetNode<RichTextLabel>("Text");
         GetTree().Paused = true;
         ReloadAllMenu();
         GetTree().Root.SizeChanged += OnRootOnSizeChanged;
@@ -95,12 +100,11 @@ public partial class PauseUI : Control {
 
         if (InputManager.instance.IsKeyPressed(InputKey.UIConfirm) && Time.GetTicksMsec() - _lastConfirmTime > 500) {
             _lastConfirmTime = Time.GetTicksMsec();
-            var menu = MenuManager.instance.GetMenuGroups();
-            if (_currentGroupIndex < 0 || _currentGroupIndex >= menu.Length) {
+            if (_currentGroupIndex < 0 || _currentGroupIndex >= currentData.Length) {
                 GD.PrintErr("Current group index is out of range.");
                 return;
             }
-            var currentGroup = menu[_currentGroupIndex];
+            var currentGroup = currentData[_currentGroupIndex];
             if (_currentFocusButtonIndex < 0 || _currentFocusButtonIndex >= currentGroup.Length) {
                 GD.PrintErr("Current focus button index is out of range.");
                 return;
@@ -127,6 +131,7 @@ public partial class PauseUI : Control {
             GD.PrintErr("No menu groups found.");
             return;
         }
+        currentData = menu;
 
         for (short index = 0; index < menu.Length; index++) {
             var group = menu[index];
@@ -177,12 +182,20 @@ public partial class PauseUI : Control {
         var totalWidth = ButtonWidth * _menuGroups.Count + ButtonSpacing * (_menuGroups.Count - 1);
         Size = new Vector2(totalWidth, ButtonHeight);
         var initX = Mathf.Max((_parent.Size.X - totalWidth) / 2, _parent.Size.X * 0.01);
-        var minX = Mathf.Min(initX, _parent.Size.X * 0.99 - totalWidth);//initX - index * (ButtonWidth + ButtonSpacing);
+        var minX = Mathf.Min(initX, _parent.Size.X * 0.99 - totalWidth);
         var target = Vector2.Zero;
         target.X = Mathf.Clamp(initX - index * (ButtonWidth + totalWidth), minX, initX);
         target.Y = (_parent.Size.Y - ButtonHeight) / 2;
         Position = target;
         SwitchMenuGroupFocusButton(0, true);
+        var tipWidth = _parent.Size.X * 0.8;
+        _menuTip.Size = new Vector2(tipWidth, ButtonHeight);
+        _menuTipText.Size = _menuTip.Size;
+        _menuTip.Position = new Vector2(
+            _parent.Size.X * 0.3,
+            (_parent.Size.Y - ButtonHeight) / 2 - ButtonHeight - 15
+        );
+        _menuTipText.Text = currentData[_currentGroupIndex][_currentFocusButtonIndex].Description;
     }
 
     /// <summary>
@@ -200,5 +213,6 @@ public partial class PauseUI : Control {
         var currentGroup = _menuGroups[_currentGroupIndex];
         if (index < 0 || index >= currentGroup.GetChildCount()) return;
         currentGroup.Position = new Vector2(currentGroup.Position.X, -index * (ButtonHeight + 15));
+        _menuTipText.Text = currentData[_currentGroupIndex][_currentFocusButtonIndex].Description;
     }
 }

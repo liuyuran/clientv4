@@ -17,16 +17,16 @@ public partial class InGamingUI: CanvasLayer {
 		MenuManager.instance.AddMenuGroup("player", 1);
 		MenuManager.instance.AddMenuGroup("inventory", 2);
 		MenuManager.instance.AddMenuGroup("test", 3);
-		MenuManager.instance.AddMenuItem("player", "player", "哈哈哈", 1, "", () => {
+		MenuManager.instance.AddMenuItem("player", "player", "哈哈哈", 1, "111", () => {
 			GD.Print("testA");
 		});
-		MenuManager.instance.AddMenuItem("inventory", "inventory", "你YY的", 1, "", () => {
+		MenuManager.instance.AddMenuItem("inventory", "inventory", "你YY的", 1, "222", () => {
 			GD.Print("testB");
 		});
-		MenuManager.instance.AddMenuItem("inventory", "inventory2", "你XX的", 2, "", () => {
+		MenuManager.instance.AddMenuItem("inventory", "inventory2", "你XX的", 2, "333", () => {
 			GD.Print("testB");
 		});
-		MenuManager.instance.AddMenuItem("test", "test", "测试", 1, "", () => {
+		MenuManager.instance.AddMenuItem("test", "test", "测试", 1, "444", () => {
 			GD.Print("testB");
 		});
 	}
