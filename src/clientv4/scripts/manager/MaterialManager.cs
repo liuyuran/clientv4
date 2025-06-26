@@ -217,7 +217,7 @@ public class MaterialManager {
         var atlasTexture = CreateItemTextureAtlas(textures, out var uvCoordinates);
 
         // 设置材质
-        ((StandardMaterial3D)_defaultMaterial).AlbedoTexture = atlasTexture;
+        ((StandardMaterial3D)_defaultItemMaterial).AlbedoTexture = atlasTexture;
 
         // 存储各方块各面的UV坐标
         _itemUvs.Clear();

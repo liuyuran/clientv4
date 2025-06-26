@@ -2,5 +2,5 @@
 
 public class Stone: Block {
     public override string name => "stone";
-    public override string texturePath => "core:/texture/block/sample.png";
+    public override string texturePath => "core:/texture/block/stone.png";
 }
