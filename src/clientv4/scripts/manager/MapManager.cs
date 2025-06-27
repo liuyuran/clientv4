@@ -4,10 +4,13 @@ using game.scripts.manager.map;
 using game.scripts.renderer;
 using game.scripts.utils;
 using Godot;
+using Microsoft.Extensions.Logging;
+using ModLoader.logger;
 
 namespace game.scripts.manager;
 
 public class MapManager {
+    private readonly ILogger _logger = LogManager.GetLogger<MapManager>();
     public delegate void BlockChangedCallback(ulong worldId, Vector3 position, ulong blockId, Direction direction);
     public static MapManager instance { get; private set; } = new();
     private readonly TerrainGenerator _generator;
@@ -53,7 +56,9 @@ public class MapManager {
         if (!createIfNotExists) {
             return null;
         }
+        var startTime = DateUtil.GetTimestamp();
         var data = _generator.GenerateTerrain(worldId, position);
+        _logger.LogDebug("Generate terrain for chunk {position} in world {worldId} took {time} ms", position, worldId, DateUtil.GetTimestamp() - startTime);
         chunkData.Add(position, data);
         blockData = data;
         return blockData;
@@ -84,5 +89,6 @@ public class MapManager {
         chunkData = _chunks[worldId];
         chunkData[chunkPosition] = blockData;
         _chunks[worldId] = chunkData;
+        _logger.LogDebug("Overwrote block data for chunk {chunkPosition} in world {worldId}", chunkPosition, worldId);
     }
 }

@@ -4,17 +4,20 @@ using game.scripts.manager;
 using game.scripts.manager.player;
 using game.scripts.utils;
 using Godot;
+using Microsoft.Extensions.Logging;
 using ModLoader.logger;
 
 namespace game.scripts.renderer;
 
 public partial class WorldContainer: Control {
+    private readonly ILogger _logger = LogManager.GetLogger<WorldContainer>();
     [Export] private PackedScene _worldPrototype;
     [Export] private PackedScene _UIPrototype;
     private readonly ConcurrentDictionary<ulong, SubViewport> _subViewports = new();
     private ulong _currentWorldId;
 
     public override void _Ready() {
+        DateUtil.goDotMode = true;
         RedirectLogger.WriteLine = (level, s) => {
             GD.Print(string.Format(CultureInfo.CurrentCulture, "[{0}] {1}", level, s));
         };
@@ -59,6 +62,7 @@ public partial class WorldContainer: Control {
             ((SubViewportContainer)viewport.GetParent()).Visible = worldId == targetWorldId;
         }
         _currentWorldId = targetWorldId;
+        _logger.LogDebug("Set current world to {WorldId}", targetWorldId);
     }
     
     public SubViewport GetCurrentSubViewport() {
@@ -93,5 +97,6 @@ public partial class WorldContainer: Control {
         var ui = _UIPrototype.Instantiate<CanvasLayer>();
         subViewport.AddChild(ui);
         _subViewports[worldId] = subViewport;
+        _logger.LogDebug("Created sub viewport for world {WorldId}", worldId);
     }
 }

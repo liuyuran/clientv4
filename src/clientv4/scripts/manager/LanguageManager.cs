@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using Godot;
+using Microsoft.Extensions.Logging;
+using ModLoader.logger;
 using SecondLanguage;
 using Translation = Godot.Translation;
 
 namespace game.scripts.manager;
 
 public class LanguageManager {
+    private readonly ILogger _logger = LogManager.GetLogger<LanguageManager>();
     public static LanguageManager instance { get; private set; } = new();
 
     private LanguageManager() {
@@ -52,6 +55,7 @@ public class LanguageManager {
     }
 
     private void AddTranslation(string locale, string path) {
+        _logger.LogDebug("Adding translation for locale {Locale} from path {Path}", locale, path);
         var extension = System.IO.Path.GetExtension(path);
         switch (extension) {
             case ".mo": {

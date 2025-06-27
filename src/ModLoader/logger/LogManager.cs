@@ -3,12 +3,12 @@
 namespace ModLoader.logger;
 
 public class LogManager {
-    private static readonly ILoggerFactory _loggerFactory = LoggerFactory.Create(builder => {
+    private static readonly ILoggerFactory LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => {
         builder.SetMinimumLevel(LogLevel.Debug);
         builder.AddProvider(new RedirectLoggerProvider());
     });
     
     public static ILogger GetLogger<T>() {
-        return _loggerFactory.CreateLogger<T>();
+        return LoggerFactory.CreateLogger<T>();
     }
 }

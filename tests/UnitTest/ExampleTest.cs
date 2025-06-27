@@ -12,10 +12,6 @@ public class ExampleTest
     [TestCase]
     public void Success() => AssertBool(true).IsTrue();
 
-
-    [TestCase]
-    public void Failed() => AssertBool(false).IsTrue();
-
     [TestCase]
     [DataPoint(nameof(arrayDataPointProperty))]
     public void WithDataPointProperty(int a, int b, int expected) => AssertThat(a + b).IsEqual(expected);

@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using Godot;
+using Microsoft.Extensions.Logging;
+using ModLoader.logger;
 using Tomlyn;
 using FileAccess = Godot.FileAccess;
 
@@ -15,6 +17,7 @@ namespace game.scripts.manager;
 /// every resource pack that has the same name has a priority, and if program cannot find a texture in a pack that has higher priority, then will find in the next pack.
 /// </summary>
 public class ResourcePackManager {
+    private readonly ILogger _logger = LogManager.GetLogger<ResourcePackManager>();
     public static ResourcePackManager instance { get; private set; } = new();
     
     private readonly Dictionary<string, List<ResourcePackInfo>> _resourcePackPaths = new();
@@ -24,11 +27,17 @@ public class ResourcePackManager {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
         var resourcePackPath = Path.Combine(basePath, ResourcePackDirectory);
         
-        if (!DirAccess.DirExistsAbsolute(resourcePackPath)) return;
+        if (!DirAccess.DirExistsAbsolute(resourcePackPath)) {
+            _logger.LogError("Resource pack directory '{ResourcePackDirectory}' does not exist at path: {Path}", ResourcePackDirectory, resourcePackPath);
+            return;
+        }
         
         foreach (var directory in DirAccess.GetDirectoriesAt(resourcePackPath)) {
             var metaPath = Path.Combine(resourcePackPath, directory, "meta.toml");
-            if (!FileAccess.FileExists(metaPath)) continue;
+            if (!FileAccess.FileExists(metaPath)) {
+                _logger.LogWarning("Resource pack metadata file 'meta.toml' not found in directory: {Directory}", directory);
+                continue;
+            }
             
             try {
                 var metaContent = FileAccess.GetFileAsBytes(metaPath);
@@ -46,7 +55,7 @@ public class ResourcePackManager {
                     });
                 }
             } catch (Exception e) {
-                GD.PrintErr($"Failed to load resource pack metadata from {metaPath}: {e.Message}");
+                _logger.LogError("Failed to load resource pack metadata from {s}: {eMessage}", metaPath, e.Message);
             }
         }
         

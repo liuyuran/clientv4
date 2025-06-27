@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Threading;
 using game.scripts.manager.blocks;
 using Godot;
+using Microsoft.Extensions.Logging;
+using ModLoader.logger;
 
 namespace game.scripts.manager;
 
 public class BlockManager {
+    private readonly ILogger _logger = LogManager.GetLogger<BlockManager>();
     public static BlockManager instance { get; private set; } = new();
     
     private readonly ConcurrentDictionary<string, ulong> _blockIds = new();
@@ -27,6 +30,7 @@ public class BlockManager {
         _blocks.TryAdd(id, block);
         _blockCache.TryAdd(typeof(T), id);
         _blockIds.TryAdd(block.name, id);
+        _logger.LogDebug("block {BlockName} registered with ID {BlockId}", block.name, id);
     }
 
     public ulong GetBlockId<T>() where T : Block {

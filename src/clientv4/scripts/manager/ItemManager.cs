@@ -6,10 +6,13 @@ using game.scripts.manager.item;
 using game.scripts.manager.item.composition;
 using game.scripts.renderer;
 using Godot;
+using Microsoft.Extensions.Logging;
+using ModLoader.logger;
 
 namespace game.scripts.manager;
 
 public class ItemManager {
+    private readonly ILogger _logger = LogManager.GetLogger<ItemManager>();
     public static ItemManager instance { get; private set; } = new();
     
     private readonly ConcurrentDictionary<string, ulong> _itemIds = new();
@@ -18,7 +21,6 @@ public class ItemManager {
 
     private ItemManager() {
         Register<Dirt>();
-        GD.Print("ItemManager initialized.");
     }
 
     private void Register<T>() where T : Item, new() {
@@ -26,6 +28,7 @@ public class ItemManager {
         var id = (ulong)Interlocked.Increment(ref _currentId);
         _items.TryAdd(id, item);
         _itemIds.TryAdd(item.name, id);
+        _logger.LogDebug("Item {ItemName} registered with ID {ItemId}", item.name, id);
     }
 
     public ulong GetItemId(string name) {

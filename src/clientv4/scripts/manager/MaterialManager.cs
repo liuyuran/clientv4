@@ -3,10 +3,13 @@ using System.Linq;
 using game.scripts.utils;
 using Godot;
 using Godot.Collections;
+using Microsoft.Extensions.Logging;
+using ModLoader.logger;
 
 namespace game.scripts.manager;
 
 public class MaterialManager {
+    private readonly ILogger _logger = LogManager.GetLogger<MaterialManager>();
     public static MaterialManager instance { get; private set; } = new();
     private readonly Dictionary<ulong, Dictionary<Direction, Vector2[]>> _uvs = new();
     private readonly Dictionary<ulong, Dictionary<Direction, Vector2[]>> _itemUvs = new();
@@ -18,10 +21,13 @@ public class MaterialManager {
         _uvs.Clear();
         _defaultMaterial = new StandardMaterial3D();
         GenerateBlockTexture();
+        _logger.LogDebug("Default block material generated with texture: {Texture}", ((StandardMaterial3D)_defaultMaterial).AlbedoTexture);
         _defaultWaterMaterial = GenerateWaterShaderMaterial();
+        _logger.LogDebug("Default water material generated with shader: {Shader}", _defaultWaterMaterial.Shader);
         _itemUvs.Clear();
         _defaultItemMaterial = new StandardMaterial3D();
         GenerateItemTexture();
+        _logger.LogDebug("Default item material generated with texture: {Texture}", ((StandardMaterial3D)_defaultItemMaterial).AlbedoTexture);
     }
 
     private ShaderMaterial GenerateWaterShaderMaterial() {
