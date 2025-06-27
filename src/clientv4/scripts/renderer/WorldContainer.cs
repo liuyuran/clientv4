@@ -23,6 +23,7 @@ public partial class WorldContainer: Control {
         };
         PlayerManager.instance.InitializeAnimation();
         ResourcePackManager.instance.ScanResourcePacks();
+        ModManager.instance.ScanModPacks();
         MaterialManager.instance.GenerateMaterials();
         MapManager.instance.OnBlockChanged += OnInstanceOnOnBlockChanged;
     }

@@ -1,0 +1,7 @@
+display_name="核心mod"
+name="core"
+lib="Core.dll"
+priority=0
+description="""
+对自己没有信心的话就不要动了吧
+"""

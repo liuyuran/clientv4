@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader.logger;
@@ -33,6 +34,8 @@ public class ResourcePackManager {
         }
         
         foreach (var directory in DirAccess.GetDirectoriesAt(resourcePackPath)) {
+            if (directory.StartsWith('.')) continue;
+            if (directory.StartsWith('~')) continue;
             var metaPath = Path.Combine(resourcePackPath, directory, "meta.toml");
             if (!FileAccess.FileExists(metaPath)) {
                 _logger.LogWarning("Resource pack metadata file 'meta.toml' not found in directory: {Directory}", directory);
@@ -40,8 +43,8 @@ public class ResourcePackManager {
             }
             
             try {
-                var metaContent = FileAccess.GetFileAsBytes(metaPath);
-                var metadata = Toml.ToModel<ResourcePackMeta>(metaContent.GetStringFromUtf8()[1..]);
+                var metaContent = FileUtil.RemoveBom(FileAccess.GetFileAsBytes(metaPath));
+                var metadata = Toml.ToModel<ResourcePackMeta>(metaContent);
                 if (metadata.name != null) {
                     if (!_resourcePackPaths.ContainsKey(metadata.name)) {
                         _resourcePackPaths[metadata.name] = [];
