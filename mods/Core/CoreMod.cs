@@ -1,12 +1,13 @@
 ﻿using ModLoader;
+using ModLoader.handle;
 
 namespace Core;
 
 public class CoreMod: IMod {
-    public void OnLoad() {
+    public void OnLoad(IModHandler handler) {
         //
     }
-    public void OnUnload() {
+    public void OnUnload(IModHandler handler) {
         //
     }
     public void OnGameStart() {

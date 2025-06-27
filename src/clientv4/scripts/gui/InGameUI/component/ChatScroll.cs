@@ -1,4 +1,5 @@
 using game.scripts.manager;
+using game.scripts.manager.chat;
 using Godot;
 
 namespace game.scripts.gui.InGameUI.component;

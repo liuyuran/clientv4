@@ -1,4 +1,4 @@
-﻿namespace game.scripts.manager;
+﻿namespace game.scripts.manager.chat;
 
 public class ChatManager {
     public delegate void MessageAddedHandler(MessageInfo message);

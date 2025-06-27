@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using game.scripts.config;
-using game.scripts.manager.map;
 using game.scripts.renderer;
 using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader.logger;
 
-namespace game.scripts.manager;
+namespace game.scripts.manager.map;
 
 public class MapManager {
     private readonly ILogger _logger = LogManager.GetLogger<MapManager>();

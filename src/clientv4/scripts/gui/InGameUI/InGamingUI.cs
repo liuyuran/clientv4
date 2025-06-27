@@ -1,5 +1,6 @@
 using System;
 using game.scripts.manager;
+using game.scripts.manager.menu;
 using Godot;
 
 namespace game.scripts.gui.InGameUI;

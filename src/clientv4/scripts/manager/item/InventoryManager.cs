@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using game.scripts.manager.item;
 using game.scripts.manager.item.composition;
 
-namespace game.scripts.manager;
+namespace game.scripts.manager.item;
 
 /// <summary>
 /// manage equipment and inventory data for players.

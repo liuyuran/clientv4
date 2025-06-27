@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Godot;
 
-namespace game.scripts.manager;
+namespace game.scripts.manager.menu;
 
 public class MenuManager {
     public static MenuManager instance { get; private set; } = new();

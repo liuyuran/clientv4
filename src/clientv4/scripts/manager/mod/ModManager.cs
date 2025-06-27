@@ -7,23 +7,28 @@ using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader;
+using ModLoader.handle;
 using ModLoader.logger;
 using Tomlyn;
 using FileAccess = Godot.FileAccess;
 
-namespace game.scripts.manager;
+namespace game.scripts.manager.mod;
 
 public class ModManager {
     private readonly ILogger _logger = LogManager.GetLogger<ModManager>();
     public static ModManager instance { get; private set; } = new();
     private const string ModDirectory = "Mods";
+    private static bool _loaded;
     private readonly Dictionary<string, IMod> _modInstances = new();
     private readonly Dictionary<string, ModMeta> _modMetas = new();
     private readonly HashSet<string> _activeMods = [];
     private readonly Assembly _publicAssembly = typeof(IMod).Assembly;
+    private readonly IModHandler _modHandler = new DefaultModHandler();
 
     private ModManager() {
+        if (_loaded) return;
         AppDomain.CurrentDomain.AssemblyResolve += OnCurrentDomainOnAssemblyResolve;
+        _loaded = true;
     }
 
     private Assembly OnCurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args) {
@@ -114,7 +119,7 @@ public class ModManager {
             return;
         }
 
-        modInstance.OnLoad();
+        modInstance.OnLoad(_modHandler);
         _activeMods.Add(name);
         _logger.LogInformation("Activated mod: {Name}", name);
     }
@@ -130,7 +135,7 @@ public class ModManager {
             return;
         }
 
-        modInstance.OnUnload();
+        modInstance.OnUnload(_modHandler);
         _activeMods.Remove(name);
         _logger.LogInformation("Deactivated mod: {Name}", name);
     }

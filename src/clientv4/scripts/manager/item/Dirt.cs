@@ -1,4 +1,6 @@
-﻿using game.scripts.manager.item.composition;
+﻿using game.scripts.manager.blocks;
+using game.scripts.manager.item.composition;
+using Block = game.scripts.manager.item.composition.Block;
 
 namespace game.scripts.manager.item;
 

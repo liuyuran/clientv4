@@ -2,12 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using game.scripts.manager.blocks;
-using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader.logger;
 
-namespace game.scripts.manager;
+namespace game.scripts.manager.blocks;
 
 public class BlockManager {
     private readonly ILogger _logger = LogManager.GetLogger<BlockManager>();
