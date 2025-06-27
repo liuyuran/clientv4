@@ -25,67 +25,10 @@ public sealed class RedirectLogger : ILogger {
             case LogLevel.None:
                 break;
             case LogLevel.Trace:
-                handler = new DefaultInterpolatedStringHandler(14, 3);
-                handler.AppendLiteral("[");
-                handler.AppendFormatted(_timeProvider.GetLocalNow());
-                handler.AppendLiteral("] [");
-                handler.AppendFormatted(_categoryName);
-                handler.AppendLiteral("] [");
-                handler.AppendLiteral(nameof(LogLevel.Trace));
-                handler.AppendLiteral("] ");
-                handler.AppendFormatted(formatter(state, exception));
-                WriteLine(logLevel, handler.ToString());
-                break;
             case LogLevel.Debug:
-                handler = new DefaultInterpolatedStringHandler(14, 3);
-
-                handler.AppendLiteral("[");
-                handler.AppendFormatted(_timeProvider.GetLocalNow());
-                handler.AppendLiteral("] [");
-                handler.AppendFormatted(_categoryName);
-                handler.AppendLiteral("] [");
-                handler.AppendLiteral(nameof(LogLevel.Debug));
-                handler.AppendLiteral("] ");
-                handler.AppendFormatted(formatter(state, exception));
-                WriteLine(logLevel, handler.ToString());
-                break;
             case LogLevel.Information:
-                handler = new DefaultInterpolatedStringHandler(20, 3);
-
-                handler.AppendLiteral("[");
-                handler.AppendFormatted(_timeProvider.GetLocalNow());
-                handler.AppendLiteral("] [");
-                handler.AppendFormatted(_categoryName);
-                handler.AppendLiteral("] [");
-                handler.AppendLiteral(nameof(LogLevel.Information));
-                handler.AppendLiteral("] ");
-                handler.AppendFormatted(formatter(state, exception));
-                WriteLine(logLevel, handler.ToString());
-                break;
             case LogLevel.Warning:
-                handler = new DefaultInterpolatedStringHandler(16, 3);
-                handler.AppendLiteral("[");
-                handler.AppendFormatted(_timeProvider.GetLocalNow());
-                handler.AppendLiteral("] [");
-                handler.AppendFormatted(_categoryName);
-                handler.AppendLiteral("] [");
-                handler.AppendLiteral(nameof(LogLevel.Warning));
-                handler.AppendLiteral("] ");
-                handler.AppendFormatted(formatter(state, exception));
-                WriteLine(logLevel, handler.ToString());
-                break;
             case LogLevel.Error:
-                handler = new DefaultInterpolatedStringHandler(14, 3);
-                handler.AppendLiteral("[");
-                handler.AppendFormatted(_timeProvider.GetLocalNow());
-                handler.AppendLiteral("] [");
-                handler.AppendFormatted(_categoryName);
-                handler.AppendLiteral("] [");
-                handler.AppendLiteral(nameof(LogLevel.Error));
-                handler.AppendLiteral("] ");
-                handler.AppendFormatted(formatter(state, exception));
-                WriteLine(logLevel, handler.ToString());
-                break;
             case LogLevel.Critical:
                 handler = new DefaultInterpolatedStringHandler(17, 3);
                 handler.AppendLiteral("[");
@@ -93,7 +36,7 @@ public sealed class RedirectLogger : ILogger {
                 handler.AppendLiteral("] [");
                 handler.AppendFormatted(_categoryName);
                 handler.AppendLiteral("] [");
-                handler.AppendLiteral(nameof(LogLevel.Critical));
+                handler.AppendLiteral(nameof(logLevel));
                 handler.AppendLiteral("] ");
                 handler.AppendFormatted(formatter(state, exception));
                 WriteLine(logLevel, handler.ToString());

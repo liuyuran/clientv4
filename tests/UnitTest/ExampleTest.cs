@@ -1,4 +1,5 @@
 ﻿using GdUnit4;
+using Godot;
 using static GdUnit4.Assertions;
 
 namespace UnitTest;
@@ -6,22 +7,18 @@ namespace UnitTest;
 [TestSuite]
 public class ExampleTest
 {
-    public static IEnumerable<object[]> arrayDataPointProperty => [[1, 2, 3], [4, 5, 9]];
-    public static IEnumerable<object[]> ArrayDataPointMethod() => [[1, 2, 3], [4, 5, 9]];
-
+    // Fast execution - no Godot runtime needed
     [TestCase]
-    public void Success() => AssertBool(true).IsTrue();
-
-    [TestCase]
-    [DataPoint(nameof(arrayDataPointProperty))]
-    public void WithDataPointProperty(int a, int b, int expected) => AssertThat(a + b).IsEqual(expected);
-
-    [TestCase]
-    [DataPoint(nameof(ArrayDataPointMethod))]
-    public void WithArrayDataPointMethod(int a, int b, int expected) => AssertThat(a + b).IsEqual(expected);
-
-
-    [TestCase(0, 1, 2, TestName = "TestA")]
-    [TestCase(1, 2, 3, TestName = "TestB", Description = "foo ")]
-    public void DataRows(int a, int b, int c) => AssertBool(true).IsTrue();
+    public void IsEqual()
+    {
+        AssertThat("This is a test message").IsEqual("This is a test message");
+    }
+        
+    // Godot runtime required for Node operations
+    [TestCase] 
+    [RequireGodotRuntime]
+    public void TestGodotNode()
+    {
+        AssertThat(new Node2D()).IsNotNull();
+    }
 }
