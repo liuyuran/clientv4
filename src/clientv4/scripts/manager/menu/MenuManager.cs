@@ -12,7 +12,7 @@ public class MenuManager {
         var group = new MenuGroupItem {
             Id = id,
             Children = [],
-            ListOrder = order
+            ListOrder = order >= 0 ? order : (short)_menus.Count
         };
         
         _menus.Add(group);
@@ -29,7 +29,7 @@ public class MenuManager {
             Id = itemId,
             Name = itemName,
             Action = action,
-            ListOrder = order,
+            ListOrder = order >= 0 ? order : (short)group.Children.Count,
             Description = description
         };
         

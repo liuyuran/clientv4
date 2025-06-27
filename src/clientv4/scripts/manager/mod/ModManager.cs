@@ -22,7 +22,8 @@ public class ModManager {
     private readonly Dictionary<string, IMod> _modInstances = new();
     private readonly Dictionary<string, ModMeta> _modMetas = new();
     private readonly HashSet<string> _activeMods = [];
-    private readonly Assembly _publicAssembly = typeof(IMod).Assembly;
+    private readonly Assembly _modLoaderAssembly = typeof(IMod).Assembly;
+    private readonly Assembly _loggerAssembly = typeof(ILogger).Assembly;
     private readonly IModHandler _modHandler = new DefaultModHandler();
 
     private ModManager() {
@@ -33,8 +34,11 @@ public class ModManager {
 
     private Assembly OnCurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args) {
         var assemblyName = new AssemblyName(args.Name);
-        if (assemblyName.Name == _publicAssembly.GetName().Name) {
-            return _publicAssembly;
+        if (assemblyName.Name == _modLoaderAssembly.GetName().Name) {
+            return _modLoaderAssembly;
+        }
+        if (assemblyName.Name == _loggerAssembly.GetName().Name) {
+            return _loggerAssembly;
         }
         return null;
     }

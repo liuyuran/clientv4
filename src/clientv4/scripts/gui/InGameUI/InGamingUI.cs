@@ -1,6 +1,4 @@
 using System;
-using game.scripts.manager;
-using game.scripts.manager.menu;
 using Godot;
 
 namespace game.scripts.gui.InGameUI;
@@ -15,21 +13,6 @@ public partial class InGamingUI: CanvasLayer {
 		ProcessMode = ProcessModeEnum.Always;
 		_status.Focus = InGameUIFocus.Game;
 		OpenPlayingUI();
-		MenuManager.instance.AddMenuGroup("player", 1);
-		MenuManager.instance.AddMenuGroup("inventory", 2);
-		MenuManager.instance.AddMenuGroup("test", 3);
-		MenuManager.instance.AddMenuItem("player", "player", "哈哈哈", 1, "111", () => {
-			GD.Print("testA");
-		});
-		MenuManager.instance.AddMenuItem("inventory", "inventory", "你YY的", 1, "222", () => {
-			GD.Print("testB");
-		});
-		MenuManager.instance.AddMenuItem("inventory", "inventory2", "你XX的", 2, "333", () => {
-			GD.Print("testB");
-		});
-		MenuManager.instance.AddMenuItem("test", "test", "测试", 1, "444", () => {
-			GD.Print("testB");
-		});
 	}
 
 	public override void _Process(double delta) {
