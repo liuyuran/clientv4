@@ -90,4 +90,70 @@ public class MapManager {
         _chunks[worldId] = chunkData;
         _logger.LogDebug("Overwrote block data for chunk {chunkPosition} in world {worldId}", chunkPosition, worldId);
     }
+
+    public long GetNearestLand(ulong worldId, Vector3 position) {
+        var chunkPosition = position.ToChunkPosition();
+        var localPosition = position.ToLocalPosition();
+        if (localPosition.X < 0) localPosition.X += Config.ChunkSize;
+        if (localPosition.Y < 0) localPosition.Y += Config.ChunkSize;
+        if (localPosition.Z < 0) localPosition.Z += Config.ChunkSize;
+        
+        // 计算全局Y坐标
+        long globalY = chunkPosition.Y * Config.ChunkSize + localPosition.Y;
+        
+        // 搜索范围（确保覆盖上下一个区块）
+        int searchRange = Config.ChunkSize * 2;
+        
+        // 先检查当前位置
+        if (CheckPositionForEmptySpace(worldId, chunkPosition, localPosition, globalY)) {
+            return globalY;
+        }
+        
+        // 交替向下和向上搜索
+        for (int i = 1; i <= searchRange; i++) {
+            // 向下搜索
+            long downY = globalY - i;
+            if (CheckPositionForEmptySpace(worldId, chunkPosition, localPosition, downY)) {
+                return downY;
+            }
+            
+            // 向上搜索
+            long upY = globalY + i;
+            if (CheckPositionForEmptySpace(worldId, chunkPosition, localPosition, upY)) {
+                return upY;
+            }
+        }
+        
+        return -1;  // 没找到合适的空间
+    }
+    
+    // 辅助方法：检查指定全局Y坐标处是否有两格连续的空间
+    private bool CheckPositionForEmptySpace(ulong worldId, Vector3I originalChunkPos, Vector3I localPos, long globalY) {
+        // 计算区块位置和本地位置
+        Vector3I chunkPos = new Vector3I(
+            originalChunkPos.X,
+            (int)Mathf.Floor((float)globalY / Config.ChunkSize),
+            originalChunkPos.Z
+        );
+        int localY = (int)(globalY % Config.ChunkSize);
+        if (localY < 0) localY += Config.ChunkSize;
+        
+        // 获取区块数据
+        var blockData = GetBlockData(worldId, chunkPos);
+        if (blockData == null) return false;
+        
+        // 检查当前位置是否为空
+        if (blockData[localPos.X][localY][localPos.Z].BlockId != 0) return false;
+        
+        // 检查上方一格是否为空
+        if (localY + 1 < Config.ChunkSize) {
+            // 上方格子在同一区块
+            return blockData[localPos.X][localY + 1][localPos.Z].BlockId == 0;
+        } else {
+            // 上方格子在上方区块
+            Vector3I upChunkPos = new Vector3I(chunkPos.X, chunkPos.Y + 1, chunkPos.Z);
+            var upBlockData = GetBlockData(worldId, upChunkPos, false);
+            return upBlockData != null && upBlockData[localPos.X][0][localPos.Z].BlockId == 0;
+        }
+    }
 }

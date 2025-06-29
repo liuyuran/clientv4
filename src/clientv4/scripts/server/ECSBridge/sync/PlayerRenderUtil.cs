@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Friflo.Engine.ECS;
 using game.scripts.manager;
+using game.scripts.manager.map;
 using game.scripts.manager.player;
 using game.scripts.renderer;
 using game.scripts.server.ECSBridge.gravity;
@@ -41,7 +42,7 @@ public static class PlayerRenderUtil {
             entityNodes[entity] = player;
             entity.GetComponent<CPhysicsVelocity>().Rid = player.GetRid();
         }
-        player.GlobalPosition = new Vector3(0, 3, 0);
+        player.GlobalPosition = new Vector3(0, MapManager.instance.GetNearestLand(0, Vector3.Zero) + 3, 0);
 
         var node = LoadModel(ResourcePackManager.instance.GetFileAbsolutePath("core:/models/player.glb"));
         if (node == null) throw new Exception("Failed to load player model.");

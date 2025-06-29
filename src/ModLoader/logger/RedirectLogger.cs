@@ -36,7 +36,7 @@ public sealed class RedirectLogger : ILogger {
                 handler.AppendLiteral("] [");
                 handler.AppendFormatted(_categoryName);
                 handler.AppendLiteral("] [");
-                handler.AppendLiteral(nameof(logLevel));
+                handler.AppendLiteral(logLevel.ToString());
                 handler.AppendLiteral("] ");
                 handler.AppendFormatted(formatter(state, exception));
                 WriteLine(logLevel, handler.ToString());
