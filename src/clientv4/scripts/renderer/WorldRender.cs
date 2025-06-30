@@ -84,9 +84,9 @@ public partial class WorldRender(ulong worldId): Node3D {
         // load can be load, if not data, wait next tick
         var createCount = 0;
         foreach (var chunkCoord in requiredChunks.Except(loadedChunks)) {
-            var chunk = new ChunkRenderItem();
             var data = GetBlockData(_worldId, chunkCoord);
             if (data == null) continue;
+            var chunk = new ChunkRenderItem();
             chunk.InitData(chunkCoord, data);
             AddChild(chunk);
             chunk.Position = new Vector3(

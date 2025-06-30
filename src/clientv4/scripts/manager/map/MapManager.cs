@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using game.scripts.config;
+using game.scripts.exception;
 using game.scripts.renderer;
 using game.scripts.utils;
 using Godot;
@@ -15,6 +17,9 @@ public class MapManager {
     private readonly TerrainGenerator _generator;
     private readonly Dictionary<ulong, Dictionary<Vector3I, BlockData[][][]>> _chunks = new();
     public event BlockChangedCallback OnBlockChanged;
+    
+    private readonly Dictionary<(ulong, Vector3I), bool> _pendingGenerationTasks = new();
+    private readonly object _lockObject = new object();
     
     private MapManager() {
         // 初始化地图管理器
@@ -55,12 +60,42 @@ public class MapManager {
         if (!createIfNotExists) {
             return null;
         }
-        var startTime = PlatformUtil.GetTimestamp();
-        var data = _generator.GenerateTerrain(worldId, position);
-        _logger.LogDebug("Generate terrain for chunk {position} in world {worldId} took {time} ms", position, worldId, PlatformUtil.GetTimestamp() - startTime);
-        chunkData.Add(position, data);
-        blockData = data;
-        return blockData;
+
+        lock (_lockObject) {
+            if (_pendingGenerationTasks.TryGetValue((worldId, position), out var isGenerating) && isGenerating) {
+                // Generation already in progress, return null
+                return null;
+            }
+        
+            // Mark as generating
+            _pendingGenerationTasks[(worldId, position)] = true;
+        }
+    
+        // Start generation in thread pool
+        ThreadPool.QueueUserWorkItem(_ => {
+            try {
+                var startTime = PlatformUtil.GetTimestamp();
+                var data = _generator.GenerateTerrain(worldId, position);
+                _logger.LogDebug("Generate terrain for chunk {position} in world {worldId} took {time} ms", 
+                    position, worldId, PlatformUtil.GetTimestamp() - startTime);
+            
+                lock (_lockObject) {
+                    // Add the generated data to the chunk dictionary
+                    _chunks[worldId][position] = data;
+                    // Remove from pending tasks
+                    _pendingGenerationTasks.Remove((worldId, position));
+                }
+            }
+            catch (System.Exception ex) {
+                _logger.LogError(ex, "Error generating terrain for chunk {position} in world {worldId}", position, worldId);
+                lock (_lockObject) {
+                    _pendingGenerationTasks.Remove((worldId, position));
+                }
+            }
+        });
+    
+        // Return null since generation is in progress
+        return null;
     }
 
     public ulong GetBlockIdByPosition(Vector3 staticBodyGlobalPosition) {
@@ -78,6 +113,9 @@ public class MapManager {
         if (localPosition.Y < 0) localPosition.Y += Config.ChunkSize;
         if (localPosition.Z < 0) localPosition.Z += Config.ChunkSize;
         var blockData = GetBlockData(0, chunkPosition);
+        if (blockData == null) {
+            throw new ChunkGeneratingException();
+        }
         return blockData[localPosition.X][localPosition.Y][localPosition.Z].BlockId;
     }
     

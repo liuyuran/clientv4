@@ -1,4 +1,6 @@
-﻿using game.scripts.config;
+﻿using System;
+using game.scripts.config;
+using game.scripts.exception;
 using game.scripts.manager;
 using game.scripts.manager.blocks;
 using game.scripts.manager.map;
@@ -16,7 +18,11 @@ public partial class ChunkRenderItem : MeshInstance3D {
 
     public override void _Process(double delta) {
         if (_isDirty) {
-            UpdateMesh();
+            try {
+                UpdateMesh();
+            } catch (ChunkGeneratingException) {
+                return;
+            }
             _isDirty = false;
         }
 
