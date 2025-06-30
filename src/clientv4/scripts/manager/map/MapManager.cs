@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
+using System.Threading.Tasks;
 using game.scripts.config;
 using game.scripts.exception;
 using game.scripts.renderer;
@@ -72,7 +72,7 @@ public class MapManager {
         }
     
         // Start generation in thread pool
-        ThreadPool.QueueUserWorkItem(_ => {
+        Task.Run(() => {
             try {
                 var startTime = PlatformUtil.GetTimestamp();
                 var data = _generator.GenerateTerrain(worldId, position);

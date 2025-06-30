@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using game.scripts.config;
-using game.scripts.manager;
 using game.scripts.manager.map;
 using game.scripts.manager.player;
 using game.scripts.utils;
@@ -81,8 +80,6 @@ public partial class WorldRender(ulong worldId): Node3D {
             }
         }
 
-        // load can be load, if not data, wait next tick
-        var createCount = 0;
         foreach (var chunkCoord in requiredChunks.Except(loadedChunks)) {
             var data = GetBlockData(_worldId, chunkCoord);
             if (data == null) continue;
@@ -95,9 +92,6 @@ public partial class WorldRender(ulong worldId): Node3D {
                 chunkCoord.Z * Config.ChunkSize
             );
             _loadedChunks[chunkCoord] = chunk;
-            // don't create too many chunks in one frame
-            createCount++;
-            if (createCount > 1) break;
         }
 
         // unload chunks that are no longer required
