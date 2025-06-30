@@ -19,7 +19,7 @@ public class MapManager {
     public event BlockChangedCallback OnBlockChanged;
     
     private readonly Dictionary<(ulong, Vector3I), bool> _pendingGenerationTasks = new();
-    private readonly object _lockObject = new object();
+    private readonly object _lockObject = new();
     
     private MapManager() {
         // 初始化地图管理器
@@ -50,7 +50,7 @@ public class MapManager {
         OnBlockChanged?.Invoke(worldId, position, blockId, direction);
     }
 
-    public BlockData[][][] GetBlockData(ulong worldId, Vector3I position, bool createIfNotExists = true) {
+    public BlockData[][][] GetBlockData(ulong worldId, Vector3I position, bool createIfNotExists = true, bool sync = true) {
         if (!_chunks.TryGetValue(worldId, out var chunkData)) {
             _chunks.Add(worldId, new Dictionary<Vector3I, BlockData[][][]>());
         }
@@ -71,31 +71,43 @@ public class MapManager {
             _pendingGenerationTasks[(worldId, position)] = true;
         }
     
-        // Start generation in thread pool
-        Task.Run(() => {
-            try {
-                var startTime = PlatformUtil.GetTimestamp();
-                var data = _generator.GenerateTerrain(worldId, position);
-                _logger.LogDebug("Generate terrain for chunk {position} in world {worldId} took {time} ms", 
-                    position, worldId, PlatformUtil.GetTimestamp() - startTime);
-            
-                lock (_lockObject) {
-                    // Add the generated data to the chunk dictionary
-                    _chunks[worldId][position] = data;
-                    // Remove from pending tasks
-                    _pendingGenerationTasks.Remove((worldId, position));
-                }
+        if (sync) {
+            // Start generation in thread pool
+            Task.Run(() => {
+                GenerateChunk(worldId, position);
+            });
+        } else {
+            GenerateChunk(worldId, position);
+            // If not syncing, we can directly generate the chunk
+            // and return the data immediately
+            if (_chunks.TryGetValue(worldId, out chunkData) && chunkData.TryGetValue(position, out blockData)) {
+                return blockData;
             }
-            catch (System.Exception ex) {
-                _logger.LogError(ex, "Error generating terrain for chunk {position} in world {worldId}", position, worldId);
-                lock (_lockObject) {
-                    _pendingGenerationTasks.Remove((worldId, position));
-                }
-            }
-        });
+        }
     
         // Return null since generation is in progress
         return null;
+    }
+    
+    private void GenerateChunk(ulong worldId, Vector3I position) {
+        try {
+            var startTime = PlatformUtil.GetTimestamp();
+            var data = _generator.GenerateTerrain(worldId, position);
+            _logger.LogDebug("Generate terrain for chunk {position} in world {worldId} took {time} ms",
+                position, worldId, PlatformUtil.GetTimestamp() - startTime);
+
+            lock (_lockObject) {
+                // Add the generated data to the chunk dictionary
+                _chunks[worldId][position] = data;
+                // Remove from pending tasks
+                _pendingGenerationTasks.Remove((worldId, position));
+            }
+        } catch (System.Exception ex) {
+            _logger.LogError(ex, "Error generating terrain for chunk {position} in world {worldId}", position, worldId);
+            lock (_lockObject) {
+                _pendingGenerationTasks.Remove((worldId, position));
+            }
+        }
     }
 
     public ulong GetBlockIdByPosition(Vector3 staticBodyGlobalPosition) {
@@ -140,7 +152,7 @@ public class MapManager {
         long globalY = chunkPosition.Y * Config.ChunkSize + localPosition.Y;
         
         // 搜索范围（确保覆盖上下一个区块）
-        int searchRange = Config.ChunkSize * 2;
+        var searchRange = Config.ChunkSize * 2;
         
         // 先检查当前位置
         if (CheckPositionForEmptySpace(worldId, chunkPosition, localPosition, globalY)) {
@@ -148,15 +160,15 @@ public class MapManager {
         }
         
         // 交替向下和向上搜索
-        for (int i = 1; i <= searchRange; i++) {
+        for (var i = 1; i <= searchRange; i++) {
             // 向下搜索
-            long downY = globalY - i;
+            var downY = globalY - i;
             if (CheckPositionForEmptySpace(worldId, chunkPosition, localPosition, downY)) {
                 return downY;
             }
             
             // 向上搜索
-            long upY = globalY + i;
+            var upY = globalY + i;
             if (CheckPositionForEmptySpace(worldId, chunkPosition, localPosition, upY)) {
                 return upY;
             }
@@ -168,12 +180,12 @@ public class MapManager {
     // 辅助方法：检查指定全局Y坐标处是否有两格连续的空间
     private bool CheckPositionForEmptySpace(ulong worldId, Vector3I originalChunkPos, Vector3I localPos, long globalY) {
         // 计算区块位置和本地位置
-        Vector3I chunkPos = new Vector3I(
+        var chunkPos = new Vector3I(
             originalChunkPos.X,
             (int)Mathf.Floor((float)globalY / Config.ChunkSize),
             originalChunkPos.Z
         );
-        int localY = (int)(globalY % Config.ChunkSize);
+        var localY = (int)(globalY % Config.ChunkSize);
         if (localY < 0) localY += Config.ChunkSize;
         
         // 获取区块数据
@@ -187,11 +199,11 @@ public class MapManager {
         if (localY + 1 < Config.ChunkSize) {
             // 上方格子在同一区块
             return blockData[localPos.X][localY + 1][localPos.Z].BlockId == 0;
-        } else {
-            // 上方格子在上方区块
-            Vector3I upChunkPos = new Vector3I(chunkPos.X, chunkPos.Y + 1, chunkPos.Z);
-            var upBlockData = GetBlockData(worldId, upChunkPos, false);
-            return upBlockData != null && upBlockData[localPos.X][0][localPos.Z].BlockId == 0;
         }
+
+        // 上方格子在上方区块
+        var upChunkPos = new Vector3I(chunkPos.X, chunkPos.Y + 1, chunkPos.Z);
+        var upBlockData = GetBlockData(worldId, upChunkPos, false);
+        return upBlockData != null && upBlockData[localPos.X][0][localPos.Z].BlockId == 0;
     }
 }

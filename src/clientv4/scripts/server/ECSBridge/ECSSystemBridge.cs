@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
+using game.scripts.config;
 using game.scripts.manager;
 using game.scripts.manager.map;
 using game.scripts.manager.player;
@@ -10,6 +11,7 @@ using game.scripts.server.ECSBridge.gravity;
 using game.scripts.server.ECSBridge.input;
 using game.scripts.server.ECSBridge.render;
 using game.scripts.server.ECSBridge.sync;
+using game.scripts.utils;
 using Godot;
 
 namespace game.scripts.server.ECSBridge;
@@ -36,21 +38,37 @@ public partial class ECSSystemBridge: Node {
             new SBlockDestroyOrPlace()
         };
     }
+    
+    private IEnumerable<Vector3I> GetRequiredChunkCoordinates(Vector3 playerPosition) {
+        var centerChunk = playerPosition.ToChunkPosition();
+        for (var x = centerChunk.X - Config.ChunkRenderDistance; x <= centerChunk.X + Config.ChunkRenderDistance; x++)
+        for (var y = centerChunk.Y - Config.ChunkRenderDistance; y <= centerChunk.Y + Config.ChunkRenderDistance; y++)
+        for (var z = centerChunk.Z - Config.ChunkRenderDistance; z <= centerChunk.Z + Config.ChunkRenderDistance; z++)
+            yield return new Vector3I(x, y, z);
+    }
 
     public override void _Process(double delta) {
         if (!_isInitialized) {
+            var currentPlayerId = Multiplayer.MultiplayerPeer.GetUniqueId();
+            var playerInfo = PlayerManager.instance.GetPlayerByPeerId(currentPlayerId);
+            if (playerInfo == null) return;
             _isInitialized = true;
-            var inputHandler = _world.CreateEntity(new CRenderType {
+            var player = _world.CreateEntity(new CRenderType {
                 Type = ERenderType.MainPlayer
             }, new CInputEvent(), new CTransform(), new CCamera(), new CPhysicsVelocity(), new CPeer {
                 PeerId = Multiplayer.GetUniqueId()
             }, new CPhysicsStatus {
                 Jumping = false
             }, new CJumpStatus());
-            inputHandler.AddSignalHandler<SignalBlockChanged>(signal => {
+            player.AddSignalHandler<SignalBlockChanged>(signal => {
                 MapManager.instance.SetBlock(signal.Event.WorldId, signal.Event.Position, signal.Event.BlockId, signal.Event.Direction);
             });
-            GetTree().Root.AddChild(new PlayerControl(inputHandler));
+            using var iter = GetRequiredChunkCoordinates(playerInfo.position).GetEnumerator();
+            while (iter.MoveNext()) {
+                var chunkCoord = iter.Current;
+                MapManager.instance.GetBlockData(playerInfo.worldId, chunkCoord, true, false);
+            }
+            GetTree().Root.AddChild(new PlayerControl(player));
             return;
         }
 
