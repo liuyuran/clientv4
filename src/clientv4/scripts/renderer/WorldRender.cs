@@ -80,6 +80,8 @@ public partial class WorldRender(ulong worldId): Node3D {
             }
         }
 
+        // load can be load, if not data, wait next tick
+        var createCount = 0;
         foreach (var chunkCoord in requiredChunks.Except(loadedChunks)) {
             var data = GetBlockData(_worldId, chunkCoord);
             if (data == null) continue;
@@ -92,6 +94,9 @@ public partial class WorldRender(ulong worldId): Node3D {
                 chunkCoord.Z * Config.ChunkSize
             );
             _loadedChunks[chunkCoord] = chunk;
+            // don't create too many chunks in one frame
+            createCount++;
+            if (createCount > 1) break;
         }
 
         // unload chunks that are no longer required
@@ -161,15 +166,5 @@ public partial class WorldRender(ulong worldId): Node3D {
         }
 
         MapManager.instance.OverwriteBlockData(worldId, chunkPosition, data);
-    }
-
-    public void InitRender() {
-        for (var x = 0; x < Config.ChunkSize; x++) {
-            for (var y = 0; y < Config.ChunkSize; y++) {
-                for (var z = 0; z < Config.ChunkSize; z++) {
-                    _Process(0);
-                }
-            }
-        }
     }
 }

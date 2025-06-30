@@ -112,8 +112,10 @@ public partial class ChunkRenderItem : MeshInstance3D {
         var neighborPos = pos + offset;
         if (!IsValidPositionInChunk(neighborPos)) {
             var blockId = MapManager.instance.GetBlockIdByPosition(_chunkPosition * Config.ChunkSize + neighborPos);
-            if (blockId == 0) return true;
-            return BlockManager.instance.GetBlock(blockId).transparent;
+            return blockId switch {
+                null or 0 => true,
+                _ => BlockManager.instance.GetBlock(blockId.Value).transparent
+            };
         }
         var neighborBlockData = GetBlockData(neighborPos);
         if (neighborBlockData == null) {

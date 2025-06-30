@@ -82,7 +82,7 @@ public class SBlockDestroyOrPlace : QuerySystem<CPhysicsVelocity, CCamera, CInpu
                     target.Z = Mathf.FloorToInt(targetF.Z);
                     // Here you can add logic to handle the block interaction, like breaking or placing blocks
                     var blockId = MapManager.instance.GetBlockIdByPosition(target);
-                    if ((blockId == 0 || BlockManager.instance.GetBlock(blockId).blockType != EBlockType.Solid) && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
+                    if (blockId != null && (blockId == 0 || BlockManager.instance.GetBlock(blockId.Value).blockType != EBlockType.Solid) && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
                         entity.EmitSignal(new SignalBlockChanged {
                             Position = target,
                             BlockId = BlockManager.instance.GetBlockId<Dirt>(),

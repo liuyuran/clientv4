@@ -41,9 +41,9 @@ public partial class ECSSystemBridge: Node {
     
     private IEnumerable<Vector3I> GetRequiredChunkCoordinates(Vector3 playerPosition) {
         var centerChunk = playerPosition.ToChunkPosition();
-        for (var x = centerChunk.X - Config.ChunkRenderDistance; x <= centerChunk.X + Config.ChunkRenderDistance; x++)
-        for (var y = centerChunk.Y - Config.ChunkRenderDistance; y <= centerChunk.Y + Config.ChunkRenderDistance; y++)
-        for (var z = centerChunk.Z - Config.ChunkRenderDistance; z <= centerChunk.Z + Config.ChunkRenderDistance; z++)
+        for (var x = centerChunk.X - Config.ChunkRenderDistance - 1; x <= centerChunk.X + Config.ChunkRenderDistance + 1; x++)
+        for (var y = centerChunk.Y - Config.ChunkRenderDistance - 1; y <= centerChunk.Y + Config.ChunkRenderDistance + 1; y++)
+        for (var z = centerChunk.Z - Config.ChunkRenderDistance - 1; z <= centerChunk.Z + Config.ChunkRenderDistance + 1; z++)
             yield return new Vector3I(x, y, z);
     }
 
@@ -52,6 +52,11 @@ public partial class ECSSystemBridge: Node {
             var currentPlayerId = Multiplayer.MultiplayerPeer.GetUniqueId();
             var playerInfo = PlayerManager.instance.GetPlayerByPeerId(currentPlayerId);
             if (playerInfo == null) return;
+            using var iter = GetRequiredChunkCoordinates(playerInfo.position).GetEnumerator();
+            while (iter.MoveNext()) {
+                var chunkCoord = iter.Current;
+                MapManager.instance.GetBlockData(playerInfo.worldId, chunkCoord, true, false);
+            }
             _isInitialized = true;
             var player = _world.CreateEntity(new CRenderType {
                 Type = ERenderType.MainPlayer
@@ -63,11 +68,6 @@ public partial class ECSSystemBridge: Node {
             player.AddSignalHandler<SignalBlockChanged>(signal => {
                 MapManager.instance.SetBlock(signal.Event.WorldId, signal.Event.Position, signal.Event.BlockId, signal.Event.Direction);
             });
-            using var iter = GetRequiredChunkCoordinates(playerInfo.position).GetEnumerator();
-            while (iter.MoveNext()) {
-                var chunkCoord = iter.Current;
-                MapManager.instance.GetBlockData(playerInfo.worldId, chunkCoord, true, false);
-            }
             GetTree().Root.AddChild(new PlayerControl(player));
             return;
         }
