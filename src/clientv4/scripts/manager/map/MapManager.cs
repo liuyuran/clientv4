@@ -55,9 +55,9 @@ public class MapManager {
         if (!createIfNotExists) {
             return null;
         }
-        var startTime = DateUtil.GetTimestamp();
+        var startTime = PlatformUtil.GetTimestamp();
         var data = _generator.GenerateTerrain(worldId, position);
-        _logger.LogDebug("Generate terrain for chunk {position} in world {worldId} took {time} ms", position, worldId, DateUtil.GetTimestamp() - startTime);
+        _logger.LogDebug("Generate terrain for chunk {position} in world {worldId} took {time} ms", position, worldId, PlatformUtil.GetTimestamp() - startTime);
         chunkData.Add(position, data);
         blockData = data;
         return blockData;

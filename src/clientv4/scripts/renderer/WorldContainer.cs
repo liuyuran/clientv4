@@ -20,7 +20,7 @@ public partial class WorldContainer: Control {
     private ulong _currentWorldId;
 
     public override void _Ready() {
-        DateUtil.goDotMode = true;
+        PlatformUtil.goDotMode = true;
         RedirectLogger.WriteLine = (level, s) => {
             GD.Print(string.Format(CultureInfo.CurrentCulture, "[{0}] {1}", level, s));
         };
