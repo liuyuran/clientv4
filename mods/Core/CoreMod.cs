@@ -10,10 +10,11 @@ public class CoreMod : IMod {
 
     public void OnLoad(IModHandler handler) {
         handler.menu.AddMenuGroup("core");
-        handler.menu.AddMenuItem("core", "core_item", "Core Item", "This is a core item.", () => {
-            _logger.LogDebug("Core item clicked!");
-        });
-        _logger.LogDebug("CoreMod loaded.");
+        handler.menu.AddMenuItem("core", "core mod settings",
+            I18N.Tr("mod.core", "menu.setting"),
+            I18N.Tr("mod.core", "menu.setting.desc"),
+            () => { _logger.LogDebug("Core item clicked!"); });
+        _logger.LogDebug(I18N.Tr("mod.core", "mod.loaded"));
     }
 
     public void OnUnload(IModHandler handler) {

@@ -4,3 +4,5 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 src/clientv4/Mods/core/*.dll
+
+*.mo

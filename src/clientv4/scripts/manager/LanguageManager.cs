@@ -1,24 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Godot;
 using Microsoft.Extensions.Logging;
+using ModLoader;
+using ModLoader.language;
 using ModLoader.logger;
 using SecondLanguage;
 using Translation = Godot.Translation;
 
 namespace game.scripts.manager;
 
-public class LanguageManager {
+public class LanguageManager: ITranslateService {
     private readonly ILogger _logger = LogManager.GetLogger<LanguageManager>();
     public static LanguageManager instance { get; private set; } = new();
 
     private LanguageManager() {
-        ReloadLanguageFiles();
+        TranslationServer.SetLocale("zh_CN");
+        I18N.service = this;
     }
 
-    private void ReloadLanguageFiles() {
+    public void ReloadLanguageFiles() {
+        TranslationServer.Clear();
         var allResourcePacks = ResourcePackManager.instance.GetAllResourcePacks();
         foreach (var pack in allResourcePacks) {
             var languagePath = System.IO.Path.Combine(pack.path, "language");
@@ -60,7 +62,8 @@ public class LanguageManager {
         switch (extension) {
             case ".mo": {
                 var parser = new GettextMOTranslation();
-                parser.Load(path);
+                var bytes = FileAccess.GetFileAsBytes(path);
+                parser.Load(bytes);
                 var keys = parser.GetGettextKeys();
                 var translation = new Translation {
                     Locale = locale
@@ -68,6 +71,7 @@ public class LanguageManager {
                 foreach (var key in keys) {
                     var translateKey = key.Key;
                     var value = key.Value;
+                    if (string.IsNullOrEmpty(translateKey.ID)) continue;
                     translation.AddPluralMessage(translateKey.ID, value, translateKey.IDPlural);
                 }
 
@@ -76,7 +80,8 @@ public class LanguageManager {
             }
             case "po": {
                 var parser = new GettextPOTranslation();
-                parser.Load(path);
+                var bytes = FileAccess.GetFileAsBytes(path);
+                parser.Load(bytes);
                 var keys = parser.GetGettextKeys();
                 var translation = new Translation {
                     Locale = locale
@@ -84,6 +89,7 @@ public class LanguageManager {
                 foreach (var key in keys) {
                     var translateKey = key.Key;
                     var value = key.Value;
+                    if (string.IsNullOrEmpty(translateKey.ID)) continue;
                     translation.AddPluralMessage(translateKey.ID, value, translateKey.IDPlural);
                 }
 
@@ -91,5 +97,29 @@ public class LanguageManager {
                 break;
             }
         }
+    }
+
+    public string format(string key, string module, params object[] args) {
+        if (string.IsNullOrEmpty(key)) {
+            _logger.LogWarning("Translation key is null or empty.");
+            return string.Empty;
+        }
+
+        var translation = TranslationServer.Translate(key, module);
+        if (translation == key) {
+            _logger.LogWarning("Translation for key '{Key}' not found.", key);
+            return key;
+        }
+
+        if (args.Length > 0) {
+            try {
+                return string.Format(translation, args);
+            } catch (FormatException e) {
+                _logger.LogError(e, "Error formatting translation for key '{Key}' with args {Args}", key, args);
+                return translation;
+            }
+        }
+
+        return translation;
     }
 }

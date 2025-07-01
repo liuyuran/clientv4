@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-23 18:16+0800\n"
-"PO-Revision-Date: 2025-06-23 18:20+0800\n"
+"POT-Creation-Date: 2025-07-01 10:31+0800\n"
+"PO-Revision-Date: 2025-07-01 10:57+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -19,17 +19,32 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.6\n"
 
-#: scripts/gui/InGameUI/InGamingMenuUI.cs:16
+#: mods/Core/CoreMod.cs:14
+msgid "menu.setting"
+msgid_plural "mod.core"
+msgstr[0] "核心模组设定"
+
+#: mods/Core/CoreMod.cs:15
+msgid "menu.setting.desc"
+msgid_plural "mod.core"
+msgstr[0] "调节核心模组的参数"
+
+#: mods/Core/CoreMod.cs:17
+msgid "mod.loaded"
+msgid_plural "mod.core"
+msgstr[0] "模组已加载"
+
+#: src/clientv4/scripts/gui/InGameUI/InGamingMenuUI.cs:16
 msgid "inventory"
 msgid_plural "menu"
 msgstr[0] "背包"
 
-#: scripts/manager/map/generator/DefaultWorldGenerator.cs:12
+#: src/clientv4/scripts/manager/map/generator/DefaultWorldGenerator.cs:12
 msgid "flat_land"
 msgid_plural "world_type"
 msgstr[0] "超平坦"
 
-#: scripts/manager/map/generator/StandardWorldGenerator.cs:12
+#: src/clientv4/scripts/manager/map/generator/StandardWorldGenerator.cs:12
 msgid "standard_land"
 msgid_plural "world_type"
 msgstr[0] "标准"

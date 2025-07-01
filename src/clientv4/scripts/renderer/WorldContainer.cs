@@ -26,6 +26,7 @@ public partial class WorldContainer: Control {
         };
         PlayerManager.instance.InitializeAnimation();
         ResourcePackManager.instance.ScanResourcePacks();
+        LanguageManager.instance.ReloadLanguageFiles();
         MenuManager.instance.AddMenuGroup("player", 1);
         MenuManager.instance.AddMenuGroup("inventory", 2);
         MenuManager.instance.AddMenuGroup("test", 3);

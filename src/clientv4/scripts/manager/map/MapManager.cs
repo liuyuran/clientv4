@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using game.scripts.config;
-using game.scripts.exception;
 using game.scripts.renderer;
 using game.scripts.utils;
 using Godot;
