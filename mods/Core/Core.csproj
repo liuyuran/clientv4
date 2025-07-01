@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\clientv4\Clientv4.csproj" />
       <ProjectReference Include="..\..\src\ModLoader\ModLoader.csproj" />
     </ItemGroup>
 

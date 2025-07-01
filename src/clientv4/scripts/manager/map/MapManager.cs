@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using game.scripts.config;
+using game.scripts.manager.map.generator;
 using game.scripts.renderer;
 using game.scripts.utils;
 using Godot;
@@ -23,6 +24,10 @@ public class MapManager {
     private MapManager() {
         // 初始化地图管理器
         _generator = new TerrainGenerator(123456);
+    }
+    
+    public void RegisterGenerator<T>(ulong worldId) where T : IWorldGenerator {
+        _generator.RegistryGenerator<T>(worldId);
     }
 
     public void SetBlock(ulong worldId, Vector3 position, ulong blockId, Direction direction) {

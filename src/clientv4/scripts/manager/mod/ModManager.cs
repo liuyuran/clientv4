@@ -24,7 +24,7 @@ public class ModManager {
     private readonly HashSet<string> _activeMods = [];
     private readonly Assembly _modLoaderAssembly = typeof(IMod).Assembly;
     private readonly Assembly _loggerAssembly = typeof(ILogger).Assembly;
-    private readonly IModHandler _modHandler = new DefaultModHandler();
+    private readonly Assembly _selfAssembly = typeof(ModManager).Assembly;
 
     private ModManager() {
         if (_loaded) return;
@@ -39,6 +39,9 @@ public class ModManager {
         }
         if (assemblyName.Name == _loggerAssembly.GetName().Name) {
             return _loggerAssembly;
+        }
+        if (assemblyName.Name == _selfAssembly.GetName().Name) {
+            return _selfAssembly;
         }
         return null;
     }
@@ -123,7 +126,7 @@ public class ModManager {
             return;
         }
 
-        modInstance.OnLoad(_modHandler);
+        modInstance.OnLoad();
         _activeMods.Add(name);
         _logger.LogInformation("Activated mod: {Name}", name);
     }
@@ -139,7 +142,7 @@ public class ModManager {
             return;
         }
 
-        modInstance.OnUnload(_modHandler);
+        modInstance.OnUnload();
         _activeMods.Remove(name);
         _logger.LogInformation("Deactivated mod: {Name}", name);
     }
