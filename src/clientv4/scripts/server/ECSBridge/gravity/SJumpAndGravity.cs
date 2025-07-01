@@ -22,9 +22,9 @@ public class SJumpAndGravity(EntityStore world) : QuerySystem<CInputEvent, CPhys
                 }
                 if (Time.GetTicksMsec() - jumpStatus.JumpStartTime > 300) return; // if jump started more than 500 ms ago, do nothing
                 physicsVelocity.Velocity.Y += (Time.GetTicksMsec() - jumpStatus.JumpStartTime) switch {
-                    < 100 => 600,
-                    < 200 => 300,
-                    _ => 100
+                    < 100 => 1400,
+                    < 200 => 600,
+                    _ => 50
                 };
                 commandBuffer.AddTag<THasDirtData>(entity.Id);
             }
@@ -32,7 +32,7 @@ public class SJumpAndGravity(EntityStore world) : QuerySystem<CInputEvent, CPhys
         // apply gravity
         Query.ForEachEntity(
             (ref CInputEvent _, ref CPhysicsStatus _, ref CPhysicsVelocity physicsVelocity, ref CJumpStatus _, Entity _) => {
-                physicsVelocity.Velocity.Y += -98;
+                physicsVelocity.Velocity.Y += -400;
             }
         );
         commandBuffer.Playback();
