@@ -48,6 +48,7 @@ public partial class ECSSystemBridge: Node {
     }
 
     public override void _Process(double delta) {
+        delta = 0.016;
         if (!_isInitialized) {
             var currentPlayerId = Multiplayer.MultiplayerPeer.GetUniqueId();
             var playerInfo = PlayerManager.instance.GetPlayerByPeerId(currentPlayerId);
