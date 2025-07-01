@@ -38,7 +38,12 @@ public partial class ChunkRenderItem : MeshInstance3D {
         _blockData = blockData;
         Name = $"Chunk_{chunkPosition.X}_{chunkPosition.Y}_{chunkPosition.Z}";
         _chunkPosition = chunkPosition;
-        _isDirty = true;
+        UpdateMesh();
+        Mesh = _readyMesh;
+        if (_readyMesh._Surfaces.Count > 0) {
+            UpdateCollider();
+        }
+        _readyMesh = null;
     }
 
     [Rpc(CallLocal = true)]
