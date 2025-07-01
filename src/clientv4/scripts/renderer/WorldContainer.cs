@@ -15,7 +15,8 @@ namespace game.scripts.renderer;
 public partial class WorldContainer: Control {
     private readonly ILogger _logger = LogManager.GetLogger<WorldContainer>();
     [Export] private PackedScene _worldPrototype;
-    [Export] private PackedScene _UIPrototype;
+    [Export] private PackedScene _uiPrototype;
+    [Export] private PackedScene _loadingPrototype;
     private readonly ConcurrentDictionary<ulong, SubViewport> _subViewports = new();
     private ulong _currentWorldId;
 
@@ -115,7 +116,7 @@ public partial class WorldContainer: Control {
         camera.Name = "MainCamera";
         camera.MakeCurrent();
         camera.GlobalPosition = new Vector3(0, 2, 2);
-        var ui = _UIPrototype.Instantiate<CanvasLayer>();
+        var ui = _uiPrototype.Instantiate<CanvasLayer>();
         subViewport.AddChild(ui);
         _subViewports[worldId] = subViewport;
         _logger.LogDebug("Created sub viewport for world {WorldId}", worldId);

@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7ce5r3ljccrc"]
+
+[ext_resource type="Script" uid="uid://cxv0gvcm5xw56" path="res://scripts/renderer/Loading.cs" id="1_5jylu"]
+
+[node name="Loading" type="CanvasLayer"]
+layer = 3
+visible = false
+script = ExtResource("1_5jylu")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.757243, 0.391373, 0.00843116, 1)
+
+[node name="Content" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Text" type="RichTextLabel" parent="Content"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -101.0
+offset_top = -20.0
+offset_right = -48.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+text = "加载中"
