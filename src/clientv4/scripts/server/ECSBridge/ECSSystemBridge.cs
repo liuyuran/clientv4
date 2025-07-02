@@ -70,6 +70,7 @@ public partial class ECSSystemBridge: Node {
                 MapManager.instance.SetBlock(signal.Event.WorldId, signal.Event.Position, signal.Event.BlockId, signal.Event.Direction);
             });
             GetTree().Root.AddChild(new PlayerControl(player));
+            GameStatus.SetStatus(GameStatus.Status.Playing);
             return;
         }
 

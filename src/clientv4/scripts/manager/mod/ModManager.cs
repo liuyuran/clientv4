@@ -7,7 +7,6 @@ using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader;
-using ModLoader.handle;
 using ModLoader.logger;
 using Tomlyn;
 using FileAccess = Godot.FileAccess;

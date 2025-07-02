@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-01 10:31+0800\n"
+"POT-Creation-Date: 2025-07-01 15:05+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,38 +18,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: mods/Core/CoreMod.cs:14
+#: .\mods\Core\CoreMod.cs:16
 msgid "menu.setting"
 msgid_plural "mod.core"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mods/Core/CoreMod.cs:15
+#: .\mods\Core\CoreMod.cs:18
 msgid "menu.setting.desc"
 msgid_plural "mod.core"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mods/Core/CoreMod.cs:17
+#: .\mods\Core\CoreMod.cs:21
 msgid "mod.loaded"
 msgid_plural "mod.core"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/clientv4/scripts/gui/InGameUI/InGamingMenuUI.cs:16
+#: .\src\clientv4\scripts\gui\InGameUI\InGamingMenuUI.cs:16
 msgid "inventory"
 msgid_plural "menu"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/clientv4/scripts/manager/map/generator/DefaultWorldGenerator.cs:12
-msgid "flat_land"
-msgid_plural "world_type"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/clientv4/scripts/manager/map/generator/StandardWorldGenerator.cs:12
-msgid "standard_land"
-msgid_plural "world_type"
 msgstr[0] ""
 msgstr[1] ""

@@ -8,7 +8,7 @@ public class MenuManager {
     public static MenuManager instance { get; private set; } = new();
     private List<MenuGroupItem> _menus = [];
     
-    public void AddMenuGroup(string id, short order) {
+    public void AddMenuGroup(string id, short order = -1) {
         var group = new MenuGroupItem {
             Id = id,
             Children = [],

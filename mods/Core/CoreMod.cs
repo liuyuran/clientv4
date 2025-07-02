@@ -1,11 +1,12 @@
 ﻿using game.scripts.manager.menu;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using ModLoader;
-using ModLoader.handle;
 using ModLoader.logger;
 
 namespace Core;
 
+[UsedImplicitly]
 public class CoreMod : IMod {
     private readonly ILogger _logger = LogManager.GetLogger<CoreMod>();
 

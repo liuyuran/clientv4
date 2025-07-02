@@ -28,6 +28,7 @@ public partial class WorldContainer: Control {
         PlayerManager.instance.InitializeAnimation();
         ResourcePackManager.instance.ScanResourcePacks();
         LanguageManager.instance.ReloadLanguageFiles();
+        GameStatus.SetStatus(GameStatus.Status.Loading);
         MenuManager.instance.AddMenuGroup("player", 1);
         MenuManager.instance.AddMenuGroup("inventory", 2);
         MenuManager.instance.AddMenuGroup("test", 3);
@@ -118,6 +119,10 @@ public partial class WorldContainer: Control {
         camera.GlobalPosition = new Vector3(0, 2, 2);
         var ui = _uiPrototype.Instantiate<CanvasLayer>();
         subViewport.AddChild(ui);
+        var loading = _loadingPrototype.Instantiate<Loading>();
+        loading.SetLayer(4);
+        loading.Visible = true;
+        subViewport.AddChild(loading);
         _subViewports[worldId] = subViewport;
         _logger.LogDebug("Created sub viewport for world {WorldId}", worldId);
     }
