@@ -23,7 +23,7 @@ public partial class InGamingUI {
         }
     }
 	
-    private void TryClosePauseUI() {
+    public void TryClosePauseUI() {
         if (_status.Focus != InGameUIFocus.Pause) {
             return;
         }

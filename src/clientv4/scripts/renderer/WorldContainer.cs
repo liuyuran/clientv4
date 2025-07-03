@@ -30,20 +30,13 @@ public partial class WorldContainer: Control {
         LanguageManager.instance.ReloadLanguageFiles();
         GameStatus.SetStatus(GameStatus.Status.Loading);
         MenuManager.instance.AddMenuGroup("player", 1);
-        MenuManager.instance.AddMenuGroup("inventory", 2);
-        MenuManager.instance.AddMenuGroup("test", 3);
-        MenuManager.instance.AddMenuItem("player", "player", "哈哈哈", 1, "111", () => {
-            GD.Print("testA");
-        });
-        MenuManager.instance.AddMenuItem("inventory", "inventory", "你YY的", 1, "222", () => {
-            GD.Print("testB");
-        });
-        MenuManager.instance.AddMenuItem("inventory", "inventory2", "你XX的", 2, "333", () => {
-            GD.Print("testB");
-        });
-        MenuManager.instance.AddMenuItem("test", "test", "测试", 1, "444", () => {
-            GD.Print("testB");
-        });
+        MenuManager.instance.AddMenuItem("player", "player",
+            Tr("menu.player", "core"), 1,
+            Tr("menu.player.desc", "core"), () => {
+                var uiRef = GameNodeReference.UI;
+                uiRef.TryClosePauseUI();
+                uiRef.OpenMenu();
+            });
         ModManager.instance.ScanModPacks();
         ModManager.instance.ActivateMod("core");
         ModManager.instance.OnStartGame();
