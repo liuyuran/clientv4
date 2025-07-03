@@ -1,4 +1,5 @@
 using System;
+using game.scripts.utils;
 using Godot;
 
 namespace game.scripts.gui.InGameUI;
@@ -10,6 +11,7 @@ public partial class InGamingUI: CanvasLayer {
 	private InGamingUIStatus _status;
 		
 	public override void _Ready() {
+		GameNodeReference.UI = this;
 		ProcessMode = ProcessModeEnum.Always;
 		_status.Focus = InGameUIFocus.Game;
 		OpenPlayingUI();
