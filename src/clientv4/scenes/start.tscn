@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://2v7krsjntfq"]
 
-[ext_resource type="Texture2D" uid="uid://cdtbb6hjd311b" path="res://assets/start-menu-back.jpeg" id="1_jaeev"]
 [ext_resource type="Script" uid="uid://joix6a68lgkw" path="res://scripts/Menu.cs" id="1_u80x2"]
+[ext_resource type="Texture2D" uid="uid://bes6p7rsfglhp" path="res://assets/start-menu-back.png" id="2_u80x2"]
 
 [node name="Start" type="Control"]
 layout_mode = 3
@@ -19,7 +19,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("1_jaeev")
+texture = ExtResource("2_u80x2")
 stretch_mode = 3
 
 [node name="ButtonBox" type="VBoxContainer" parent="."]
