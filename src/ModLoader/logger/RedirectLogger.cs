@@ -18,9 +18,7 @@ public sealed class RedirectLogger : ILogger {
         _categoryName = categoryName;
     }
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception, string> formatter) {
-        DefaultInterpolatedStringHandler handler;
-
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) {
         switch (logLevel) {
             case LogLevel.None:
                 break;
@@ -30,7 +28,7 @@ public sealed class RedirectLogger : ILogger {
             case LogLevel.Warning:
             case LogLevel.Error:
             case LogLevel.Critical:
-                handler = new DefaultInterpolatedStringHandler(17, 3);
+                var handler = new DefaultInterpolatedStringHandler(17, 3);
                 handler.AppendLiteral("[");
                 handler.AppendFormatted(_timeProvider.GetLocalNow());
                 handler.AppendLiteral("] [");

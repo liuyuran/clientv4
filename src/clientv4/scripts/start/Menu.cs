@@ -3,15 +3,15 @@ using Godot;
 
 namespace game.scripts.start;
 
-public partial class Menu : Node3D {
+public partial class Menu : Control {
     [Export] private PackedScene _gameScene;
     
     public override void _Ready() {
-        //
+        CloseOtherPanel();
     }
 
     public override void _Process(double delta) {
-        //
+        JumpToGameSceneAndStartLocalServer();
     }
     
     private void CloseOtherPanel() {
@@ -23,19 +23,29 @@ public partial class Menu : Node3D {
         GetTree().Quit();
     }
     
+    private void OpenSingle() {
+        CloseOtherPanel();
+        OpenSinglePlayMenu();
+    }
+    
+    private void OpenMulti() {
+        CloseOtherPanel();
+        OpenMultiPlayMenu();
+    }
+    
     private void OpenSettings() {
         CloseOtherPanel();
-        //
+        OpenSettingPanel();
     }
     
     private void OpenModSettings() {
         CloseOtherPanel();
-        //
+        OpenModPanel();
     }
     
     private void OpenAbout() {
         CloseOtherPanel();
-        //
+        OpenAboutPanel();
     }
 
     private void JumpToGameSceneAndStartLocalServer() {
