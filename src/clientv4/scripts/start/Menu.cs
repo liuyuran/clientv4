@@ -1,7 +1,7 @@
 using game.scripts.server;
 using Godot;
 
-namespace game.scripts;
+namespace game.scripts.start;
 
 public partial class Menu : Node3D {
     [Export] private PackedScene _gameScene;
@@ -11,6 +11,30 @@ public partial class Menu : Node3D {
     }
 
     public override void _Process(double delta) {
+        //
+    }
+    
+    private void CloseOtherPanel() {
+        CloseModPanel();
+        CloseAboutPanel();
+    }
+
+    private void ExitGame() {
+        GetTree().Quit();
+    }
+    
+    private void OpenSettings() {
+        CloseOtherPanel();
+        //
+    }
+    
+    private void OpenModSettings() {
+        CloseOtherPanel();
+        //
+    }
+    
+    private void OpenAbout() {
+        CloseOtherPanel();
         //
     }
 
