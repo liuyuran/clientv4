@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
+using game.scripts.utils;
 using Godot;
+using Karambolo.PO;
 using Microsoft.Extensions.Logging;
 using ModLoader;
 using ModLoader.language;
 using ModLoader.logger;
-using SecondLanguage;
 using Translation = Godot.Translation;
 
 namespace game.scripts.manager;
@@ -25,29 +26,9 @@ public class LanguageManager: ITranslateService {
         foreach (var pack in allResourcePacks) {
             var languagePath = System.IO.Path.Combine(pack.path, "language");
             if (!DirAccess.DirExistsAbsolute(languagePath)) continue;
-            // 如果存在相同文件名的两个翻译文件，优先使用mo文件
-            var moFiles = DirAccess.GetFilesAt(languagePath)
-                .Where(file => file.EndsWith(".mo"))
-                .ToList();
-            var moKeys = moFiles
-                .Select(System.IO.Path.GetFileNameWithoutExtension)
-                .ToHashSet();
             var poFiles = DirAccess.GetFilesAt(languagePath)
-                .Where(file => {
-                    if (!file.EndsWith(".po")) return false;
-                    if (moKeys.Contains(System.IO.Path.GetFileNameWithoutExtension(file))) {
-                        return false;
-                    }
-
-                    return true;
-                })
-                .ToList();
-            // 先加载mo文件
-            foreach (var file in moFiles) {
-                var locale = System.IO.Path.GetFileNameWithoutExtension(file);
-                AddTranslation(locale, System.IO.Path.Combine(languagePath, file));
-            }
-
+                .Where(file => file.EndsWith(".po"))
+                .ToHashSet();
             // 再加载po文件
             foreach (var file in poFiles) {
                 var locale = System.IO.Path.GetFileNameWithoutExtension(file);
@@ -60,37 +41,19 @@ public class LanguageManager: ITranslateService {
         _logger.LogDebug("Adding translation for locale {Locale} from path {Path}", locale, path);
         var extension = System.IO.Path.GetExtension(path);
         switch (extension) {
-            case ".mo": {
-                var parser = new GettextMOTranslation();
-                var bytes = FileAccess.GetFileAsBytes(path);
-                parser.Load(bytes);
-                var keys = parser.GetGettextKeys();
+            case ".po": {
+                var parser = new POParser(new POParserSettings());
+                var bytes = FileUtil.RemoveBom(FileAccess.GetFileAsBytes(path));
+                var result = parser.Parse(bytes);
+                var keys = result.Catalog.Keys;
                 var translation = new Translation {
                     Locale = locale
                 };
                 foreach (var key in keys) {
-                    var translateKey = key.Key;
-                    var value = key.Value;
-                    if (string.IsNullOrEmpty(translateKey.ID)) continue;
-                    translation.AddPluralMessage(translateKey.ID, value, translateKey.IDPlural);
-                }
-
-                TranslationServer.AddTranslation(translation);
-                break;
-            }
-            case "po": {
-                var parser = new GettextPOTranslation();
-                var bytes = FileAccess.GetFileAsBytes(path);
-                parser.Load(bytes);
-                var keys = parser.GetGettextKeys();
-                var translation = new Translation {
-                    Locale = locale
-                };
-                foreach (var key in keys) {
-                    var translateKey = key.Key;
-                    var value = key.Value;
-                    if (string.IsNullOrEmpty(translateKey.ID)) continue;
-                    translation.AddPluralMessage(translateKey.ID, value, translateKey.IDPlural);
+                    var translateKey = key.Id;
+                    var contextKey = key.PluralId;
+                    var value = result.Catalog[key].ToArray();
+                    translation.AddPluralMessage(translateKey, value, contextKey);
                 }
 
                 TranslationServer.AddTranslation(translation);
