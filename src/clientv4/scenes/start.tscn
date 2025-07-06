@@ -1,13 +1,13 @@
 [gd_scene load_steps=9 format=3 uid="uid://2v7krsjntfq"]
 
 [ext_resource type="Script" uid="uid://joix6a68lgkw" path="res://scripts/start/Menu.cs" id="1_u80x2"]
+[ext_resource type="PackedScene" uid="uid://cn4ppnh48p74l" path="res://prefabs/menus/about.tscn" id="2_4ge6i"]
 [ext_resource type="Texture2D" uid="uid://bes6p7rsfglhp" path="res://assets/start-menu-back.png" id="2_u80x2"]
-[ext_resource type="PackedScene" uid="uid://cn4ppnh48p74l" path="res://prefabs/menus/about.tscn" id="2_y16t7"]
-[ext_resource type="PackedScene" uid="uid://c4l82svkvmewt" path="res://scenes/game.tscn" id="3_4ge6i"]
-[ext_resource type="PackedScene" uid="uid://it553qyuja7f" path="res://prefabs/menus/mod-settings.tscn" id="4_8itgj"]
-[ext_resource type="PackedScene" uid="uid://coc2dqudywcoq" path="res://prefabs/menus/multi-player.tscn" id="5_8itgj"]
-[ext_resource type="PackedScene" uid="uid://cwgwu1mopi6ss" path="res://prefabs/menus/settings.tscn" id="5_tn317"]
-[ext_resource type="PackedScene" uid="uid://cw1o7mm248i74" path="res://prefabs/menus/single-player.tscn" id="7_tn317"]
+[ext_resource type="PackedScene" uid="uid://it553qyuja7f" path="res://prefabs/menus/mod-settings.tscn" id="3_8itgj"]
+[ext_resource type="PackedScene" uid="uid://c4l82svkvmewt" path="res://scenes/game.tscn" id="3_tn317"]
+[ext_resource type="PackedScene" uid="uid://coc2dqudywcoq" path="res://prefabs/menus/multi-player.tscn" id="4_tn317"]
+[ext_resource type="PackedScene" uid="uid://cwgwu1mopi6ss" path="res://prefabs/menus/settings.tscn" id="5_m8nf6"]
+[ext_resource type="PackedScene" uid="uid://cw1o7mm248i74" path="res://prefabs/menus/single-player.tscn" id="6_pgjjs"]
 
 [node name="Start" type="Control"]
 layout_mode = 3
@@ -17,24 +17,91 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_u80x2")
-_aboutPanelScene = ExtResource("2_y16t7")
-_gameScene = ExtResource("3_4ge6i")
-_modPanelScene = ExtResource("4_8itgj")
-_multiPlayMenuScene = ExtResource("5_8itgj")
-_settingPanelScene = ExtResource("5_tn317")
-_singlePlayMenuScene = ExtResource("7_tn317")
+_aboutPanelScene = ExtResource("2_4ge6i")
+_gameScene = ExtResource("3_tn317")
+_modPanelScene = ExtResource("3_8itgj")
+_multiPlayMenuScene = ExtResource("4_tn317")
+_settingPanelScene = ExtResource("5_m8nf6")
+_singlePlayMenuScene = ExtResource("6_pgjjs")
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -104.0
+offset_top = -60.0
+offset_right = 104.0
+offset_bottom = 60.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_u80x2")
-stretch_mode = 3
+expand_mode = 2
 
-[node name="ButtonBox" type="VBoxContainer" parent="."]
+[node name="GameButtons" type="VBoxContainer" parent="."]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 477.0
+offset_top = 308.0
+offset_right = 787.0
+offset_bottom = 444.0
+
+[node name="SinglePlayer" type="Button" parent="GameButtons"]
+layout_mode = 2
+text = "单人游戏"
+
+[node name="MultiPlayer" type="Button" parent="GameButtons"]
+layout_mode = 2
+text = "多人游戏"
+
+[node name="ModSettings" type="Button" parent="GameButtons"]
+layout_mode = 2
+text = "MOD"
+
+[node name="Settings" type="Button" parent="GameButtons"]
+layout_mode = 2
+text = "设置
+"
+
+[node name="About" type="Button" parent="GameButtons"]
+layout_mode = 2
+text = "关于"
+
+[node name="Exit" type="Button" parent="GameButtons"]
+layout_mode = 2
+text = "退出游戏"
+
+[node name="GameTitle" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 466.0
+offset_top = 135.0
+offset_right = 795.0
+offset_bottom = 231.0
+theme_override_font_sizes/normal_font_size = 35
+bbcode_enabled = true
+text = "无尽魔方
+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Version" type="RichTextLabel" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -284.0
+offset_top = -42.0
+grow_horizontal = 0
+grow_vertical = 0
+bbcode_enabled = true
+fit_content = true
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[connection signal="pressed" from="GameButtons/SinglePlayer" to="." method="OpenSingle"]
+[connection signal="pressed" from="GameButtons/MultiPlayer" to="." method="OpenMulti"]
+[connection signal="pressed" from="GameButtons/ModSettings" to="." method="OpenModSettings"]
+[connection signal="pressed" from="GameButtons/Settings" to="." method="OpenSettings"]
+[connection signal="pressed" from="GameButtons/About" to="." method="OpenAbout"]
+[connection signal="pressed" from="GameButtons/Exit" to="." method="ExitGame"]
