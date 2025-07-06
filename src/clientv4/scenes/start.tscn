@@ -99,6 +99,14 @@ fit_content = true
 horizontal_alignment = 2
 vertical_alignment = 2
 
+[node name="PanelBox" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [connection signal="pressed" from="GameButtons/SinglePlayer" to="." method="OpenSingle"]
 [connection signal="pressed" from="GameButtons/MultiPlayer" to="." method="OpenMulti"]
 [connection signal="pressed" from="GameButtons/ModSettings" to="." method="OpenModSettings"]
