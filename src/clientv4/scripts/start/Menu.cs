@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using game.scripts.manager.reset;
 using game.scripts.server;
 using game.scripts.utils;
 using Godot;
@@ -28,6 +29,7 @@ public partial class Menu : Control {
         GameNodeReference.GamingScenePacked = _gameScene;
         GetTree().Root.SizeChanged += OnRootSizeChanged;
         CallDeferred(MethodName.OnRootSizeChanged);
+        ResetManager.Reset();
     }
 
     public override void _ExitTree() {

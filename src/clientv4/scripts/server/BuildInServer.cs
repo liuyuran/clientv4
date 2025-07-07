@@ -21,6 +21,17 @@ public partial class BuildInServer : Node {
         Multiplayer.ConnectionFailed += OnConnectionFail;
         Multiplayer.ServerDisconnected += OnServerDisconnected;
     }
+    
+    public override void _ExitTree() {
+        Multiplayer.PeerConnected -= OnPlayerConnected;
+        Multiplayer.PeerDisconnected -= OnPlayerDisconnected;
+        Multiplayer.ConnectedToServer -= OnConnectOk;
+        Multiplayer.ConnectionFailed -= OnConnectionFail;
+        Multiplayer.ServerDisconnected -= OnServerDisconnected;
+        _shouldPingThreadRun = false;
+        _pingThread?.Join();
+        base._ExitTree();
+    }
 
     private static string GetNickname() {
         return ServerStartupConfig.instance.nickname;
@@ -89,12 +100,6 @@ public partial class BuildInServer : Node {
     private void OnServerDisconnected() {
         Multiplayer.MultiplayerPeer = null;
         GD.Print("Server disconnected. You can try to reconnect or create a new game.");
-    }
-    
-    public override void _ExitTree() {
-        _shouldPingThreadRun = false;
-        _pingThread?.Join();
-        base._ExitTree();
     }
     
     private void PingMeasurementLoop() {

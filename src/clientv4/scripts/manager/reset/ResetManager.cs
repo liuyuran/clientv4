@@ -1,26 +1,18 @@
-﻿using game.scripts.manager.blocks;
-using game.scripts.manager.chat;
-using game.scripts.manager.item;
-using game.scripts.manager.map;
-using game.scripts.manager.menu;
-using game.scripts.manager.mod;
-using game.scripts.manager.player;
+﻿using System;
+using System.Linq;
 using game.scripts.utils;
 
 namespace game.scripts.manager.reset;
 
 public class ResetManager {
-    public void Reset() {
-        PlayerManager.instance.Reset();
-        MenuManager.instance.Reset();
-        MapManager.instance.Reset();
-        ChatManager.instance.Reset();
-        ItemManager.instance.Reset();
-        BlockManager.instance.Reset();
-        ModManager.instance.Reset();
-        LanguageManager.instance.Reset();
-        MaterialManager.instance.Reset();
-        ResourcePackManager.instance.Reset();
+    public static void Reset() {
+        var resetTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .Where(type => typeof(IReset).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+        foreach (var type in resetTypes) {
+            var resetInstance = (IReset)Activator.CreateInstance(type);
+            resetInstance?.Reset();
+        }
         GameNodeReference.UI = null;
         GameStatus.SetStatus(GameStatus.Status.StartMenu);
     }
