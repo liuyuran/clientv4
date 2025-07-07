@@ -2,12 +2,13 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using game.scripts.manager.reset;
 using Microsoft.Extensions.Logging;
 using ModLoader.logger;
 
 namespace game.scripts.manager.blocks;
 
-public class BlockManager {
+public class BlockManager: IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<BlockManager>();
     public static BlockManager instance { get; private set; } = new();
     
@@ -55,5 +56,17 @@ public class BlockManager {
             throw new Exception($"BlockId {blockId} not found");
         }
         return block;
+    }
+
+    public void Reset() {
+        instance = new BlockManager();
+        Dispose();
+    }
+    
+    public void Dispose() {
+        _blockCache.Clear();
+        _blockIds.Clear();
+        _blocks.Clear();
+        GC.SuppressFinalize(this);
     }
 }

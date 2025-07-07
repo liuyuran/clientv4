@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using game.scripts.manager.reset;
 using Godot;
 
 namespace game.scripts.manager.menu;
 
-public class MenuManager {
+public class MenuManager: IReset, IDisposable {
     public static MenuManager instance { get; private set; } = new();
     private List<MenuGroupItem> _menus = [];
     
@@ -86,5 +87,14 @@ public class MenuManager {
         public Action Action;
         public short ListOrder;
         public string Description;
+    }
+
+    public void Reset() {
+        instance = new MenuManager();
+        Dispose();
+    }
+    public void Dispose() {
+        _menus.Clear();
+        GC.SuppressFinalize(this);
     }
 }

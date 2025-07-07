@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,7 @@ namespace game.scripts.manager;
 /// if someone wants to replace some texture or model, thou can create a resource pack that has higher priority.
 /// every resource pack that has the same name has a priority, and if program cannot find a texture in a pack that has higher priority, then will find in the next pack.
 /// </summary>
-public class ResourcePackManager {
+public class ResourcePackManager: IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<ResourcePackManager>();
     public static ResourcePackManager instance { get; private set; } = new();
     
@@ -110,5 +111,14 @@ public class ResourcePackManager {
         public ulong priority { get; init; }
         public string description { get; init; }
         public string path { get; init; }
+    }
+
+    public void Reset() {
+        instance = new ResourcePackManager();
+        Dispose();
+    }
+    public void Dispose() {
+        _resourcePackPaths.Clear();
+        GC.SuppressFinalize(this);
     }
 }

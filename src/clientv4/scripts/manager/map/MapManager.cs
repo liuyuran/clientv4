@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using game.scripts.config;
 using game.scripts.manager.map.generator;
+using game.scripts.manager.reset;
 using game.scripts.renderer;
 using game.scripts.utils;
 using Godot;
@@ -10,7 +12,7 @@ using ModLoader.logger;
 
 namespace game.scripts.manager.map;
 
-public class MapManager {
+public class MapManager: IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<MapManager>();
     public delegate void BlockChangedCallback(ulong worldId, Vector3 position, ulong blockId, Direction direction);
     public static MapManager instance { get; private set; } = new();
@@ -206,5 +208,16 @@ public class MapManager {
         var upChunkPos = new Vector3I(chunkPos.X, chunkPos.Y + 1, chunkPos.Z);
         var upBlockData = GetBlockData(worldId, upChunkPos, false);
         return upBlockData != null && upBlockData[localPos.X][0][localPos.Z].BlockId == 0;
+    }
+
+    public void Reset() {
+        instance = new MapManager();
+        Dispose();
+    }
+    public void Dispose() {
+        _chunks.Clear();
+        _pendingGenerationTasks.Clear();
+        OnBlockChanged = null;
+        GC.SuppressFinalize(this);
     }
 }

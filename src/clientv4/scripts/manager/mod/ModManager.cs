@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,7 @@ using FileAccess = Godot.FileAccess;
 
 namespace game.scripts.manager.mod;
 
-public class ModManager {
+public class ModManager: IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<ModManager>();
     public static ModManager instance { get; private set; } = new();
     private const string ModDirectory = "Mods";
@@ -174,5 +175,17 @@ public class ModManager {
         public string lib { get; init; }
         public ulong priority { get; init; }
         public string description { get; init; }
+    }
+
+    public void Reset() {
+        instance = new ModManager();
+        Dispose();
+    }
+    public void Dispose() {
+        _modInstances.Clear();
+        _modMetas.Clear();
+        _activeMods.Clear();
+        AppDomain.CurrentDomain.AssemblyResolve -= OnCurrentDomainOnAssemblyResolve;
+        GC.SuppressFinalize(this);
     }
 }

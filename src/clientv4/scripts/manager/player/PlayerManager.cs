@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using game.scripts.manager.reset;
 using Godot;
 
 namespace game.scripts.manager.player;
 
-public partial class PlayerManager {
+public partial class PlayerManager: IReset, IDisposable {
     public static PlayerManager instance { get; private set; } = new();
     
     private readonly Dictionary<long, PlayerInfo> _playersByPeerId = new();
@@ -77,6 +79,20 @@ public partial class PlayerManager {
     
     public Vector3 GetPlayerPosition(long peerId) {
         return _playersByPeerId.TryGetValue(peerId, out var playerInfo) ? playerInfo.position : Vector3.Zero;
+    }
+
+    public void Reset() {
+        instance = new PlayerManager();
+        Dispose();
+    }
+    public void Dispose() {
+        _playersByPeerId.Clear();
+        _playersById.Clear();
+        _sentChunks.Clear();
+        _animationPlayer.QueueFree();
+        _animationPlayer = null;
+        _animationLibraries.Clear();
+        GC.SuppressFinalize(this);
     }
 }
 

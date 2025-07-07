@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
 using Karambolo.PO;
@@ -11,7 +12,7 @@ using Translation = Godot.Translation;
 
 namespace game.scripts.manager;
 
-public class LanguageManager: ITranslateService {
+public class LanguageManager: ITranslateService, IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<LanguageManager>();
     public static LanguageManager instance { get; private set; } = new();
 
@@ -84,5 +85,14 @@ public class LanguageManager: ITranslateService {
         }
 
         return translation;
+    }
+
+    public void Reset() {
+        instance = new LanguageManager();
+        Dispose();
+    }
+    public void Dispose() {
+        TranslationServer.Clear();
+        GC.SuppressFinalize(this);
     }
 }

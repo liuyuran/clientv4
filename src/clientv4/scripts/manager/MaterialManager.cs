@@ -2,6 +2,7 @@
 using System.Linq;
 using game.scripts.manager.blocks;
 using game.scripts.manager.item;
+using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
 using Godot.Collections;
@@ -10,7 +11,7 @@ using ModLoader.logger;
 
 namespace game.scripts.manager;
 
-public class MaterialManager {
+public class MaterialManager: IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<MaterialManager>();
     public static MaterialManager instance { get; private set; } = new();
     private readonly Dictionary<ulong, Dictionary<Direction, Vector2[]>> _uvs = new();
@@ -400,5 +401,21 @@ public class MaterialManager {
         }
 
         return _itemUvs[itemId][direction];
+    }
+
+    public void Reset() {
+        instance = new MaterialManager();
+        Dispose();
+    }
+    public void Dispose() {
+        _uvs.Clear();
+        _itemUvs.Clear();
+        _defaultMaterial?.Dispose();
+        _defaultWaterMaterial?.Dispose();
+        _defaultItemMaterial?.Dispose();
+        _defaultMaterial = null;
+        _defaultWaterMaterial = null;
+        _defaultItemMaterial = null;
+        GC.SuppressFinalize(this);
     }
 }

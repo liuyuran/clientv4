@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using game.scripts.manager.item.composition;
+using game.scripts.manager.reset;
 using game.scripts.renderer;
 using Godot;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,7 @@ using ModLoader.logger;
 
 namespace game.scripts.manager.item;
 
-public class ItemManager {
+public class ItemManager: IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<ItemManager>();
     public static ItemManager instance { get; private set; } = new();
     
@@ -73,5 +74,15 @@ public class ItemManager {
         }
 
         return node;
+    }
+
+    public void Reset() {
+        instance = new ItemManager();
+        Dispose();
+    }
+    public void Dispose() {
+        _items.Clear();
+        _itemIds.Clear();
+        GC.SuppressFinalize(this);
     }
 }
