@@ -1,13 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using game.scripts.manager.reset;
+using game.scripts.utils;
 using Godot;
+using ModLoader;
 
 namespace game.scripts.manager.menu;
 
 public class MenuManager: IReset, IDisposable {
     public static MenuManager instance { get; private set; } = new();
     private List<MenuGroupItem> _menus = [];
+
+    private MenuManager() {
+        AddMenuGroup("system", 1);
+        AddMenuItem("system", "back-to-start",
+            I18N.Tr("menu.system", "back-to-start"), 1,
+            I18N.Tr("menu.system", "back-to-start.desc"), () => {
+                GameNodeReference.CurrentScene.GetTree().ChangeSceneToPacked(GameNodeReference.StartScenePacked);
+            });
+        AddMenuItem("system", "exit",
+            I18N.Tr("menu.system", "exit"), 1,
+            I18N.Tr("menu.system", "exit.desc"), () => {
+                GameNodeReference.CurrentScene.GetTree().Quit();
+            });
+    }
     
     public void AddMenuGroup(string id, short order = -1) {
         var group = new MenuGroupItem {

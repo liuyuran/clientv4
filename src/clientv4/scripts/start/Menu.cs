@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using game.scripts.server;
+using game.scripts.utils;
 using Godot;
 
 namespace game.scripts.start;
@@ -7,6 +8,7 @@ namespace game.scripts.start;
 [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
 public partial class Menu : Control {
     [Export] private PackedScene _gameScene;
+    [Export] private PackedScene _startScene;
     private TextureRect _backgroundRect;
     private VBoxContainer _gameBtnContainer;
     private RichTextLabel _gameTitleLabel;
@@ -21,6 +23,9 @@ public partial class Menu : Control {
         _modalPanel = GetNode<Panel>("PanelBox");
         CloseOtherPanel();
         InjectVersionInfo();
+        GameNodeReference.CurrentScene = GetTree().CurrentScene;
+        GameNodeReference.StartScenePacked = _startScene;
+        GameNodeReference.GamingScenePacked = _gameScene;
         GetTree().Root.SizeChanged += OnRootSizeChanged;
         CallDeferred(MethodName.OnRootSizeChanged);
     }
@@ -116,7 +121,7 @@ public partial class Menu : Control {
         ServerStartupConfig.instance.serverIp = "";
         ServerStartupConfig.instance.serverPort = -1;
         // 加载游戏场景
-        GetTree().ChangeSceneToPacked(_gameScene);
+        GetTree().ChangeSceneToPacked(GameNodeReference.GamingScenePacked);
     }
     
     private void InjectVersionInfo() {

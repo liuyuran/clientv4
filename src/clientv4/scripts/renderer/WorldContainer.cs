@@ -21,6 +21,7 @@ public partial class WorldContainer: Control {
     private ulong _currentWorldId;
 
     public override void _Ready() {
+        GameNodeReference.CurrentScene = GetTree().CurrentScene;
         PlatformUtil.goDotMode = true;
         RedirectLogger.WriteLine = (level, s) => {
             GD.Print(string.Format(CultureInfo.CurrentCulture, "[{0}] {1}", level, s));
@@ -29,14 +30,6 @@ public partial class WorldContainer: Control {
         ResourcePackManager.instance.ScanResourcePacks();
         LanguageManager.instance.ReloadLanguageFiles();
         GameStatus.SetStatus(GameStatus.Status.Loading);
-        MenuManager.instance.AddMenuGroup("player", 1);
-        MenuManager.instance.AddMenuItem("player", "player",
-            Tr("menu.player", "core"), 1,
-            Tr("menu.player.desc", "core"), () => {
-                var uiRef = GameNodeReference.UI;
-                uiRef.TryClosePauseUI();
-                uiRef.OpenMenu();
-            });
         ModManager.instance.ScanModPacks();
         ModManager.instance.ActivateMod("core");
         ModManager.instance.OnStartGame();
