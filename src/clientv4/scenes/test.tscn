@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://m713emq6mwqv"]
+
+[ext_resource type="Script" uid="uid://b6nu36qchoek6" path="res://scripts/start/background/SinglePlayerBackground.cs" id="1_errlg"]
+
+[node name="Test" type="Panel"]
+script = ExtResource("1_errlg")

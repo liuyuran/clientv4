@@ -19,7 +19,6 @@ grow_vertical = 2
 script = ExtResource("1_u80x2")
 _aboutPanelScene = ExtResource("2_4ge6i")
 _gameScene = ExtResource("3_tn317")
-_startScene = null
 _modPanelScene = ExtResource("3_8itgj")
 _multiPlayMenuScene = ExtResource("4_tn317")
 _settingPanelScene = ExtResource("5_m8nf6")
