@@ -14,6 +14,42 @@ public class ArchiveManager {
     public static ArchiveManager instance { get; private set; } = new();
     
     private const string SaveDirectory = "worlds";
+
+    public void Create(string saveName) {
+        var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
+        var saveBasePath = Path.Combine(basePath, SaveDirectory);
+        
+        if (!DirAccess.DirExistsAbsolute(saveBasePath)) {
+            DirAccess.MakeDirAbsolute(saveBasePath);
+        }
+        
+        var savePath = Path.Combine(saveBasePath, saveName);
+        if (DirAccess.DirExistsAbsolute(savePath)) {
+            _logger.LogWarning("Save directory '{SaveName}' already exists at path: {Path}", saveName, savePath);
+            return;
+        }
+        
+        DirAccess.MakeDirAbsolute(savePath);
+    }
+
+    public List<ArchiveMeta> List(string saveName) {
+        var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
+        var saveBasePath = Path.Combine(basePath, SaveDirectory);
+        
+        if (!DirAccess.DirExistsAbsolute(saveBasePath)) {
+            _logger.LogWarning("Save directory '{SaveDirectory}' does not exist at path: {Path}", SaveDirectory, saveBasePath);
+            return [];
+        }
+        
+        var savePath = Path.Combine(saveBasePath, saveName);
+        if (!DirAccess.DirExistsAbsolute(savePath)) {
+            _logger.LogWarning("Save directory '{SaveName}' does not exist at path: {Path}", saveName, savePath);
+            return [];
+        }
+        
+        var archiveFiles = DirAccess.GetDirectoriesAt(savePath);
+        return archiveFiles.Select(file => new ArchiveMeta { Name = Path.GetFileName(file) }).ToList();
+    }
     
     public void Save(string saveName) {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
@@ -63,5 +99,9 @@ public class ArchiveManager {
                 return null;
             });
         }
+    }
+    
+    public struct ArchiveMeta {
+        public string Name;
     }
 }
