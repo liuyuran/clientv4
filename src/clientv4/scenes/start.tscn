@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://2v7krsjntfq"]
+[gd_scene load_steps=10 format=3 uid="uid://2v7krsjntfq"]
 
 [ext_resource type="Script" uid="uid://joix6a68lgkw" path="res://scripts/start/Menu.cs" id="1_u80x2"]
 [ext_resource type="PackedScene" uid="uid://cn4ppnh48p74l" path="res://prefabs/menus/about.tscn" id="2_4ge6i"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://coc2dqudywcoq" path="res://prefabs/menus/multi-player.tscn" id="4_tn317"]
 [ext_resource type="PackedScene" uid="uid://cwgwu1mopi6ss" path="res://prefabs/menus/settings.tscn" id="5_m8nf6"]
 [ext_resource type="PackedScene" uid="uid://cw1o7mm248i74" path="res://prefabs/menus/single-player.tscn" id="6_pgjjs"]
+[ext_resource type="PackedScene" uid="uid://bjgy3hhrl5g25" path="res://prefabs/menus/single/singleArchiveItem.tscn" id="8_tn317"]
 
 [node name="Start" type="Control"]
 layout_mode = 3
@@ -19,10 +20,12 @@ grow_vertical = 2
 script = ExtResource("1_u80x2")
 _aboutPanelScene = ExtResource("2_4ge6i")
 _gameScene = ExtResource("3_tn317")
+_startScene = null
 _modPanelScene = ExtResource("3_8itgj")
 _multiPlayMenuScene = ExtResource("4_tn317")
 _settingPanelScene = ExtResource("5_m8nf6")
 _singlePlayMenuScene = ExtResource("6_pgjjs")
+_singleArchiveItemScene = ExtResource("8_tn317")
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 1

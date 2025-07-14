@@ -5,38 +5,35 @@ namespace game.scripts.start.background;
 public partial class SinglePlayerBackground : Panel {
     public override void _Draw() {
         var componentSize = GetTree().Root.GetSize();
-        const float margin = 100.0f;
+        const float margin = 25.0f;
         const float cornerRadius = 15.0f; // 内凹圆角半径
         var color = new Color(0.2f, 0.2f, 0.2f); // 深灰色
 
         // 1. 左侧矩形
-        var leftRectWidth = 250.0f;
+        const float leftRectWidth = 250.0f;
         var leftRectHeight = componentSize.Y - 2 * margin;
         if (leftRectHeight > 2 * cornerRadius) {
             var leftRect = new Rect2(margin, margin, leftRectWidth, leftRectHeight);
-            DrawInvertedRoundRect(leftRect, cornerRadius, color);
+            DrawInvertedRoundRect(leftRect, cornerRadius, color, 2);
         }
 
         // 右侧区域的起始 X 坐标和可用宽度
-        var rightAreaX = margin + leftRectWidth + margin;
+        const float rightAreaX = margin + leftRectWidth + margin;
         var rightAreaWidth = componentSize.X - rightAreaX - margin;
 
-        if (rightAreaWidth > 2 * cornerRadius) {
-            // 2. 右下矩形
-            const float rightBottomRectHeight = 30.0f;
-            var rightBottomRectY = componentSize.Y - margin - rightBottomRectHeight;
-            if (rightBottomRectY > margin) {
-                var rightBottomRect = new Rect2(rightAreaX, rightBottomRectY, rightAreaWidth, rightBottomRectHeight);
-                DrawInvertedRoundRect(rightBottomRect, cornerRadius, color);
+        if (!(rightAreaWidth > 2 * cornerRadius)) return;
+        // 2. 右下矩形
+        const float rightBottomRectHeight = 90.0f;
+        var rightBottomRectY = componentSize.Y - margin - rightBottomRectHeight;
+        if (!(rightBottomRectY > margin)) return;
+        var rightBottomRect = new Rect2(rightAreaX, rightBottomRectY, rightAreaWidth, rightBottomRectHeight);
+        DrawInvertedRoundRect(rightBottomRect, cornerRadius, color, 2);
 
-                // 3. 右上矩形
-                var rightTopRectHeight = rightBottomRectY - margin - margin; // 高度为剩余空间
-                if (rightTopRectHeight > 2 * cornerRadius) {
-                    var rightTopRect = new Rect2(rightAreaX, margin, rightAreaWidth, rightTopRectHeight);
-                    DrawInvertedRoundRect(rightTopRect, cornerRadius, color);
-                }
-            }
-        }
+        // 3. 右上矩形
+        var rightTopRectHeight = rightBottomRectY - margin - margin; // 高度为剩余空间
+        if (!(rightTopRectHeight > 2 * cornerRadius)) return;
+        var rightTopRect = new Rect2(rightAreaX, margin, rightAreaWidth, rightTopRectHeight);
+        DrawInvertedRoundRect(rightTopRect, cornerRadius, color, 2);
     }
 
     /// <summary>

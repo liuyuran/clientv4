@@ -10,8 +10,12 @@ public class ResetManager {
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => typeof(IReset).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
         foreach (var type in resetTypes) {
-            var resetInstance = (IReset)Activator.CreateInstance(type);
-            resetInstance?.Reset();
+            // 获取类型上名为instance的静态字段，此字段为自身类型的单例
+            var instanceField = type.GetField("instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            if (instanceField == null) continue;
+            var instance = instanceField.GetValue(null);
+            if (instance is not IReset resetInstance) continue;
+            resetInstance.Reset();
         }
         GameNodeReference.UI = null;
         GameStatus.SetStatus(GameStatus.Status.StartMenu);
