@@ -1,9 +1,11 @@
-﻿using Godot;
+﻿using game.scripts.manager.archive;
+using Godot;
 
 namespace game.scripts.start;
 
 public partial class Menu {
     [Export] private PackedScene _singlePlayMenuScene;
+    [Export] private PackedScene _singleArchiveItemScene;
     private Control _singlePlayMenu;
     
     private void CloseSinglePlayMenu() {
@@ -15,5 +17,44 @@ public partial class Menu {
     private void OpenSinglePlayMenu() {
         _singlePlayMenu = _singlePlayMenuScene.Instantiate<Control>();
         _modalPanel.AddChild(_singlePlayMenu);
+    }
+
+    private void LoadArchiveList() {
+        if (_singlePlayMenu == null) {
+            GD.PrintErr("SinglePlayMenu is not initialized.");
+            return;
+        }
+        
+        var archiveList = _singlePlayMenu.GetNode<VBoxContainer>("ArchiveList");
+        foreach (var child in archiveList.GetChildren()) {
+            child.QueueFree();
+        }
+
+        var archives = ArchiveManager.instance.List();
+        foreach (var archive in archives) {
+            var item = _singleArchiveItemScene.Instantiate<HBoxContainer>();
+            // TODO inject data to node
+            item.Name = archive.Name;
+            item.Connect(Control.SignalName.MouseEntered, new Callable(this, MethodName.ArchiveItemMouseEntered));
+            item.Connect(Control.SignalName.MouseExited, new Callable(this, MethodName.ArchiveItemMouseExited));
+            item.Connect(Control.SignalName.GuiInput, new Callable(this, MethodName.ArchiveItemGuiInput));
+            archiveList.AddChild(item);
+        }
+    }
+    
+    private void ArchiveItemMouseEntered(HBoxContainer item) {
+        GD.Print("Mouse entered archive item: ", item.Name);
+    }
+    
+    private void ArchiveItemMouseExited(HBoxContainer item) {
+        GD.Print("Mouse exited archive item: ", item.Name);
+    }
+
+    private void ArchiveItemGuiInput(HBoxContainer item) {
+        // mouse click
+        if (Input.IsMouseButtonPressed(MouseButton.Left)) {
+            GD.Print("Archive item clicked: ", item.Name);
+            // TODO handle archive item click
+        }
     }
 }

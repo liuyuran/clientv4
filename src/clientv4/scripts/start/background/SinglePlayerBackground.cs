@@ -25,7 +25,7 @@ public partial class SinglePlayerBackground : Panel {
             // 2. 右下矩形
             const float rightBottomRectHeight = 30.0f;
             var rightBottomRectY = componentSize.Y - margin - rightBottomRectHeight;
-            if (rightBottomRectY > margin && rightBottomRectHeight >= 2 * cornerRadius) {
+            if (rightBottomRectY > margin) {
                 var rightBottomRect = new Rect2(rightAreaX, rightBottomRectY, rightAreaWidth, rightBottomRectHeight);
                 DrawInvertedRoundRect(rightBottomRect, cornerRadius, color);
 

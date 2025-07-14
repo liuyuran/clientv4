@@ -32,7 +32,7 @@ public class ArchiveManager {
         DirAccess.MakeDirAbsolute(savePath);
     }
 
-    public List<ArchiveMeta> List(string saveName) {
+    public List<ArchiveMeta> List() {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
         var saveBasePath = Path.Combine(basePath, SaveDirectory);
         
@@ -41,13 +41,7 @@ public class ArchiveManager {
             return [];
         }
         
-        var savePath = Path.Combine(saveBasePath, saveName);
-        if (!DirAccess.DirExistsAbsolute(savePath)) {
-            _logger.LogWarning("Save directory '{SaveName}' does not exist at path: {Path}", saveName, savePath);
-            return [];
-        }
-        
-        var archiveFiles = DirAccess.GetDirectoriesAt(savePath);
+        var archiveFiles = DirAccess.GetDirectoriesAt(saveBasePath);
         return archiveFiles.Select(file => new ArchiveMeta { Name = Path.GetFileName(file) }).ToList();
     }
     
