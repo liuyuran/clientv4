@@ -76,7 +76,7 @@ public partial class Menu : Control {
     public override void _Process(double delta) {
         // JumpToGameSceneAndStartLocalServer();
     }
-    
+
     private void CloseOtherPanel() {
         CloseModPanel();
         CloseAboutPanel();
