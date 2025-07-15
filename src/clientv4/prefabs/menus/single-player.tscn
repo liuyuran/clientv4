@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://cw1o7mm248i74"]
+[gd_scene load_steps=6 format=3 uid="uid://cw1o7mm248i74"]
 
 [ext_resource type="PackedScene" uid="uid://bjgy3hhrl5g25" path="res://prefabs/menus/single/singleArchiveItem.tscn" id="1_crsvh"]
 [ext_resource type="Script" uid="uid://b6nu36qchoek6" path="res://scripts/start/background/SinglePlayerBackground.cs" id="1_nlj08"]
@@ -11,8 +11,6 @@ gradient = SubResource("Gradient_rf50a")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_0godb"]
 texture = SubResource("GradientTexture1D_ddb8j")
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nlj08"]
 
 [node name="Single-player" type="Control"]
 layout_mode = 3
@@ -32,66 +30,80 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_0godb")
 script = ExtResource("1_nlj08")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_nlj08")
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 45
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
 layout_mode = 2
-offset_right = 1152.0
-offset_bottom = 648.0
-grow_horizontal = 2
-grow_vertical = 2
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="Panel/HBoxContainer"]
+[node name="ArchiveBox" type="VBoxContainer" parent="Panel/HBoxContainer"]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="Panel/HBoxContainer/VBoxContainer2"]
-custom_minimum_size = Vector2(0, 80)
+[node name="Button" type="Button" parent="Panel/HBoxContainer/ArchiveBox"]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "新世界"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Panel/HBoxContainer/VBoxContainer2"]
-custom_minimum_size = Vector2(250, 0)
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/HBoxContainer/ArchiveBox"]
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer/VBoxContainer2/ScrollContainer"]
+[node name="ArchiveList" type="VBoxContainer" parent="Panel/HBoxContainer/ArchiveBox/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBoxContainer" parent="Panel/HBoxContainer/VBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource("1_crsvh")]
+[node name="VBoxContainer" parent="Panel/HBoxContainer/ArchiveBox/ScrollContainer/ArchiveList" instance=ExtResource("1_crsvh")]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 80
+theme_override_constants/margin_right = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_bottom = 60
+
+[node name="InfoScroll" type="ScrollContainer" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Panel/HBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="InfoBox" type="VBoxContainer" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/InfoScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ArchiveInfo" type="RichTextLabel" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/InfoScroll/InfoBox"]
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
-text = "test"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel/HBoxContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 80)
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 
-[node name="Button" type="Button" parent="Panel/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="LoadButton" type="Button" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "加载存档"
 
-[node name="Button2" type="Button" parent="Panel/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="DeleteButton" type="Button" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "删除存档"

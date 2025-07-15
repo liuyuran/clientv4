@@ -26,6 +26,9 @@ public partial class Menu {
         }
         
         var archiveList = _singlePlayMenu.GetNode<VBoxContainer>("ArchiveList");
+        var archiveInfo = _singlePlayMenu.GetNode<RichTextLabel>("ArchiveInfo");
+        var loadButton = _singlePlayMenu.GetNode<Button>("LoadButton");
+        var deleteButton = _singlePlayMenu.GetNode<Button>("DeleteButton");
         foreach (var child in archiveList.GetChildren()) {
             child.QueueFree();
         }
