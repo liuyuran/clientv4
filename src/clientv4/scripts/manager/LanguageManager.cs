@@ -91,6 +91,7 @@ public class LanguageManager: ITranslateService, IReset, IDisposable {
         instance = new LanguageManager();
         Dispose();
     }
+    
     public void Dispose() {
         TranslationServer.Clear();
         GC.SuppressFinalize(this);

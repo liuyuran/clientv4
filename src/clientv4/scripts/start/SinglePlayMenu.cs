@@ -37,7 +37,9 @@ public partial class Menu {
             item.Name = archive.Name;
             item.Connect(Control.SignalName.MouseEntered, new Callable(this, MethodName.ArchiveItemMouseEntered));
             item.Connect(Control.SignalName.MouseExited, new Callable(this, MethodName.ArchiveItemMouseExited));
-            item.Connect(Control.SignalName.GuiInput, new Callable(this, MethodName.ArchiveItemGuiInput));
+            item.Connect(Control.SignalName.GuiInput, Callable.From(() => {
+                ArchiveItemGuiInput(item);
+            }));
             archiveList.AddChild(item);
         }
     }
@@ -53,8 +55,12 @@ public partial class Menu {
     private void ArchiveItemGuiInput(HBoxContainer item) {
         // mouse click
         if (Input.IsMouseButtonPressed(MouseButton.Left)) {
-            GD.Print("Archive item clicked: ", item.Name);
-            // TODO handle archive item click
+            LoadArchiveItemDetailData(item.Name);
         }
+    }
+    
+    private void LoadArchiveItemDetailData(string archiveName) {
+        // TODO load archive item detail data
+        GD.Print("Loading archive item detail data for: ", archiveName);
     }
 }

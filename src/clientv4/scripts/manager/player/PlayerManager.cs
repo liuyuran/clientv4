@@ -89,8 +89,10 @@ public partial class PlayerManager: IReset, IDisposable {
         _playersByPeerId.Clear();
         _playersById.Clear();
         _sentChunks.Clear();
-        _animationPlayer.QueueFree();
-        _animationPlayer = null;
+        if (_animationPlayer != null) {
+            _animationPlayer.QueueFree();
+            _animationPlayer = null;
+        }
         _animationLibraries.Clear();
         GC.SuppressFinalize(this);
     }
