@@ -1,16 +1,16 @@
 [gd_scene load_steps=6 format=3 uid="uid://cw1o7mm248i74"]
 
-[ext_resource type="PackedScene" uid="uid://bjgy3hhrl5g25" path="res://prefabs/menus/single/singleArchiveItem.tscn" id="1_crsvh"]
 [ext_resource type="Script" uid="uid://b6nu36qchoek6" path="res://scripts/start/background/SinglePlayerBackground.cs" id="1_nlj08"]
+[ext_resource type="PackedScene" uid="uid://j3x420fdiyv5" path="res://prefabs/menus/single/createWorld.tscn" id="2_nlj08"]
 
 [sub_resource type="Gradient" id="Gradient_rf50a"]
 colors = PackedColorArray(0.56985, 0.625954, 0.528781, 1, 0.568627, 0.627451, 0.529412, 1)
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_ddb8j"]
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rf50a"]
 gradient = SubResource("Gradient_rf50a")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_0godb"]
-texture = SubResource("GradientTexture1D_ddb8j")
+texture = SubResource("GradientTexture1D_rf50a")
 
 [node name="Single-player" type="Control"]
 layout_mode = 3
@@ -62,9 +62,6 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBoxContainer" parent="Panel/HBoxContainer/ArchiveBox/ScrollContainer/ArchiveList" instance=ExtResource("1_crsvh")]
-layout_mode = 2
-
 [node name="MarginContainer" type="MarginContainer" parent="Panel/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -107,3 +104,7 @@ text = "加载存档"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "删除存档"
+
+[node name="CreateWorld" parent="." instance=ExtResource("2_nlj08")]
+visible = false
+layout_mode = 1

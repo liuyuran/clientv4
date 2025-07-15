@@ -36,7 +36,7 @@ public partial class Menu {
         var archives = ArchiveManager.instance.List();
         foreach (var archive in archives) {
             var item = _singleArchiveItemScene.Instantiate<HBoxContainer>();
-            // TODO inject data to node
+            var displayLabel = item.GetNode<RichTextLabel>("DisplayName");
             item.Name = archive.Name;
             item.Connect(Control.SignalName.MouseEntered, new Callable(this, MethodName.ArchiveItemMouseEntered));
             item.Connect(Control.SignalName.MouseExited, new Callable(this, MethodName.ArchiveItemMouseExited));
