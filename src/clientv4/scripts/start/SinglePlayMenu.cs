@@ -27,6 +27,7 @@ public partial class Menu {
         
         var archiveList = _singlePlayMenu.GetNode<VBoxContainer>("ArchiveList");
         var archiveInfo = _singlePlayMenu.GetNode<RichTextLabel>("ArchiveInfo");
+        var createButton = _singlePlayMenu.GetNode<Button>("CreateButton");
         var loadButton = _singlePlayMenu.GetNode<Button>("LoadButton");
         var deleteButton = _singlePlayMenu.GetNode<Button>("DeleteButton");
         foreach (var child in archiveList.GetChildren()) {
@@ -65,5 +66,28 @@ public partial class Menu {
     private void LoadArchiveItemDetailData(string archiveName) {
         // TODO load archive item detail data
         GD.Print("Loading archive item detail data for: ", archiveName);
+    }
+
+    private void OpenSingleCreateWorld() {
+        var createPanel = _singlePlayMenu.GetNode<Control>("CreateWorld");
+        createPanel.Visible = true;
+        var seed = _singlePlayMenu.GetNode<LineEdit>("SeedInput");
+        var createButton = _singlePlayMenu.GetNode<Button>("StartGame");
+        seed.Text = "";
+        createButton.Pressed += CreateArchive;
+    }
+
+    private void CloseSingleCreateWorld() {
+        var createPanel = _singlePlayMenu.GetNode<Control>("CreateWorld");
+        createPanel.Visible = false;
+        var seed = _singlePlayMenu.GetNode<LineEdit>("SeedInput");
+        var createButton = _singlePlayMenu.GetNode<Button>("StartGame");
+        seed.Text = "";
+        createButton.Pressed -= CreateArchive;
+    }
+    
+    private void CreateArchive() {
+        var seed = _singlePlayMenu.GetNode<LineEdit>("SeedInput");
+        // TODO
     }
 }

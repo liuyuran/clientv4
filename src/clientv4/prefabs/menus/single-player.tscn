@@ -48,7 +48,7 @@ layout_mode = 2
 [node name="ArchiveBox" type="VBoxContainer" parent="Panel/HBoxContainer"]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="Panel/HBoxContainer/ArchiveBox"]
+[node name="CreateWorld" type="Button" parent="Panel/HBoxContainer/ArchiveBox"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "新世界"
