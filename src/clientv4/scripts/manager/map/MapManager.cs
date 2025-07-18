@@ -16,6 +16,7 @@ public class MapManager: IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<MapManager>();
     public delegate void BlockChangedCallback(ulong worldId, Vector3 position, ulong blockId, Direction direction);
     public static MapManager instance { get; private set; } = new();
+    public static long Seed;
     private readonly TerrainGenerator _generator;
     private readonly Dictionary<ulong, Dictionary<Vector3I, BlockData[][][]>> _chunks = new();
     public event BlockChangedCallback OnBlockChanged;
@@ -25,7 +26,7 @@ public class MapManager: IReset, IDisposable {
     
     private MapManager() {
         // 初始化地图管理器
-        _generator = new TerrainGenerator(123456);
+        _generator = new TerrainGenerator(Seed);
     }
     
     public void RegisterGenerator<T>(ulong worldId) where T : IWorldGenerator {

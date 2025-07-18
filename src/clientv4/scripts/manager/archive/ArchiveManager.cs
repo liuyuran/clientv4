@@ -14,6 +14,7 @@ public class ArchiveManager {
     public static ArchiveManager instance { get; private set; } = new();
     
     private const string SaveDirectory = "worlds";
+    private string _currentSaveName = string.Empty;
 
     public void Create(string saveName) {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
@@ -30,6 +31,7 @@ public class ArchiveManager {
         }
         
         DirAccess.MakeDirAbsolute(savePath);
+        _currentSaveName = saveName;
     }
 
     public List<ArchiveMeta> List() {
@@ -45,7 +47,7 @@ public class ArchiveManager {
         return archiveFiles.Select(file => new ArchiveMeta { Name = Path.GetFileName(file) }).ToList();
     }
     
-    public void Save(string saveName) {
+    public void Save() {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
         var saveBasePath = Path.Combine(basePath, SaveDirectory);
         
@@ -64,7 +66,7 @@ public class ArchiveManager {
         }
         foreach (var file in archiveFiles) {
             if (file.Key.Trim().Length == 0) continue;
-            var filePath = Path.Combine(saveBasePath, saveName, file.Key);
+            var filePath = Path.Combine(saveBasePath, _currentSaveName, file.Key);
             Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? string.Empty);
             var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
             fileHandle.StoreBuffer(file.Value);
@@ -72,6 +74,7 @@ public class ArchiveManager {
     }
 
     public void Load(string saveName) {
+        _currentSaveName = saveName;
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
         var saveBasePath = Path.Combine(basePath, SaveDirectory);
         
