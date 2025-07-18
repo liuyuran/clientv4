@@ -2,20 +2,22 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using game.scripts.manager.archive;
 using game.scripts.manager.reset;
 using Microsoft.Extensions.Logging;
 using ModLoader.logger;
 
 namespace game.scripts.manager.blocks;
 
-public class BlockManager: IReset, IDisposable {
+public class BlockManager: IReset, IArchive, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<BlockManager>();
     public static BlockManager instance { get; private set; } = new();
+    private const string ArchiveFilename = "block-define.dat";
     
     private readonly ConcurrentDictionary<string, ulong> _blockIds = new();
     private readonly ConcurrentDictionary<Type, ulong> _blockCache = new();
     private readonly ConcurrentDictionary<ulong, Block> _blocks = new();
-    private long _currentId;
+    private ulong _currentId;
 
     private BlockManager() {
         Register<Water>();
@@ -25,7 +27,8 @@ public class BlockManager: IReset, IDisposable {
 
     private void Register<T>() where T : Block, new() {
         var block = new T();
-        var id = (ulong)Interlocked.Increment(ref _currentId);
+        if (_blockIds.ContainsKey(block.name)) return; // avoid duplicate registration
+        var id = Interlocked.Increment(ref _currentId);
         _blocks.TryAdd(id, block);
         _blockCache.TryAdd(typeof(T), id);
         _blockIds.TryAdd(block.name, id);
@@ -68,5 +71,13 @@ public class BlockManager: IReset, IDisposable {
         _blockIds.Clear();
         _blocks.Clear();
         GC.SuppressFinalize(this);
+    }
+
+    public void Archive(Dictionary<string, byte[]> fileList) {
+        throw new NotImplementedException();
+    }
+    
+    public void Recover(Func<string, byte[]> getDataFunc) {
+        throw new NotImplementedException();
     }
 }
