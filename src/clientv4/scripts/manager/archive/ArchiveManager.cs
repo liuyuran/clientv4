@@ -13,7 +13,7 @@ public class ArchiveManager {
     private readonly ILogger _logger = LogManager.GetLogger<ArchiveManager>();
     public static ArchiveManager instance { get; private set; } = new();
     
-    private const string SaveDirectory = "worlds";
+    private const string SaveDirectory = "Worlds";
     private string _currentSaveName = string.Empty;
 
     public void Create(string saveName) {
