@@ -105,6 +105,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "删除存档"
 
-[node name="CreateWorld" parent="." instance=ExtResource("2_nlj08")]
+[node name="CreateWorldPanel" parent="." instance=ExtResource("2_nlj08")]
 visible = false
 layout_mode = 1

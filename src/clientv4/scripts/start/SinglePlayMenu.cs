@@ -12,8 +12,9 @@ public partial class Menu {
     [Export] private PackedScene _singlePlayMenuScene;
     [Export] private PackedScene _singleArchiveItemScene;
     private Control _singlePlayMenu;
+    private Control _createPanel;
     private string _selectedArchiveName = string.Empty;
-    
+
     /// <summary>
     /// close the single play menu if it is open.
     /// </summary>
@@ -22,7 +23,7 @@ public partial class Menu {
         _singlePlayMenu.QueueFree();
         _singlePlayMenu = null;
     }
-    
+
     /// <summary>
     /// open the single play menu, if it is not already open.
     /// </summary>
@@ -31,8 +32,10 @@ public partial class Menu {
             GD.Print("SinglePlayMenu is already open.");
             return;
         }
+
         _singlePlayMenu = _singlePlayMenuScene.Instantiate<Control>();
         _modalPanel.AddChild(_singlePlayMenu);
+        LoadArchiveList();
     }
 
     /// <summary>
@@ -43,33 +46,36 @@ public partial class Menu {
             GD.PrintErr("SinglePlayMenu is not initialized.");
             return;
         }
-        
+
         // bind action for buttons.
-        var archiveList = _singlePlayMenu.GetNode<VBoxContainer>("ArchiveList");
-        var createButton = _singlePlayMenu.GetNode<Button>("CreateButton");
-        var createCancelButton = _singlePlayMenu.GetNode<Button>("CreateCancelButton");
-        var loadButton = _singlePlayMenu.GetNode<Button>("LoadButton");
-        var deleteButton = _singlePlayMenu.GetNode<Button>("DeleteButton");
-        
+        _createPanel = _singlePlayMenu.GetNode<Control>("CreateWorldPanel");
+        var archiveList = _singlePlayMenu.GetNode<VBoxContainer>("Panel/HBoxContainer/ArchiveBox/ScrollContainer/ArchiveList");
+        var createButton = _singlePlayMenu.GetNode<Button>("Panel/HBoxContainer/ArchiveBox/CreateWorld");
+        var createCancelButton = _createPanel.GetNode<Button>("Panel/Control2/CreateCancelButton");
+        var loadButton = _singlePlayMenu.GetNode<Button>("Panel/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/LoadButton");
+        var deleteButton = _singlePlayMenu.GetNode<Button>("Panel/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/DeleteButton");
+
         loadButton.Pressed += () => {
             if (string.IsNullOrEmpty(_selectedArchiveName)) {
                 GD.PrintErr("No archive selected for loading.");
                 return;
             }
+
             ResetManager.Reset();
             ArchiveManager.instance.Load(_selectedArchiveName);
             JumpToGameSceneAndStartLocalServer();
         };
-        
+
         deleteButton.Pressed += () => {
             if (string.IsNullOrEmpty(_selectedArchiveName)) {
                 GD.PrintErr("No archive selected for deletion.");
                 return;
             }
+
             DeleteArchiveItem(_selectedArchiveName);
             LoadArchiveList();
         };
-        
+
         createButton.Pressed += OpenSingleCreateWorld;
         createCancelButton.Pressed += CloseSingleCreateWorld;
 
@@ -77,24 +83,19 @@ public partial class Menu {
         foreach (var child in archiveList.GetChildren()) {
             child.QueueFree();
         }
+
         var archives = ArchiveManager.instance.List();
         foreach (var archive in archives) {
             var item = _singleArchiveItemScene.Instantiate<HBoxContainer>();
             var displayLabel = item.GetNode<RichTextLabel>("DisplayName");
             item.Name = archive.Name;
             displayLabel.Text = archive.Name;
-            item.Connect(Control.SignalName.MouseEntered, Callable.From(() => {
-                ArchiveItemMouseEntered(item);
-            }));
-            item.Connect(Control.SignalName.MouseExited, Callable.From(() => {
-                ArchiveItemMouseExited(item);
-            }));
-            item.Connect(Control.SignalName.GuiInput, Callable.From(() => {
-                ArchiveItemGuiInput(item);
-            }));
+            item.Connect(Control.SignalName.MouseEntered, Callable.From(() => { ArchiveItemMouseEntered(item); }));
+            item.Connect(Control.SignalName.MouseExited, Callable.From(() => { ArchiveItemMouseExited(item); }));
+            item.Connect(Control.SignalName.GuiInput, Callable.From(() => { ArchiveItemGuiInput(item); }));
             archiveList.AddChild(item);
         }
-        
+
         // auto select the first archive item if exists and load its detail data.
         if (archiveList.GetChildCount() > 0) {
             var firstItem = archiveList.GetChild<HBoxContainer>(0);
@@ -104,14 +105,14 @@ public partial class Menu {
             _selectedArchiveName = string.Empty;
         }
     }
-    
+
     /// <summary>
     /// mouse in hover event for archive item.
     /// </summary>
     private void ArchiveItemMouseEntered(HBoxContainer item) {
         GD.Print("Mouse entered archive item: ", item.Name);
     }
-    
+
     /// <summary>
     /// mouse out hover event for archive item.
     /// </summary>
@@ -128,7 +129,7 @@ public partial class Menu {
             LoadArchiveItemDetailData(item.Name);
         }
     }
-    
+
     /// <summary>
     /// load the detail data for the selected archive item.
     /// </summary>
@@ -137,7 +138,7 @@ public partial class Menu {
         var archiveInfo = _singlePlayMenu.GetNode<RichTextLabel>("ArchiveInfo");
         GD.Print("Loading archive item detail data for: ", archiveName);
     }
-    
+
     /// <summary>
     /// callback for deleting an archive item.
     /// </summary>
@@ -150,10 +151,9 @@ public partial class Menu {
     /// open the single play menu and load the archive list.
     /// </summary>
     private void OpenSingleCreateWorld() {
-        var createPanel = _singlePlayMenu.GetNode<Control>("CreateWorld");
-        createPanel.Visible = true;
-        var seed = _singlePlayMenu.GetNode<LineEdit>("SeedInput");
-        var createButton = _singlePlayMenu.GetNode<Button>("StartGame");
+        _createPanel.Visible = true;
+        var seed = _createPanel.GetNode<LineEdit>("Panel/SeedInput");
+        var createButton = _createPanel.GetNode<Button>("Panel/Control2/StartGame");
         seed.Text = "";
         createButton.Pressed += CreateArchive;
     }
@@ -162,19 +162,18 @@ public partial class Menu {
     /// close the single create-world panel and reset the input fields.
     /// </summary>
     private void CloseSingleCreateWorld() {
-        var createPanel = _singlePlayMenu.GetNode<Control>("CreateWorld");
-        createPanel.Visible = false;
-        var seed = _singlePlayMenu.GetNode<LineEdit>("SeedInput");
-        var createButton = _singlePlayMenu.GetNode<Button>("StartGame");
+        _createPanel.Visible = false;
+        var seed = _createPanel.GetNode<LineEdit>("Panel/SeedInput");
+        var createButton = _createPanel.GetNode<Button>("Panel/Control2/StartGame");
         seed.Text = "";
         createButton.Pressed -= CreateArchive;
     }
-    
+
     /// <summary>
     /// create a new archive with the specified seed and start the game.
     /// </summary>
     private void CreateArchive() {
-        var seed = _singlePlayMenu.GetNode<LineEdit>("SeedInput");
+        var seed = _createPanel.GetNode<LineEdit>("Panel/SeedInput");
         MapManager.Seed = long.Parse(seed.Text);
         ResetManager.Reset();
         ArchiveManager.instance.Create("new world");
