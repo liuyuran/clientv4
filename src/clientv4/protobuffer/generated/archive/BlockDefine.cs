@@ -20,16 +20,26 @@ public struct BlockDefine : IFlatbufferObject
   public BlockDefine __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public ulong IdBreakpoint { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUlong(o + __p.bb_pos) : (ulong)0; } }
+  public generated.archive.BlockDefineItem? Data(int j) { int o = __p.__offset(6); return o != 0 ? (generated.archive.BlockDefineItem?)(new generated.archive.BlockDefineItem()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
+  public int DataLength { get { int o = __p.__offset(6); return o != 0 ? __p.__vector_len(o) : 0; } }
 
   public static Offset<generated.archive.BlockDefine> CreateBlockDefine(FlatBufferBuilder builder,
-      ulong id_breakpoint = 0) {
-    builder.StartTable(1);
+      ulong id_breakpoint = 0,
+      VectorOffset dataOffset = default(VectorOffset)) {
+    builder.StartTable(2);
     BlockDefine.AddIdBreakpoint(builder, id_breakpoint);
+    BlockDefine.AddData(builder, dataOffset);
     return BlockDefine.EndBlockDefine(builder);
   }
 
-  public static void StartBlockDefine(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void StartBlockDefine(FlatBufferBuilder builder) { builder.StartTable(2); }
   public static void AddIdBreakpoint(FlatBufferBuilder builder, ulong idBreakpoint) { builder.AddUlong(0, idBreakpoint, 0); }
+  public static void AddData(FlatBufferBuilder builder, VectorOffset dataOffset) { builder.AddOffset(1, dataOffset.Value, 0); }
+  public static VectorOffset CreateDataVector(FlatBufferBuilder builder, Offset<generated.archive.BlockDefineItem>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
+  public static VectorOffset CreateDataVectorBlock(FlatBufferBuilder builder, Offset<generated.archive.BlockDefineItem>[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateDataVectorBlock(FlatBufferBuilder builder, ArraySegment<Offset<generated.archive.BlockDefineItem>> data) { builder.StartVector(4, data.Count, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateDataVectorBlock(FlatBufferBuilder builder, IntPtr dataPtr, int sizeInBytes) { builder.StartVector(1, sizeInBytes, 1); builder.Add<Offset<generated.archive.BlockDefineItem>>(dataPtr, sizeInBytes); return builder.EndVector(); }
+  public static void StartDataVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
   public static Offset<generated.archive.BlockDefine> EndBlockDefine(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<generated.archive.BlockDefine>(o);
@@ -43,6 +53,7 @@ static public class BlockDefineVerify
   {
     return verifier.VerifyTableStart(tablePos)
       && verifier.VerifyField(tablePos, 4 /*IdBreakpoint*/, 8 /*ulong*/, 8, false)
+      && verifier.VerifyVectorOfTables(tablePos, 6 /*Data*/, generated.archive.BlockDefineItemVerify.Verify, false)
       && verifier.VerifyTableEnd(tablePos);
   }
 }

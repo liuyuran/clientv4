@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using game.scripts.config;
+using game.unittest.manager;
 using Godot;
 
 namespace game.unittest;
@@ -10,21 +13,16 @@ namespace game.unittest;
 /// </summary>
 public partial class ShownUnitTest: Control {
     private Node _box;
-    private Control _boxUI;
     private Node3D _boxGame;
     private ScrollContainer _result;
     private VBoxContainer _logBox;
-    private readonly List<Action> _test = [];
-    private readonly List<Action> _testClean = [];
+    private readonly List<IUnitTest> _test = [];
     private int _currentTestIndex;
 
     public override void _Ready() {
         _box = GetNode<Node>("Box");
-        _boxUI = new Control();
         _boxGame = new Node3D();
-        _box.AddChild(_boxUI);
         _box.AddChild(_boxGame);
-        _boxUI.Visible = false;
         _boxGame.Visible = false;
         _result = GetNode<ScrollContainer>("Result");
         _logBox = new VBoxContainer();
@@ -33,12 +31,17 @@ public partial class ShownUnitTest: Control {
         _result.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
         CallDeferred(MethodName.OnRootSizeChanged);
         GetTree().Root.SizeChanged += OnRootSizeChanged;
-        AddTest(RunTestForECSBridge, CleanupECSBridgeTest);
+        var allTest = Assembly.GetExecutingAssembly().GetTypes()
+            .Where(type => type.IsClass && !type.IsAbstract && typeof(IUnitTest).IsAssignableFrom(type))
+            .Select(type => (IUnitTest)Activator.CreateInstance(type))
+            .ToList();
+        foreach (var test in allTest) {
+            AddTest(test);
+        }
     }
 
-    private void AddTest(Action main, Action clean) {
-        _test.Add(main);
-        _testClean.Add(clean);
+    private void AddTest(IUnitTest test) {
+        _test.Add(test);
     }
 
     private void OnRootSizeChanged() {
@@ -81,9 +84,9 @@ public partial class ShownUnitTest: Control {
             return;
         }
         
-        _test[_currentTestIndex]?.Invoke();
-        _testClean[_currentTestIndex]?.Invoke();
-
+        _test[_currentTestIndex].RunTest(_boxGame, AppendLog);
+        _test[_currentTestIndex].Cleanup(_boxGame, AppendLog);
+        AppendLog($"Finish test: {_test[_currentTestIndex].GetType().Name}");
         _currentTestIndex++;
     }
 }

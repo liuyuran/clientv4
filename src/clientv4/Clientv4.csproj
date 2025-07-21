@@ -16,4 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ModLoader\ModLoader.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="protobuffer\proto\block-define.fbs" />
+  </ItemGroup>
 </Project>

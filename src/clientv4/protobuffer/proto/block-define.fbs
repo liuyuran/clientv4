@@ -1,5 +1,11 @@
 ﻿namespace generated.archive;
 
+table BlockDefineItem {
+  block_id: uint64;
+  type: string;
+}
+
 table BlockDefine {
   id_breakpoint: uint64;
+  data: [BlockDefineItem];
 }
