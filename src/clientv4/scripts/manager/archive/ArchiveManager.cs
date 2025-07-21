@@ -68,8 +68,24 @@ public class ArchiveManager {
             if (file.Key.Trim().Length == 0) continue;
             var filePath = Path.Combine(saveBasePath, _currentSaveName, file.Key);
             Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? string.Empty);
-            var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
-            fileHandle.StoreBuffer(file.Value);
+            var extension = Path.GetExtension(filePath);
+            switch (extension) {
+                case ".dat": {
+                    var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
+                    fileHandle.StoreBuffer(file.Value);
+                    break;
+                }
+                case ".log": {
+                    using var fileStream = new FileStream(filePath, FileMode.Append);
+                    fileStream.Write(file.Value, 0, file.Value.Length);
+                    break;
+                }
+                default: {
+                    var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
+                    fileHandle.StoreBuffer(file.Value);
+                    break;
+                }
+            }
         }
     }
 
