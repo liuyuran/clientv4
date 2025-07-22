@@ -82,6 +82,7 @@ public partial class InGamingUI {
     [Rpc(CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Unreliable)]
     private void ReceiveChatMessage(string message) {
         ChatManager.instance.AddMessage(new ChatManager.MessageInfo {
+            Timestamp = PlatformUtil.GetTimestamp(),
             Message = message
         });
     }

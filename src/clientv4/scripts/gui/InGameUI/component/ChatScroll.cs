@@ -1,5 +1,6 @@
 using game.scripts.manager;
 using game.scripts.manager.chat;
+using game.scripts.utils;
 using Godot;
 
 namespace game.scripts.gui.InGameUI.component;
@@ -15,6 +16,7 @@ public partial class ChatScroll: Panel {
 		_chatHistory = GetNode<ScrollContainer>("chatHistory");
 		_chatBox = _chatHistory.GetNode<VBoxContainer>("chatBox");
 		AddMessage(new ChatManager.MessageInfo {
+			Timestamp = PlatformUtil.GetTimestamp(),
 			Message = "[color=yellow]Welcome to Friflo![/color]"
 		});
 		ScrollToBottom();
