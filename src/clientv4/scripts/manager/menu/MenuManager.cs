@@ -14,13 +14,13 @@ public class MenuManager: IReset, IDisposable {
     private MenuManager() {
         AddMenuGroup("system", 1);
         AddMenuItem("system", "back-to-start",
-            I18N.Tr("menu.system", "back-to-start"), 1,
-            I18N.Tr("menu.system", "back-to-start.desc"), () => {
+            I18N.Tr("core", "menu.system.back-to-start"), 1,
+            I18N.Tr("core", "menu.system.back-to-start.desc"), () => {
                 GameNodeReference.CurrentScene.GetTree().ChangeSceneToPacked(GameNodeReference.StartScenePacked);
             });
         AddMenuItem("system", "exit",
-            I18N.Tr("menu.system", "exit"), 1,
-            I18N.Tr("menu.system", "exit.desc"), () => {
+            I18N.Tr("core", "menu.system.exit"), 1,
+            I18N.Tr("core", "menu.system.exit.desc"), () => {
                 GameNodeReference.CurrentScene.GetTree().Quit();
             });
     }

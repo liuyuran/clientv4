@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using DotnetNoise;
 using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
@@ -22,26 +23,30 @@ public class ModManager: IReset, IDisposable {
     private readonly Dictionary<string, IMod> _modInstances = new();
     private readonly Dictionary<string, ModMeta> _modMetas = new();
     private readonly HashSet<string> _activeMods = [];
-    private readonly Assembly _modLoaderAssembly = typeof(IMod).Assembly;
-    private readonly Assembly _loggerAssembly = typeof(ILogger).Assembly;
-    private readonly Assembly _selfAssembly = typeof(ModManager).Assembly;
+    private readonly Dictionary<string, Assembly> _loadedAssembly = [];
+    private readonly List<Assembly> _extraAssemblies = [
+        typeof(FastNoise).Assembly
+    ];
 
     private ModManager() {
         if (_loaded) return;
         AppDomain.CurrentDomain.AssemblyResolve += OnCurrentDomainOnAssemblyResolve;
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+            var name = assembly.GetName().Name;
+            if (name != null) _loadedAssembly.Add(name, assembly);
+        }
+
+        foreach (var extra in _extraAssemblies) {
+            var name = extra.GetName().Name;
+            if (name != null) _loadedAssembly.TryAdd(name, extra);
+        }
         _loaded = true;
     }
 
     private Assembly OnCurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args) {
         var assemblyName = new AssemblyName(args.Name);
-        if (assemblyName.Name == _modLoaderAssembly.GetName().Name) {
-            return _modLoaderAssembly;
-        }
-        if (assemblyName.Name == _loggerAssembly.GetName().Name) {
-            return _loggerAssembly;
-        }
-        if (assemblyName.Name == _selfAssembly.GetName().Name) {
-            return _selfAssembly;
+        if (assemblyName.Name != null && _loadedAssembly.TryGetValue(assemblyName.Name, out var assembly)) {
+            return assembly;
         }
         return null;
     }

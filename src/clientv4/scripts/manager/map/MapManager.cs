@@ -109,7 +109,7 @@ public class MapManager: IReset, IDisposable {
                 // Remove from pending tasks
                 _pendingGenerationTasks.Remove((worldId, position));
             }
-        } catch (System.Exception ex) {
+        } catch (Exception ex) {
             _logger.LogError(ex, "Error generating terrain for chunk {position} in world {worldId}", position, worldId);
             lock (_lockObject) {
                 _pendingGenerationTasks.Remove((worldId, position));

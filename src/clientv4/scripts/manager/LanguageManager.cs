@@ -43,20 +43,7 @@ public class LanguageManager: ITranslateService, IReset, IDisposable {
         var extension = System.IO.Path.GetExtension(path);
         switch (extension) {
             case ".po": {
-                var parser = new POParser(new POParserSettings());
-                var bytes = FileUtil.RemoveBom(FileAccess.GetFileAsBytes(path));
-                var result = parser.Parse(bytes);
-                var keys = result.Catalog.Keys;
-                var translation = new Translation {
-                    Locale = locale
-                };
-                foreach (var key in keys) {
-                    var translateKey = key.Id;
-                    var contextKey = key.PluralId;
-                    var value = result.Catalog[key].ToArray();
-                    translation.AddPluralMessage(translateKey, value, contextKey);
-                }
-
+                var translation = ResourceLoader.Load<Translation>(path);
                 TranslationServer.AddTranslation(translation);
                 break;
             }

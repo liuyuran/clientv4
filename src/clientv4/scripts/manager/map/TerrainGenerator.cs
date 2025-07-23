@@ -6,22 +6,16 @@ using Godot;
 
 namespace game.scripts.manager.map;
 
-public class TerrainGenerator {
-    private readonly long _seed;
+public class TerrainGenerator(long seed) {
     private readonly Dictionary<ulong, IWorldGenerator> _generators = new();
 
-    public TerrainGenerator(long seed) {
-        _seed = seed;
-        RegistryGenerator<StandardWorldGenerator>(0);
-    }
-    
     public void RegistryGenerator<T>(ulong worldId) where T: IWorldGenerator {
         var generator = (IWorldGenerator)Activator.CreateInstance(typeof(T));
         if (generator == null) {
             GD.PrintErr($"cannot create instance for {typeof(T).Name}");
             return;
         }
-        generator.SetSeed(_seed);
+        generator.SetSeed(seed);
         _generators[worldId] = generator;
     }
 

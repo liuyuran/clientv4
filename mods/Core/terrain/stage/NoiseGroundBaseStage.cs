@@ -1,10 +1,11 @@
 ﻿using game.scripts.config;
 using game.scripts.manager.blocks;
+using game.scripts.manager.map.stage;
 using game.scripts.manager.map.util;
 using game.scripts.renderer;
 using game.scripts.utils;
 
-namespace game.scripts.manager.map.stage;
+namespace Core.terrain.stage;
 
 /// <summary>
 /// all chunks of the world are random base on noise, this stage is used to generate normal ground terrain.

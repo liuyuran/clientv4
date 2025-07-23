@@ -1,7 +1,9 @@
-using game.scripts.manager.map.stage;
+using Core.terrain.stage;
+using game.scripts.manager.map.generator;
 using Godot;
+using ModLoader;
 
-namespace game.scripts.manager.map.generator;
+namespace Core.terrain.generator;
 
 public class DefaultWorldGenerator : StagedWorldGenerator {
     public DefaultWorldGenerator() {
@@ -9,6 +11,6 @@ public class DefaultWorldGenerator : StagedWorldGenerator {
     }
 
     public override string GetName() {
-        return TranslationServer.Translate("flat_land", "world_type");
+        return I18N.Tr("world_type.flat_land", "mod.core");
     }
 }
