@@ -85,7 +85,7 @@ public class SBlockDestroyOrPlace : QuerySystem<CPhysicsVelocity, CCamera, CInpu
                     if (blockId != null && (blockId == 0 || BlockManager.instance.GetBlock(blockId.Value).blockType != EBlockType.Solid) && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
                         entity.EmitSignal(new SignalBlockChanged {
                             Position = target,
-                            BlockId = BlockManager.instance.GetBlockId<Dirt>(),
+                            BlockId = 1, // TODO use dynamic block id
                             Direction = Direction.None,
                             WorldId = 0
                         });

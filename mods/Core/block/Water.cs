@@ -1,6 +1,7 @@
-﻿using game.scripts.manager.blocks.util;
+﻿using game.scripts.manager.blocks;
+using game.scripts.manager.blocks.util;
 
-namespace game.scripts.manager.blocks;
+namespace Core.block;
 
 public class Water: Block {
     public override string name => "water";

@@ -21,12 +21,6 @@ public class BlockManager: IReset, IArchive, IDisposable {
     private readonly ConcurrentDictionary<ulong, Block> _blocks = new();
     private ulong _currentId;
 
-    private BlockManager() {
-        Register<Water>();
-        Register<Dirt>();
-        Register<Stone>();
-    }
-
     public void Register<T>() where T : Block, new() {
         var block = new T();
         if (_blockIds.ContainsKey(block.name)) return; // avoid duplicate registration

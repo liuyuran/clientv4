@@ -1,4 +1,8 @@
-﻿using Core.terrain.generator;
+﻿using Core.block;
+using Core.item;
+using Core.terrain.generator;
+using game.scripts.manager.blocks;
+using game.scripts.manager.item;
 using game.scripts.manager.map;
 using game.scripts.manager.menu;
 using JetBrains.Annotations;
@@ -13,6 +17,8 @@ public class CoreMod : IMod {
     private readonly ILogger _logger = LogManager.GetLogger<CoreMod>();
 
     public void OnLoad() {
+        AddBlock();
+        AddItem();
         AddTerrain();
         AddMenu();
         _logger.LogDebug(I18N.Tr("mod.core", "mod.loaded"));
@@ -29,6 +35,16 @@ public class CoreMod : IMod {
             -1,
             I18N.Tr("mod.core", "menu.setting.desc"),
             () => { _logger.LogDebug("Core item clicked!"); });
+    }
+    
+    private void AddBlock() {
+        BlockManager.instance.Register<Water>();
+        BlockManager.instance.Register<Dirt>();
+        BlockManager.instance.Register<Stone>();
+    }
+
+    private void AddItem() {
+        ItemManager.instance.Register<DirtItem>();
     }
 
     public void OnUnload() {

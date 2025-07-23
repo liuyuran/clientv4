@@ -1,4 +1,6 @@
-﻿namespace game.scripts.manager.blocks;
+﻿using game.scripts.manager.blocks;
+
+namespace Core.block;
 
 public class Dirt: Block {
     public override string name => "dirt";

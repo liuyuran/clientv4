@@ -19,11 +19,7 @@ public class ItemManager: IReset, IDisposable {
     private readonly ConcurrentDictionary<ulong, Item> _items = new();
     private long _currentId;
 
-    private ItemManager() {
-        Register<Dirt>();
-    }
-
-    private void Register<T>() where T : Item, new() {
+    public void Register<T>() where T : Item, new() {
         var item = new T();
         var id = (ulong)Interlocked.Increment(ref _currentId);
         _items.TryAdd(id, item);

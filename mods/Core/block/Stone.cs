@@ -1,4 +1,6 @@
-﻿namespace game.scripts.manager.blocks;
+﻿using game.scripts.manager.blocks;
+
+namespace Core.block;
 
 public class Stone: Block {
     public override string name => "stone";
