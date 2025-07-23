@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Globalization;
 using game.scripts.manager;
+using game.scripts.manager.archive;
 using game.scripts.manager.map;
 using game.scripts.manager.menu;
 using game.scripts.manager.mod;
@@ -32,8 +33,9 @@ public partial class WorldContainer: Control {
         GameStatus.SetStatus(GameStatus.Status.Loading);
         ModManager.instance.ScanModPacks();
         ModManager.instance.ActivateMod("core");
-        ModManager.instance.OnStartGame();
         MaterialManager.instance.GenerateMaterials();
+        ArchiveManager.instance.RecoverData();
+        ModManager.instance.OnStartGame();
         MapManager.instance.OnBlockChanged += OnInstanceOnOnBlockChanged;
     }
 

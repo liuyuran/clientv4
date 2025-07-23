@@ -42,18 +42,32 @@ offset_right = 356.0
 grow_vertical = 0
 script = ExtResource("2_a7jcy")
 
-[node name="chatHistory" type="ScrollContainer" parent="chat"]
+[node name="box" type="VBoxContainer" parent="chat"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="chatHistory" type="ScrollContainer" parent="chat/box"]
+layout_mode = 2
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 
-[node name="chatBox" type="VBoxContainer" parent="chat/chatHistory"]
+[node name="chatBox" type="VBoxContainer" parent="chat/box/chatHistory"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 2
+
+[node name="ChannelSelector" type="HBoxContainer" parent="chat/box"]
+layout_mode = 2
+
+[node name="InputBox" type="HBoxContainer" parent="chat/box"]
+layout_mode = 2
+
+[node name="MsgInput" type="LineEdit" parent="chat/box/InputBox"]
+layout_mode = 2
+size_flags_horizontal = 3

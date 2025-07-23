@@ -32,6 +32,7 @@ public class ArchiveManager {
         
         DirAccess.MakeDirAbsolute(savePath);
         _currentSaveName = saveName;
+        Save();
     }
 
     public List<ArchiveMeta> List() {
@@ -89,8 +90,7 @@ public class ArchiveManager {
         }
     }
 
-    public void Load(string saveName) {
-        _currentSaveName = saveName;
+    public void RecoverData() {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
         var saveBasePath = Path.Combine(basePath, SaveDirectory);
         
@@ -105,13 +105,17 @@ public class ArchiveManager {
         foreach (var type in resetTypes) {
             var archiveInstance = (IArchive)Activator.CreateInstance(type);
             archiveInstance?.Recover(path => {
-                var filePath = Path.Combine(saveBasePath, saveName, path);
+                var filePath = Path.Combine(saveBasePath, _currentSaveName, path);
                 if (FileAccess.FileExists(filePath)) {
                     return FileAccess.GetFileAsBytes(filePath);
                 }
                 return null;
             });
         }
+    }
+
+    public void Load(string saveName) {
+        _currentSaveName = saveName;
     }
     
     public struct ArchiveMeta {

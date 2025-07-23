@@ -9,24 +9,37 @@ public partial class ChatScroll: Panel {
 	public InGamingUI InGamingUIInstance;
 	private ScrollContainer _chatHistory;
 	private VBoxContainer _chatBox;
+	private HBoxContainer _chatInputBox;
+	private LineEdit _chatInput;
 	private Tween _tween;
 	private const int MaxLine = 300;
 	
 	public override void _Ready() {
-		_chatHistory = GetNode<ScrollContainer>("chatHistory");
+		_chatHistory = GetNode<ScrollContainer>("box/chatHistory");
 		_chatBox = _chatHistory.GetNode<VBoxContainer>("chatBox");
+		_chatInputBox = GetNode<HBoxContainer>("box/InputBox");
+		_chatInput = _chatInputBox.GetNode<LineEdit>("MsgInput");
 		AddMessage(new ChatManager.MessageInfo {
 			Timestamp = PlatformUtil.GetTimestamp(),
 			Message = "[color=yellow]Welcome to Friflo![/color]"
 		});
 		ScrollToBottom();
 		ChatManager.instance.OnMessageAdded += AddMessage;
+		_chatInput.TextSubmitted += OnChatInputOnTextSubmitted;
 	}
 
 	public override void _ExitTree() {
 		ChatManager.instance.OnMessageAdded -= AddMessage;
+		_chatInput.TextSubmitted -= OnChatInputOnTextSubmitted;
 		_tween?.Stop();
 		base._ExitTree();
+	}
+	
+	private void OnChatInputOnTextSubmitted(string text) {
+		if (string.IsNullOrWhiteSpace(text)) return;
+		ChatManager.instance.AddMessage(new ChatManager.MessageInfo { Timestamp = PlatformUtil.GetTimestamp(), Message = text });
+		SendMessage();
+		_chatInput.Text = string.Empty;
 	}
 
 	private void AddMessage(ChatManager.MessageInfo message) {
@@ -46,7 +59,7 @@ public partial class ChatScroll: Panel {
 	}
 
 	private void SendMessage() {
-		InGamingUIInstance.BroadcastChatMessage("");
+		InGamingUIInstance.BroadcastChatMessage(_chatInput.Text);
 	}
 
 	private void ScrollToBottom() {
