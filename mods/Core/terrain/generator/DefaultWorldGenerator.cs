@@ -10,6 +10,6 @@ public class DefaultWorldGenerator : StagedWorldGenerator {
     }
 
     public override string GetName() {
-        return I18N.Tr("world_type.flat_land", "mod.core");
+        return I18N.Tr("mod.core", "world_type.flat_land");
     }
 }
