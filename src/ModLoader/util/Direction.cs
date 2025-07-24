@@ -1,4 +1,4 @@
-﻿namespace game.scripts.utils;
+﻿namespace ModLoader.util;
 
 public enum Direction {
     None, // no direction

@@ -7,6 +7,10 @@ using game.scripts.manager.map;
 using game.scripts.manager.player;
 using game.scripts.utils;
 using Godot.Collections;
+using ModLoader.config;
+using ModLoader.map.util;
+using ModLoader.util;
+using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.renderer;
 

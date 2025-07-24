@@ -4,6 +4,7 @@ using System.Linq;
 using game.scripts.manager.blocks;
 using Godot;
 using JetBrains.Annotations;
+using ModLoader.block;
 
 namespace game.unittest.manager;
 

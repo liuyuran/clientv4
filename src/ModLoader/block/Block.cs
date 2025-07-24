@@ -1,6 +1,6 @@
-﻿using game.scripts.manager.blocks.util;
+﻿using ModLoader.block.util;
 
-namespace game.scripts.manager.blocks;
+namespace ModLoader.block;
 
 public abstract class Block {
     public virtual string name => throw new System.NotImplementedException();

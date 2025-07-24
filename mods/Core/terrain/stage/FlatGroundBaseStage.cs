@@ -1,10 +1,8 @@
 ﻿using Core.block;
-using game.scripts.config;
-using game.scripts.manager.blocks;
-using game.scripts.manager.map.stage;
-using game.scripts.manager.map.util;
-using game.scripts.renderer;
-using game.scripts.utils;
+using ModLoader.config;
+using ModLoader.map.stage;
+using ModLoader.map.util;
+using ModLoader.util;
 
 namespace Core.terrain.stage;
 
@@ -13,20 +11,21 @@ namespace Core.terrain.stage;
 /// </summary>
 public class FlatGroundBaseStage : ITerrainGenerateStage {
     public void GenerateTerrain(TerrainDataCache data) {
+        if (CoreMod.Handler == null) throw new InvalidOperationException("CoreMod.Handler is null, cannot get block manager.");
         data.HeightMap = new int[Config.ChunkSize][];
         data.BlockData = new BlockData[Config.ChunkSize][][];
 
         for (var x = 0; x < Config.ChunkSize; x++) {
             data.HeightMap[x] = new int[Config.ChunkSize];
             for (var z = 0; z < Config.ChunkSize; z++) {
-                data.HeightMap[x][z] = data.Position.Y switch {
+                data.HeightMap[x][z] = data.Position.y switch {
                     > 0 => 0,
                     0 => 1,
                     _ => Config.ChunkSize - 1
                 };
             }
         }
-        var stoneId = BlockManager.instance.GetBlockId<Stone>();
+        var stoneId = CoreMod.Handler.GetBlockManager().GetBlockId<Stone>();
         for (var x = 0; x < Config.ChunkSize; x++) {
             data.BlockData[x] = new BlockData[Config.ChunkSize][];
             for (var y = 0; y < Config.ChunkSize; y++) {
@@ -34,7 +33,7 @@ public class FlatGroundBaseStage : ITerrainGenerateStage {
                 for (var z = 0; z < Config.ChunkSize; z++) {
                     var maxHeight = data.HeightMap[x][z];
                     data.BlockData[x][y][z] = new BlockData {
-                        BlockId = maxHeight >= y + data.Position.Y * Config.ChunkSize ? stoneId : 0,
+                        BlockId = maxHeight >= y + data.Position.y * Config.ChunkSize ? stoneId : 0,
                         Direction = Direction.None
                     };
                 }

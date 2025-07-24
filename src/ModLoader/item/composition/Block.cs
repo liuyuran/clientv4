@@ -1,4 +1,4 @@
-﻿namespace game.scripts.manager.item.composition;
+﻿namespace ModLoader.item.composition;
 
 public static class Block {
     private const string BlockConfigKey = "block";
@@ -13,17 +13,17 @@ public static class Block {
     
     public static ulong GetBlockId(this Item item) {
         if (!item.Config.TryGetValue(BlockConfigKey, out var value)) {
-            throw new System.Exception($"Item {item.name} is not a block");
+            throw new Exception($"Item {item.name} is not a block");
         }
         
         if (value is BlockConfig config) {
             return config.BlockId;
         }
         
-        throw new System.Exception($"Item {item.name} has invalid block configuration");
+        throw new Exception($"Item {item.name} has invalid block configuration");
     }
     
     public struct BlockConfig(ulong blockId) {
-        public ulong BlockId = blockId;
+        public readonly ulong BlockId = blockId;
     }
 }

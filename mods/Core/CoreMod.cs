@@ -1,22 +1,19 @@
 ﻿using Core.block;
 using Core.item;
 using Core.terrain.generator;
-using game.scripts.manager.blocks;
-using game.scripts.manager.item;
-using game.scripts.manager.map;
-using game.scripts.manager.menu;
-using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using ModLoader;
+using ModLoader.handler;
 using ModLoader.logger;
 
 namespace Core;
 
-[UsedImplicitly]
 public class CoreMod : IMod {
     private readonly ILogger _logger = LogManager.GetLogger<CoreMod>();
+    public static IModHandler? Handler;
 
-    public void OnLoad() {
+    public void OnLoad(IModHandler handler) {
+        Handler = handler;
         AddBlock();
         AddItem();
         AddTerrain();
@@ -25,26 +22,43 @@ public class CoreMod : IMod {
     }
 
     private void AddTerrain() {
-        MapManager.instance.RegisterGenerator<StandardWorldGenerator>(0);
+        if (Handler == null) {
+            _logger.LogError("Handler is null, cannot register terrain generator.");
+            return;
+        }
+        Handler.GetMapManager().RegisterGenerator<StandardWorldGenerator>(0);
     }
 
     private void AddMenu() {
-        MenuManager.instance.AddMenuGroup("core", -1);
-        MenuManager.instance.AddMenuItem("core", "core mod settings",
+        if (Handler == null) {
+            _logger.LogError("Handler is null, cannot register menu.");
+            return;
+        }
+        Handler.GetMenuManager().AddMenuGroup("core", -1);
+        Handler.GetMenuManager().AddMenuItem("core", "core mod settings",
             I18N.Tr("mod.core", "menu.setting"),
             -1,
             I18N.Tr("mod.core", "menu.setting.desc"),
             () => { _logger.LogDebug("Core item clicked!"); });
     }
-    
+
     private void AddBlock() {
-        BlockManager.instance.Register<Water>();
-        BlockManager.instance.Register<Dirt>();
-        BlockManager.instance.Register<Stone>();
+        if (Handler == null) {
+            _logger.LogError("Handler is null, cannot register blocks.");
+            return;
+        }
+
+        Handler.GetBlockManager().Register<Water>();
+        Handler.GetBlockManager().Register<Dirt>();
+        Handler.GetBlockManager().Register<Stone>();
     }
 
     private void AddItem() {
-        ItemManager.instance.Register<DirtItem>();
+        if (Handler == null) {
+            _logger.LogError("Handler is null, cannot register items.");
+            return;
+        }
+        Handler.GetItemManager().Register<DirtItem>();
     }
 
     public void OnUnload() {

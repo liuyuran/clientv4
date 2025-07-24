@@ -29,7 +29,7 @@ public partial class InGamingUI {
         }
         if (InputManager.instance.IsKeyPressed(InputKey.UICancel) && _pauseUI != null && Time.GetTicksMsec() - _lastPauseTime > 500) {
             Input.MouseMode = Input.MouseModeEnum.Captured;
-            RemoveChild(_pauseUI);
+            _pauseUI.QueueFree();
             _pauseUI = null;
             _status.Focus = InGameUIFocus.Game;
             _lastPauseTime = Time.GetTicksMsec();

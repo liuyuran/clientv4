@@ -1,4 +1,4 @@
-﻿namespace game.scripts.manager.blocks.util;
+﻿namespace ModLoader.block.util;
 
 public enum EBlockType {
     Solid, // Solid blocks that cannot be passed through

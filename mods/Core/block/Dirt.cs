@@ -1,4 +1,4 @@
-﻿using game.scripts.manager.blocks;
+﻿using ModLoader.block;
 
 namespace Core.block;
 

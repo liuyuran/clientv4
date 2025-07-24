@@ -13,6 +13,7 @@ using game.scripts.server.ECSBridge.render;
 using game.scripts.server.ECSBridge.sync;
 using game.scripts.utils;
 using Godot;
+using ModLoader.config;
 
 namespace game.scripts.server.ECSBridge;
 
@@ -111,7 +112,6 @@ public partial class ECSSystemBridge: Node {
             } else {
                 node.QueueFree();
             }
-            node.GetParent().RemoveChild(node);
         }
         _entityNodes.Clear();
     }
@@ -146,7 +146,6 @@ public partial class ECSSystemBridge: Node {
             } else {
                 node.QueueFree();
             }
-            node.GetParent().RemoveChild(node);
             _entityNodes.Remove(obj.Entity);
             return;
         }
@@ -176,7 +175,6 @@ public partial class ECSSystemBridge: Node {
         } else {
             node.QueueFree();
         }
-        node.GetParent().RemoveChild(node);
         _entityNodes.Remove(obj.Entity);
     }
 

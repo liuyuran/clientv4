@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using game.scripts.manager.map.generator;
 using game.scripts.renderer;
 using Godot;
+using ModLoader.map.generator;
+using ModLoader.map.util;
 
 namespace game.scripts.manager.map;
 
@@ -20,7 +21,8 @@ public class TerrainGenerator(long seed) {
     }
 
     public BlockData[][][] GenerateTerrain(ulong worldId, Vector3I chunkPosition) {
-        if (_generators.TryGetValue(worldId, out var generator)) return generator.GenerateTerrain(chunkPosition);
+        if (_generators.TryGetValue(worldId, out var generator)) 
+            return generator.GenerateTerrain(new ModLoader.util.Vector3I(chunkPosition.X, chunkPosition.Y, chunkPosition.Z));
         GD.PrintErr($"no available generate for world {worldId}");
         return null;
     }

@@ -1,8 +1,8 @@
 ﻿using game.scripts.manager;
 using game.scripts.manager.item;
-using game.scripts.manager.item.composition;
-using game.scripts.utils;
 using Godot;
+using ModLoader.item.composition;
+using ModLoader.util;
 
 namespace game.scripts.renderer;
 

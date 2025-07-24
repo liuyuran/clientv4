@@ -5,7 +5,6 @@
     <RootNamespace>game</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DotnetNoise" Version="1.0.0" />
     <PackageReference Include="Friflo.Engine.ECS" Version="3.4.2" />
     <PackageReference Include="Friflo.Engine.ECS.Boost" Version="3.4.2" />
     <PackageReference Include="Google.FlatBuffers" Version="24.3.25" />

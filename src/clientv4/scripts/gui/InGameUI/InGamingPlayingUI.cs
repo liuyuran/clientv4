@@ -39,7 +39,7 @@ public partial class InGamingUI {
     }
 
     private void ClosePlayingUI() {
-        RemoveChild(_playingUI);
+        _playingUI.QueueFree();
         _playingUI = null;
     }
     

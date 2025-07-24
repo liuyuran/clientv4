@@ -1,5 +1,5 @@
 ﻿namespace ModLoader.language;
 
 public interface ITranslateService {
-    public string format(string key, string module, params object[] args);
+    public string Format(string key, string module, params object[] args);
 }

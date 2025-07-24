@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using game.scripts.manager.archive;
 using game.scripts.manager.reset;
 using game.scripts.server;
 using game.scripts.utils;
@@ -74,7 +75,10 @@ public partial class Menu : Control {
     }
 
     public override void _Process(double delta) {
-        // JumpToGameSceneAndStartLocalServer();
+        OpenSingle();
+        ResetManager.Reset();
+        ArchiveManager.instance.Load(_selectedArchiveName);
+        JumpToGameSceneAndStartLocalServer();
     }
 
     private void CloseOtherPanel() {

@@ -1,6 +1,6 @@
-﻿using game.scripts.utils;
+﻿using ModLoader.util;
 
-namespace game.scripts.renderer;
+namespace ModLoader.map.util;
 
 public struct BlockData {
     public ulong BlockId;

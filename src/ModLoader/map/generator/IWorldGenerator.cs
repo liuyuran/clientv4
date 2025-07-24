@@ -1,7 +1,7 @@
-﻿using game.scripts.renderer;
-using Godot;
+﻿using ModLoader.map.util;
+using ModLoader.util;
 
-namespace game.scripts.manager.map.generator;
+namespace ModLoader.map.generator;
 
 public interface IWorldGenerator {
     void SetSeed(long seed);

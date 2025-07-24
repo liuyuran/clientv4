@@ -1,10 +1,12 @@
-﻿namespace ModLoader;
+﻿using ModLoader.handler;
+
+namespace ModLoader;
 
 public interface IMod {
     /// <summary>
     /// Called when the mod is loaded.
     /// </summary>
-    void OnLoad();
+    void OnLoad(IModHandler handler);
 
     /// <summary>
     /// Called when the mod is unloaded.

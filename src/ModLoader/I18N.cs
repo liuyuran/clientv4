@@ -9,6 +9,6 @@ public class I18N {
         if (service == null) {
             throw new InvalidOperationException("I18N service is not initialized.");
         }
-        return service.format(key, module, args);
+        return service.Format(key, module, args);
     } 
 }

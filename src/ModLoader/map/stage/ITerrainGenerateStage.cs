@@ -1,7 +1,6 @@
-﻿using game.scripts.manager.map.util;
-using Godot;
+﻿using ModLoader.map.util;
 
-namespace game.scripts.manager.map.stage;
+namespace ModLoader.map.stage;
 
 /// <summary>
 /// generate stage for terrain.

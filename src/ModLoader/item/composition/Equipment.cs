@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace game.scripts.manager.item.composition;
+﻿namespace ModLoader.item.composition;
 
 public static class Equipment {
     private const string EquipmentConfigKey = "equipment";

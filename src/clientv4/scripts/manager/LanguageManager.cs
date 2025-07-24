@@ -50,7 +50,7 @@ public class LanguageManager: ITranslateService, IReset, IDisposable {
         }
     }
 
-    public string format(string key, string module, params object[] args) {
+    public string Format(string key, string module, params object[] args) {
         if (string.IsNullOrEmpty(key)) {
             _logger.LogWarning("Translation key is null or empty.");
             return string.Empty;

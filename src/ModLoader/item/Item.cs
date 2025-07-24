@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace game.scripts.manager.item;
+﻿namespace ModLoader.item;
 
 /// <summary>
 /// the item need composition with other class.
@@ -11,7 +9,7 @@ public abstract class Item {
     public virtual string iconPath => throw new System.NotImplementedException();
     public virtual ulong maxStack => 64;
     public ulong stackCount { get; set; } = 1;
-    protected internal readonly Dictionary<string, object> Config = new();
+    public readonly Dictionary<string, object> Config = new();
 
     public Item Clone() {
         return (Item)this.MemberwiseClone();

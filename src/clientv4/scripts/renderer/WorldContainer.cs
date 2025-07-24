@@ -10,6 +10,7 @@ using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader.logger;
+using ModLoader.util;
 
 namespace game.scripts.renderer;
 

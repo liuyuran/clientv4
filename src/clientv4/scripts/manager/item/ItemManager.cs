@@ -2,16 +2,18 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using game.scripts.manager.item.composition;
 using game.scripts.manager.reset;
 using game.scripts.renderer;
 using Godot;
 using Microsoft.Extensions.Logging;
+using ModLoader.handler;
+using ModLoader.item;
+using ModLoader.item.composition;
 using ModLoader.logger;
 
 namespace game.scripts.manager.item;
 
-public class ItemManager: IReset, IDisposable {
+public class ItemManager: IReset, IDisposable, IItemManager {
     private readonly ILogger _logger = LogManager.GetLogger<ItemManager>();
     public static ItemManager instance { get; private set; } = new();
     

@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
-using DotnetNoise;
-using game.scripts.config;
-using game.scripts.manager.map.stage;
-using game.scripts.manager.map.util;
-using game.scripts.renderer;
-using Godot;
+﻿using DotnetNoise;
+using ModLoader.config;
+using ModLoader.map.stage;
+using ModLoader.map.util;
+using ModLoader.util;
 
-namespace game.scripts.manager.map.generator;
+namespace ModLoader.map.generator;
 
 public abstract class StagedWorldGenerator: IWorldGenerator {
-    private FastNoise _noise;
+    private FastNoise? _noise;
     private readonly List<ITerrainGenerateStage> _stages = [];
     
     public void SetSeed(long seed) {
@@ -23,6 +21,7 @@ public abstract class StagedWorldGenerator: IWorldGenerator {
     }
     
     public BlockData[][][] GenerateTerrain(Vector3I chunkPosition) {
+        if (_noise == null) throw new InvalidOperationException("Noise generator is not initialized. Call SetSeed first.");
         var data = new TerrainDataCache {
             Position = chunkPosition,
             HeightMap = new int[Config.ChunkSize][],

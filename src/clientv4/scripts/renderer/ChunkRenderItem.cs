@@ -4,6 +4,10 @@ using game.scripts.manager.blocks;
 using game.scripts.manager.map;
 using game.scripts.utils;
 using Godot;
+using ModLoader.config;
+using ModLoader.map.util;
+using ModLoader.util;
+using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.renderer;
 

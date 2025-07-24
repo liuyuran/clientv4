@@ -53,7 +53,7 @@ public partial class ChatScroll: Panel {
 		label.SizeFlagsVertical = SizeFlags.ShrinkCenter;
 		_chatBox.AddChild(label);
 		if (_chatBox.GetChildCount() > MaxLine) {
-			_chatBox.RemoveChild(_chatBox.GetChild(0));
+			_chatBox.GetChild(0).QueueFree();
 		}
 		ScrollToBottomSmoothly();
 	}

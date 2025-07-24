@@ -4,10 +4,11 @@ using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
 using ModLoader;
+using ModLoader.handler;
 
 namespace game.scripts.manager.menu;
 
-public class MenuManager: IReset, IDisposable {
+public class MenuManager: IReset, IDisposable, IMenuManager {
     public static MenuManager instance { get; private set; } = new();
     private List<MenuGroupItem> _menus = [];
 

@@ -1,5 +1,5 @@
-﻿using game.scripts.manager.blocks;
-using game.scripts.manager.blocks.util;
+﻿using ModLoader.block;
+using ModLoader.block.util;
 
 namespace Core.block;
 

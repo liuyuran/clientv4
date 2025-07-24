@@ -7,11 +7,13 @@ using game.scripts.manager.reset;
 using generated.archive;
 using Google.FlatBuffers;
 using Microsoft.Extensions.Logging;
+using ModLoader.block;
+using ModLoader.handler;
 using ModLoader.logger;
 
 namespace game.scripts.manager.blocks;
 
-public class BlockManager: IReset, IArchive, IDisposable {
+public class BlockManager: IReset, IArchive, IDisposable, IBlockManager {
     private readonly ILogger _logger = LogManager.GetLogger<BlockManager>();
     public static BlockManager instance { get; private set; } = new();
     private const string ArchiveFilename = "block-define.dat";
@@ -41,6 +43,17 @@ public class BlockManager: IReset, IArchive, IDisposable {
 
     public ulong GetBlockId<T>() where T : Block {
         if (_blockCache.TryGetValue(typeof(T), out var id)) {
+            return id;
+        }
+
+        return 0;
+    }
+    
+    public ulong GetBlockId(Type type) {
+        if (type == null || type.IsAssignableTo(typeof(Block))) {
+            throw new ArgumentException("Type must be a Block or derived type", nameof(type));
+        }
+        if (_blockCache.TryGetValue(type, out var id)) {
             return id;
         }
 

@@ -1,4 +1,4 @@
-﻿namespace game.scripts.config;
+﻿namespace ModLoader.config;
 
 public class Config {
     public static int ChunkSize = 32;

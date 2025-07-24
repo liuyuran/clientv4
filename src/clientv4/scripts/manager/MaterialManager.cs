@@ -8,6 +8,7 @@ using Godot;
 using Godot.Collections;
 using Microsoft.Extensions.Logging;
 using ModLoader.logger;
+using ModLoader.util;
 
 namespace game.scripts.manager;
 

@@ -1,7 +1,6 @@
 using Core.terrain.stage;
-using game.scripts.manager.map.generator;
-using Godot;
 using ModLoader;
+using ModLoader.map.generator;
 
 namespace Core.terrain.generator;
 

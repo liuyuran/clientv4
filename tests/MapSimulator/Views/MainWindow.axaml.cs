@@ -5,11 +5,12 @@ using Avalonia.Platform;
 using game.scripts.config;
 using game.scripts.manager;
 using game.scripts.manager.blocks;
-using game.scripts.manager.blocks.util;
 using game.scripts.manager.map;
 using game.scripts.utils;
 using Godot;
 using MapSimulator.ViewModels;
+using ModLoader.block.util;
+using ModLoader.config;
 using Window = Avalonia.Controls.Window;
 
 namespace MapSimulator.Views;

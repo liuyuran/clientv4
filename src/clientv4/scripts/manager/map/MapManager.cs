@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using game.scripts.config;
-using game.scripts.manager.map.generator;
 using game.scripts.manager.reset;
 using game.scripts.renderer;
 using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
+using ModLoader.config;
+using ModLoader.handler;
 using ModLoader.logger;
+using ModLoader.map.generator;
+using ModLoader.map.util;
+using ModLoader.util;
+using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.manager.map;
 
-public class MapManager: IReset, IDisposable {
+public class MapManager: IReset, IDisposable, IMapManager {
     private readonly ILogger _logger = LogManager.GetLogger<MapManager>();
     public delegate void BlockChangedCallback(ulong worldId, Vector3 position, ulong blockId, Direction direction);
     public static MapManager instance { get; private set; } = new();

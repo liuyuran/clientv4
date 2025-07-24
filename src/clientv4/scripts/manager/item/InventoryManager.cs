@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using game.scripts.manager.item.composition;
+using ModLoader.item;
+using ModLoader.item.composition;
 
 namespace game.scripts.manager.item;
 

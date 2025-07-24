@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using DotnetNoise;
 using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader;
+using ModLoader.handler;
 using ModLoader.logger;
 using Tomlyn;
 using FileAccess = Godot.FileAccess;
@@ -27,10 +29,9 @@ public class ModManager: IReset, IDisposable {
     private readonly List<Assembly> _extraAssemblies = [
         typeof(FastNoise).Assembly
     ];
+    private readonly IModHandler _modHandler = new StandardModHandler();
 
     private ModManager() {
-        if (_loaded) return;
-        AppDomain.CurrentDomain.AssemblyResolve += OnCurrentDomainOnAssemblyResolve;
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
             var name = assembly.GetName().Name;
             if (name != null) _loadedAssembly.Add(name, assembly);
@@ -40,7 +41,18 @@ public class ModManager: IReset, IDisposable {
             var name = extra.GetName().Name;
             if (name != null) _loadedAssembly.TryAdd(name, extra);
         }
+        if (_loaded) return;
+        AppDomain.CurrentDomain.AssemblyResolve += OnCurrentDomainOnAssemblyResolve;
+        AssemblyLoadContext.Default.Resolving += OnDefaultOnResolving;
         _loaded = true;
+    }
+
+    private Assembly OnDefaultOnResolving(AssemblyLoadContext _, AssemblyName assemblyName) {
+        if (assemblyName.Name != null && _loadedAssembly.TryGetValue(assemblyName.Name, out var assembly)) {
+            return assembly;
+        }
+
+        return null;
     }
 
     private Assembly OnCurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args) {
@@ -131,7 +143,7 @@ public class ModManager: IReset, IDisposable {
             return;
         }
 
-        modInstance.OnLoad();
+        modInstance.OnLoad(_modHandler);
         _activeMods.Add(name);
         _logger.LogInformation("Activated mod: {Name}", name);
     }
@@ -190,7 +202,6 @@ public class ModManager: IReset, IDisposable {
         _modInstances.Clear();
         _modMetas.Clear();
         _activeMods.Clear();
-        AppDomain.CurrentDomain.AssemblyResolve -= OnCurrentDomainOnAssemblyResolve;
         GC.SuppressFinalize(this);
     }
 }

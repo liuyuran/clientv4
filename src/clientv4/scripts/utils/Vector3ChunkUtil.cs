@@ -1,9 +1,11 @@
-﻿using game.scripts.config;
-using Godot;
+﻿using Godot;
+using ModLoader.config;
+using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.utils;
 
 public static class Vector3ChunkUtil {
+    // ModLoader.util.Vector3I 和 GoDot.Vector3I 的隐式双向转换
     public static Vector3I ToChunkPosition(this Vector3 position) {
         return new Vector3I(
             (int)Mathf.Floor(position.X / Config.ChunkSize),

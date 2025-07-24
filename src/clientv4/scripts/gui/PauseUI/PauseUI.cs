@@ -123,7 +123,7 @@ public partial class PauseUI : Control {
 
     private void ReloadAllMenu() {
         foreach (var group in _menuGroups) {
-            RemoveChild(group);
+            group.QueueFree();
         }
 
         _menuGroups.Clear();

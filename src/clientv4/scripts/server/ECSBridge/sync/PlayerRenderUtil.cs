@@ -37,7 +37,7 @@ public static class PlayerRenderUtil {
             camera.Current = true;
         } else {
             var camera = player.GetNode<Camera3D>("head/eyes");
-            player.GetNode<Node3D>("head").RemoveChild(camera);
+            camera.QueueFree();
             worldNode.AddChild(player);
             entityNodes[entity] = player;
             entity.GetComponent<CPhysicsVelocity>().Rid = player.GetRid();

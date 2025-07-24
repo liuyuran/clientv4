@@ -135,7 +135,7 @@ public partial class Menu {
     /// </summary>
     private void LoadArchiveItemDetailData(string archiveName) {
         // TODO load archive item detail data
-        var archiveInfo = _singlePlayMenu.GetNode<RichTextLabel>("ArchiveInfo");
+        var archiveInfo = _singlePlayMenu.GetNode<RichTextLabel>("Panel/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/InfoScroll/InfoBox/ArchiveInfo");
         GD.Print("Loading archive item detail data for: ", archiveName);
     }
 
