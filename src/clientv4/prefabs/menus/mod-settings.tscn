@@ -1,4 +1,15 @@
-[gd_scene format=3 uid="uid://it553qyuja7f"]
+[gd_scene load_steps=5 format=3 uid="uid://it553qyuja7f"]
+
+[ext_resource type="Script" uid="uid://jnse5qd3u7pu" path="res://scripts/start/background/SettingBackground.cs" id="1_13xv4"]
+
+[sub_resource type="Gradient" id="Gradient_rs44p"]
+colors = PackedColorArray(0.56985, 0.625954, 0.528781, 1, 0.568627, 0.627451, 0.529412, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_82ruq"]
+gradient = SubResource("Gradient_rs44p")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_6lklq"]
+texture = SubResource("GradientTexture1D_82ruq")
 
 [node name="Mod-settings" type="Control"]
 layout_mode = 3
@@ -7,3 +18,41 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Back" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_6lklq")
+script = ExtResource("1_13xv4")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 80
+theme_override_constants/margin_right = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer"]
+layout_mode = 2

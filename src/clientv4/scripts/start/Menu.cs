@@ -75,10 +75,10 @@ public partial class Menu : Control {
     }
 
     public override void _Process(double delta) {
-        OpenSingle();
+        /*OpenSingle();
         ResetManager.Reset();
         ArchiveManager.instance.Load(_selectedArchiveName);
-        JumpToGameSceneAndStartLocalServer();
+        JumpToGameSceneAndStartLocalServer();*/
     }
 
     private void CloseOtherPanel() {
