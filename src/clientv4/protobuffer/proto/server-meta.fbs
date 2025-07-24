@@ -1,0 +1,6 @@
+﻿namespace generated.server;
+
+table ServerMeta {
+	name: string;
+	desc: string;
+}
