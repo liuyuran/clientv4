@@ -24,9 +24,6 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.6"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\src\clientv4\Clientv4.csproj" />
+        <PackageReference Include="DotnetNoise" Version="1.0.0" />
     </ItemGroup>
 </Project>
