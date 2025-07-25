@@ -10,6 +10,7 @@ public partial class Menu {
         if (_multiPlayMenu == null) return;
         _multiPlayMenu.QueueFree();
         _multiPlayMenu = null;
+        _modalPanel.Visible = false;
     }
     
     private void OpenMultiPlayMenu() {

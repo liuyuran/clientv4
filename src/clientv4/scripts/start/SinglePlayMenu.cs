@@ -1,6 +1,7 @@
 ﻿using game.scripts.manager.archive;
 using game.scripts.manager.map;
 using game.scripts.manager.reset;
+using game.scripts.utils;
 using Godot;
 
 namespace game.scripts.start;
@@ -22,6 +23,7 @@ public partial class Menu {
         if (_singlePlayMenu == null) return;
         _singlePlayMenu.QueueFree();
         _singlePlayMenu = null;
+        _modalPanel.Visible = false;
     }
 
     /// <summary>
@@ -48,12 +50,12 @@ public partial class Menu {
         }
 
         // bind action for buttons.
-        _createPanel = _singlePlayMenu.GetNode<Control>("CreateWorldPanel");
-        var archiveList = _singlePlayMenu.GetNode<VBoxContainer>("Panel/HBoxContainer/ArchiveBox/ScrollContainer/ArchiveList");
-        var createButton = _singlePlayMenu.GetNode<Button>("Panel/HBoxContainer/ArchiveBox/CreateWorld");
-        var createCancelButton = _createPanel.GetNode<Button>("Panel/Control2/CreateCancelButton");
-        var loadButton = _singlePlayMenu.GetNode<Button>("Panel/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/LoadButton");
-        var deleteButton = _singlePlayMenu.GetNode<Button>("Panel/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/DeleteButton");
+        _createPanel = _singlePlayMenu.FindNodeByName<Control>("CreateWorldPanel");
+        var archiveList = _singlePlayMenu.FindNodeByName<VBoxContainer>("ArchiveList");
+        var createButton = _singlePlayMenu.FindNodeByName<Button>("CreateWorld");
+        var createCancelButton = _createPanel.FindNodeByName<Button>("CreateCancelButton");
+        var loadButton = _singlePlayMenu.FindNodeByName<Button>("LoadButton");
+        var deleteButton = _singlePlayMenu.FindNodeByName<Button>("DeleteButton");
 
         loadButton.Pressed += () => {
             if (string.IsNullOrEmpty(_selectedArchiveName)) {
@@ -135,7 +137,7 @@ public partial class Menu {
     /// </summary>
     private void LoadArchiveItemDetailData(string archiveName) {
         // TODO load archive item detail data
-        var archiveInfo = _singlePlayMenu.GetNode<RichTextLabel>("Panel/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/InfoScroll/InfoBox/ArchiveInfo");
+        var archiveInfo = _singlePlayMenu.FindNodeByName<RichTextLabel>("ArchiveInfo");
         GD.Print("Loading archive item detail data for: ", archiveName);
     }
 
@@ -152,8 +154,8 @@ public partial class Menu {
     /// </summary>
     private void OpenSingleCreateWorld() {
         _createPanel.Visible = true;
-        var seed = _createPanel.GetNode<LineEdit>("Panel/SeedInput");
-        var createButton = _createPanel.GetNode<Button>("Panel/Control2/StartGame");
+        var seed = _createPanel.FindNodeByName<LineEdit>("SeedInput");
+        var createButton = _createPanel.FindNodeByName<Button>("StartGame");
         seed.Text = "";
         createButton.Pressed += CreateArchive;
     }
@@ -163,8 +165,8 @@ public partial class Menu {
     /// </summary>
     private void CloseSingleCreateWorld() {
         _createPanel.Visible = false;
-        var seed = _createPanel.GetNode<LineEdit>("Panel/SeedInput");
-        var createButton = _createPanel.GetNode<Button>("Panel/Control2/StartGame");
+        var seed = _createPanel.FindNodeByName<LineEdit>("SeedInput");
+        var createButton = _createPanel.FindNodeByName<Button>("StartGame");
         seed.Text = "";
         createButton.Pressed -= CreateArchive;
     }
@@ -173,7 +175,7 @@ public partial class Menu {
     /// create a new archive with the specified seed and start the game.
     /// </summary>
     private void CreateArchive() {
-        var seed = _createPanel.GetNode<LineEdit>("Panel/SeedInput");
+        var seed = _createPanel.FindNodeByName<LineEdit>("SeedInput");
         MapManager.Seed = long.Parse(seed.Text);
         ResetManager.Reset();
         ArchiveManager.instance.Create("new world");

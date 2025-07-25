@@ -19,10 +19,10 @@ public partial class Menu : Control {
     private double _backgroundWhRatio = -1;
     
     public override void _Ready() {
-        _backgroundRect = GetNode<TextureRect>("Background");
-        _gameBtnContainer = GetNode<VBoxContainer>("GameButtons");
-        _gameTitleLabel = GetNode<RichTextLabel>("GameTitle");
-        _modalPanel = GetNode<Panel>("PanelBox");
+        _backgroundRect = this.FindNodeByName<TextureRect>("Background");
+        _gameBtnContainer = this.FindNodeByName<VBoxContainer>("GameButtons");
+        _gameTitleLabel = this.FindNodeByName<RichTextLabel>("GameTitle");
+        _modalPanel = this.FindNodeByName<Panel>("PanelBox");
         CloseOtherPanel();
         InjectVersionInfo();
         GameNodeReference.CurrentScene = GetTree().CurrentScene;
@@ -74,15 +74,23 @@ public partial class Menu : Control {
         );
     }
 
+    private bool tmp = false;
+
     public override void _Process(double delta) {
         /*OpenSingle();
         ResetManager.Reset();
         ArchiveManager.instance.Load(_selectedArchiveName);
         JumpToGameSceneAndStartLocalServer();*/
-        OpenSettings();
+        // OpenSettings();
+        if (tmp) return;
+        OpenSingle();
+        tmp = true;
     }
 
     private void CloseOtherPanel() {
+        CloseSinglePlayMenu();
+        CloseMultiPlayMenu();
+        CloseSettingPanel();
         CloseModPanel();
         CloseAboutPanel();
         _modalPanel.Visible = false;
@@ -132,7 +140,7 @@ public partial class Menu : Control {
     }
     
     private void InjectVersionInfo() {
-        var versionLabel = GetNode<RichTextLabel>("Version");
+        var versionLabel = this.FindNodeByName<RichTextLabel>("Version");
         versionLabel.Text = $"Version: {ProjectSettings.GetSetting("application/config/version")}";
     }
 }

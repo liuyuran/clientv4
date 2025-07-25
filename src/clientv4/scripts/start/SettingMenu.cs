@@ -10,10 +10,14 @@ public partial class Menu {
         if (_settingPanel == null) return;
         _settingPanel.QueueFree();
         _settingPanel = null;
+        _modalPanel.Visible = false;
     }
 
     private void OpenSettingPanel() {
         _settingPanel = _settingPanelScene.Instantiate<Control>();
         _modalPanel.AddChild(_settingPanel);
+        LoadSettingCategory();
     }
+    
+    private void LoadSettingCategory() {}
 }
