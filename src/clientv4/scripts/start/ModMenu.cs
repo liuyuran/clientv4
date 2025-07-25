@@ -1,4 +1,6 @@
-﻿using Godot;
+﻿using game.scripts.manager;
+using game.scripts.utils;
+using Godot;
 
 namespace game.scripts.start;
 
@@ -16,12 +18,17 @@ public partial class Menu {
     private void OpenModPanel() {
         _modPanel = _modPanelScene.Instantiate<Control>();
         _modalPanel.AddChild(_modPanel);
-        LoadModSettingModules();
+        _moduleBox = this.FindNodeByName<HBoxContainer>("ModuleBox");
+        _categoryBox = this.FindNodeByName<HBoxContainer>("CategoryBox");
+        _contentBox = this.FindNodeByName<VBoxContainer>("ContentBox");
+        _settings = SettingsManager.instance.GetSettings();
+        LoadSettingModules();
     }
 
-    private void LoadModSettingModules() {
-        LoadModSettingCategories(0);
+    private void LoadSettingModules() {
+        var data = SettingsManager.instance.GetSettings();
+        LoadSettingCategories(0);
     }
     
-    private void LoadModSettingCategories(int index) {}
+    private void LoadSettingCategories(int index) {}
 }

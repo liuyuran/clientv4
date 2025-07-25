@@ -50,11 +50,22 @@ public class SettingsManager : ISettingsManager, IDisposable, IReset, IArchive {
         _settings[module].Add(setting);
     }
     
-    public List<SettingDefine> GetSettings(string module) {
-        if (_settings.TryGetValue(module, out var settings)) {
-            return settings;
+    public Dictionary<string, List<SettingDefine>> GetCoreSettings() {
+        var settingsCopy = new Dictionary<string, List<SettingDefine>>();
+        foreach (var kvp in _settings) {
+            if (kvp.Key != CoreSetting) continue;
+            settingsCopy[kvp.Key] = new List<SettingDefine>(kvp.Value);
         }
-        return [];
+        return settingsCopy;
+    }
+    
+    public Dictionary<string, List<SettingDefine>> GetSettings() {
+        var settingsCopy = new Dictionary<string, List<SettingDefine>>();
+        foreach (var kvp in _settings) {
+            if (kvp.Key == CoreSetting) continue;
+            settingsCopy[kvp.Key] = new List<SettingDefine>(kvp.Value);
+        }
+        return settingsCopy;
     }
 
     public void Dispose() {
