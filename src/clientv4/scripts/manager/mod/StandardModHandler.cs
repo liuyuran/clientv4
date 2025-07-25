@@ -22,4 +22,8 @@ public class StandardModHandler : IModHandler {
     public IMenuManager GetMenuManager() {
         return MenuManager.instance;
     }
+    
+    public ISettingsManager GetSettingsManager() {
+        return SettingsManager.instance;
+    }
 }

@@ -79,6 +79,7 @@ public partial class Menu : Control {
         ResetManager.Reset();
         ArchiveManager.instance.Load(_selectedArchiveName);
         JumpToGameSceneAndStartLocalServer();*/
+        OpenSettings();
     }
 
     private void CloseOtherPanel() {

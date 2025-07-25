@@ -1,5 +1,7 @@
-﻿namespace ModLoader.handler;
+﻿using ModLoader.setting;
 
-public class ISettingsManager {
-    
+namespace ModLoader.handler;
+
+public interface ISettingsManager {
+    public void AddSetting(string module, SettingDefine setting);
 }
