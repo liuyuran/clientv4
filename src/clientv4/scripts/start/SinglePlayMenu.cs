@@ -89,7 +89,7 @@ public partial class Menu {
         var archives = ArchiveManager.instance.List();
         foreach (var archive in archives) {
             var item = _singleArchiveItemScene.Instantiate<HBoxContainer>();
-            var displayLabel = item.GetNode<RichTextLabel>("DisplayName");
+            var displayLabel = item.FindNodeByName<RichTextLabel>("DisplayName");
             item.Name = archive.Name;
             displayLabel.Text = archive.Name;
             item.Connect(Control.SignalName.MouseEntered, Callable.From(() => { ArchiveItemMouseEntered(item); }));

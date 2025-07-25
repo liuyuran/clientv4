@@ -91,7 +91,7 @@ public partial class WorldContainer: Control {
         var viewportContainer = _worldPrototype.Instantiate<SubViewportContainer>();
         AddChild(viewportContainer);
         viewportContainer.Name = $"ViewportContainer_{worldId}";
-        var subViewport = viewportContainer.GetNode<SubViewport>("world");
+        var subViewport = viewportContainer.FindNodeByName<SubViewport>("world");
         subViewport.Name = $"World_{worldId}";
         var world = new WorldRender(worldId);
         subViewport.AddChild(world);

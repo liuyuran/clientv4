@@ -28,14 +28,14 @@ public partial class InGamingUI {
         }
         AddChild(_playingUI);
         _playingUI.Name = "PlayingUI";
-        _debugInfo = _playingUI.GetNode<Panel>("debug");
+        _debugInfo = _playingUI.FindNodeByName<Panel>("debug");
         RebindScript();
     }
 
     private void RebindScript() {
-        var chatScroll = _playingUI.GetNode<ChatScroll>("chat");
+        var chatScroll = _playingUI.FindNodeByName<ChatScroll>("chat");
         chatScroll.InGamingUIInstance = this;
-        _playingUI.GetNode<Panel>("debug");
+        _playingUI.FindNodeByName<Panel>("debug");
     }
 
     private void ClosePlayingUI() {

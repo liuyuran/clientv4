@@ -2,6 +2,7 @@
 using game.scripts.config;
 using game.scripts.manager;
 using game.scripts.manager.menu;
+using game.scripts.utils;
 using Godot;
 
 namespace game.scripts.gui.PauseUI;
@@ -27,8 +28,8 @@ public partial class PauseUI : Control {
     public override void _Ready() {
         ProcessMode = ProcessModeEnum.Always;
         _parent = GetParent<Control>();
-        _menuTip = _parent.GetNode<Control>("Description");
-        _menuTipText = _menuTip.GetNode<RichTextLabel>("Text");
+        _menuTip = _parent.FindNodeByName<Control>("Description");
+        _menuTipText = _menuTip.FindNodeByName<RichTextLabel>("Text");
         GetTree().Paused = true;
         ReloadAllMenu();
         GetTree().Root.SizeChanged += OnRootOnSizeChanged;

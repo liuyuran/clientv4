@@ -21,8 +21,8 @@ public partial class Menu {
     private void OpenAboutPanel() {
         _aboutPanel = _aboutPanelScene.Instantiate<Control>();
         _modalPanel.AddChild(_aboutPanel);
-        _aboutLabel = _aboutPanel.GetNode<RichTextLabel>("Back/Text");
-        _backButton = _aboutPanel.GetNode<Button>("Back/ButtonBox/Back");
+        _aboutLabel = _aboutPanel.FindNodeByName<RichTextLabel>("Text");
+        _backButton = _aboutPanel.FindNodeByName<Button>("Back");
         _backButton.Pressed += CloseAboutPanel;
         _aboutLabel.Text = GetAboutText() + "\n\n";
     }

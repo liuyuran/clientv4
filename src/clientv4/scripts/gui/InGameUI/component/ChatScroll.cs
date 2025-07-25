@@ -16,9 +16,9 @@ public partial class ChatScroll: Panel {
 	
 	public override void _Ready() {
 		_chatHistory = GetNode<ScrollContainer>("box/chatHistory");
-		_chatBox = _chatHistory.GetNode<VBoxContainer>("chatBox");
+		_chatBox = _chatHistory.FindNodeByName<VBoxContainer>("chatBox");
 		_chatInputBox = GetNode<HBoxContainer>("box/InputBox");
-		_chatInput = _chatInputBox.GetNode<LineEdit>("MsgInput");
+		_chatInput = _chatInputBox.FindNodeByName<LineEdit>("MsgInput");
 		AddMessage(new ChatManager.MessageInfo {
 			Timestamp = PlatformUtil.GetTimestamp(),
 			Message = "[color=yellow]Welcome to Friflo![/color]"

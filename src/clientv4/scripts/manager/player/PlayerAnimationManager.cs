@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using game.scripts.utils;
 using Godot;
 
 namespace game.scripts.manager.player;
@@ -38,7 +39,7 @@ public partial class PlayerManager {
     }
     
     public void DetachAnimationNode(Node creatureNode) {
-        var animationPlayer = creatureNode.GetNode<AnimationPlayer>("AnimationPlayer");
+        var animationPlayer = creatureNode.FindNodeByName<AnimationPlayer>("AnimationPlayer");
         animationPlayer.Stop();
         animationPlayer.QueueFree();
     }

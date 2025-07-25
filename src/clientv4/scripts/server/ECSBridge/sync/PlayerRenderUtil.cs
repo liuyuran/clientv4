@@ -7,6 +7,7 @@ using game.scripts.manager.player;
 using game.scripts.renderer;
 using game.scripts.server.ECSBridge.gravity;
 using game.scripts.server.ECSBridge.input;
+using game.scripts.utils;
 using Godot;
 
 namespace game.scripts.server.ECSBridge.sync;
@@ -22,7 +23,7 @@ public static class PlayerRenderUtil {
     }
     
     public static void CreatePlayer(bool mainPlayer, Entity entity, PackedScene playerPrototype, Node root, Dictionary<Entity, Node3D> entityNodes) {
-        var worldContainerNode = root.GetNode<WorldContainer>("worlds");
+        var worldContainerNode = root.FindNodeByName<WorldContainer>("worlds");
         var worldNode = worldContainerNode.GetCurrentSubViewport();
         var player = playerPrototype.Instantiate<CharacterBody3D>();
         player.Name = $"Player_{entity.Id}";
@@ -32,11 +33,11 @@ public static class PlayerRenderUtil {
             entity.GetComponent<CPhysicsVelocity>().Rid = player.GetRid();
             var spaceState = player.GetWorld3D().DirectSpaceState;
             entity.GetComponent<CCamera>().SpaceState = spaceState;
-            var camera = player.GetNode<Camera3D>("head/eyes");
+            var camera = player.FindNodeByName<Camera3D>("eyes");
             entity.GetComponent<CCamera>().Camera = camera;
             camera.Current = true;
         } else {
-            var camera = player.GetNode<Camera3D>("head/eyes");
+            var camera = player.FindNodeByName<Camera3D>("eyes");
             camera.QueueFree();
             worldNode.AddChild(player);
             entityNodes[entity] = player;
@@ -84,7 +85,7 @@ public static class PlayerRenderUtil {
         }
 
         if (velocity.Rotation.Y != 0) {
-            body3D.GetNode<Node3D>("head").RotateX(velocity.Rotation.Y);
+            body3D.FindNodeByName<Node3D>("head").RotateX(velocity.Rotation.Y);
         }
 
         if (entity.HasComponent<CPeer>()) {
