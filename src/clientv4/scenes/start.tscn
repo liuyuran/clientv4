@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://2v7krsjntfq"]
+[gd_scene load_steps=16 format=3 uid="uid://2v7krsjntfq"]
 
 [ext_resource type="Script" uid="uid://joix6a68lgkw" path="res://scripts/start/Menu.cs" id="1_u80x2"]
 [ext_resource type="PackedScene" uid="uid://cn4ppnh48p74l" path="res://prefabs/menus/about.tscn" id="2_4ge6i"]
@@ -8,7 +8,13 @@
 [ext_resource type="PackedScene" uid="uid://coc2dqudywcoq" path="res://prefabs/menus/multi-player.tscn" id="4_tn317"]
 [ext_resource type="PackedScene" uid="uid://cwgwu1mopi6ss" path="res://prefabs/menus/settings.tscn" id="5_m8nf6"]
 [ext_resource type="PackedScene" uid="uid://cw1o7mm248i74" path="res://prefabs/menus/single-player.tscn" id="6_pgjjs"]
+[ext_resource type="PackedScene" uid="uid://lux5o064bnrv" path="res://prefabs/menus/settings/module-item.tscn" id="7_pgjjs"]
+[ext_resource type="PackedScene" uid="uid://pbt6k6tck0ue" path="res://prefabs/menus/settings/category-item.tscn" id="8_1nvso"]
 [ext_resource type="PackedScene" uid="uid://bjgy3hhrl5g25" path="res://prefabs/menus/single/singleArchiveItem.tscn" id="8_tn317"]
+[ext_resource type="PackedScene" uid="uid://crbqmcid3ihnt" path="res://prefabs/menus/settings/fragment-input.tscn" id="9_r8uic"]
+[ext_resource type="PackedScene" uid="uid://cifjwlnxmnp8m" path="res://prefabs/menus/settings/fragment-selector.tscn" id="10_x1pfr"]
+[ext_resource type="PackedScene" uid="uid://5qmhgpvhamnm" path="res://prefabs/menus/settings/fragment-radio.tscn" id="11_n0tym"]
+[ext_resource type="PackedScene" uid="uid://dvl2ormwgdl7m" path="res://prefabs/menus/settings/fragment-progress.tscn" id="12_x1pfr"]
 
 [node name="Start" type="Control"]
 layout_mode = 3
@@ -24,6 +30,12 @@ _startScene = null
 _modPanelScene = ExtResource("3_8itgj")
 _multiPlayMenuScene = ExtResource("4_tn317")
 _settingPanelScene = ExtResource("5_m8nf6")
+_moduleItemPrototype = ExtResource("7_pgjjs")
+_categoryItemPrototype = ExtResource("8_1nvso")
+_configInputPrototype = ExtResource("9_r8uic")
+_configSelectorPrototype = ExtResource("10_x1pfr")
+_configRadioPrototype = ExtResource("11_n0tym")
+_configProgressPrototype = ExtResource("12_x1pfr")
 _singlePlayMenuScene = ExtResource("6_pgjjs")
 _singleArchiveItemScene = ExtResource("8_tn317")
 

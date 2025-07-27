@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://c4l82svkvmewt"]
+[gd_scene load_steps=9 format=3 uid="uid://c4l82svkvmewt"]
 
 [ext_resource type="Script" uid="uid://boua0n7c74361" path="res://scripts/renderer/WorldContainer.cs" id="1_0tnpc"]
 [ext_resource type="Script" uid="uid://btdjg0kdju2lk" path="res://scripts/server/ECSBridge/ECSSystemBridge.cs" id="1_gee14"]
 [ext_resource type="PackedScene" uid="uid://dqxxh7ygrtvuk" path="res://prefabs/player.tscn" id="2_0tnpc"]
+[ext_resource type="PackedScene" uid="uid://2v7krsjntfq" path="res://scenes/start.tscn" id="2_gee14"]
 [ext_resource type="PackedScene" uid="uid://cs5le6lxd6lqa" path="res://prefabs/world.tscn" id="2_vtaks"]
 [ext_resource type="Script" uid="uid://cx4s2ugh011ah" path="res://scripts/server/MultiPlayerSupportNode.cs" id="4_kvpfn"]
 [ext_resource type="PackedScene" uid="uid://bkhf24nhopl67" path="res://prefabs/ui.tscn" id="6_p57ef"]

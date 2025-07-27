@@ -1,9 +1,14 @@
 [gd_scene format=3 uid="uid://lux5o064bnrv"]
 
-[node name="Module-item" type="Control"]
-layout_mode = 3
+[node name="ModuleBox" type="MarginContainer"]
+custom_minimum_size = Vector2(0, 90)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="ModuleName" type="Button" parent="."]
+layout_mode = 2

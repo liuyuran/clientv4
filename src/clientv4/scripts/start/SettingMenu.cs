@@ -13,6 +13,7 @@ public partial class Menu {
     [Export] private PackedScene _configInputPrototype;
     [Export] private PackedScene _configSelectorPrototype;
     [Export] private PackedScene _configRadioPrototype;
+    [Export] private PackedScene _configProgressPrototype;
     private Control _settingPanel;
     private Control _moduleBox;
     private Control _categoryBox;

@@ -10,7 +10,6 @@ namespace game.scripts.start;
 [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
 public partial class Menu : Control {
     [Export] private PackedScene _gameScene;
-    [Export] private PackedScene _startScene;
     private TextureRect _backgroundRect;
     private VBoxContainer _gameBtnContainer;
     private RichTextLabel _gameTitleLabel;
@@ -26,7 +25,6 @@ public partial class Menu : Control {
         CloseOtherPanel();
         InjectVersionInfo();
         GameNodeReference.CurrentScene = GetTree().CurrentScene;
-        GameNodeReference.StartScenePacked = _startScene;
         GameNodeReference.GamingScenePacked = _gameScene;
         GetTree().Root.SizeChanged += OnRootSizeChanged;
         CallDeferred(MethodName.OnRootSizeChanged);
