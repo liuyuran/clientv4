@@ -23,6 +23,7 @@ public partial class WorldContainer: Control {
     private ulong _currentWorldId;
 
     public override void _Ready() {
+        GameNodeReference.StartScenePacked = ResourceLoader.Load<PackedScene>("res://scenes/start.tscn");
         GameNodeReference.CurrentScene = GetTree().CurrentScene;
         PlatformUtil.goDotMode = true;
         RedirectLogger.WriteLine = (level, s) => {
