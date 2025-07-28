@@ -17,6 +17,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="protobuffer\proto\block-define.fbs" />
+    <Content Include="protobuffer\proto\item-define.fbs" />
+    <Content Include="protobuffer\proto\player-define.fbs" />
     <Content Include="protobuffer\proto\server-meta.fbs" />
   </ItemGroup>
   <ItemGroup>

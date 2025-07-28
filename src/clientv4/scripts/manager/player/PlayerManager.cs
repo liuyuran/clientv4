@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using game.scripts.manager.archive;
 using game.scripts.manager.reset;
 using Godot;
 
 namespace game.scripts.manager.player;
 
-public partial class PlayerManager: IReset, IDisposable {
+public partial class PlayerManager : IReset, IArchive, IDisposable {
     public static PlayerManager instance { get; private set; } = new();
-    
+
     private readonly Dictionary<long, PlayerInfo> _playersByPeerId = new();
     private readonly Dictionary<ulong, PlayerInfo> _playersById = new();
     private readonly HashSet<(ulong playerId, ulong worldId, Vector3I chunkPosition)> _sentChunks = [];
     private ulong _nextPlayerId = 1;
-    
+
     /// <summary>
     /// only execute on the server or network master, need to read data from archive files
     /// </summary>
@@ -26,23 +27,23 @@ public partial class PlayerManager: IReset, IDisposable {
         _playersById[playerInfo.playerId] = playerInfo;
         GD.Print("Registered player: " + playerInfo.nickname + " with ID: " + playerInfo.playerId);
     }
-    
+
     public PlayerInfo GetPlayerByPeerId(long peerId) {
         return _playersByPeerId.GetValueOrDefault(peerId);
     }
-    
+
     public PlayerInfo GetPlayerById(ulong playerId) {
         return _playersById.GetValueOrDefault(playerId);
     }
-    
+
     public IEnumerable<PlayerInfo> GetAllPlayers() {
         return _playersById.Values;
     }
-    
+
     public bool HasSentChunk(ulong playerId, ulong worldId, Vector3I chunkPosition) {
         return _sentChunks.Contains((playerId, worldId, chunkPosition));
     }
-    
+
     public void MarkChunkSent(ulong playerId, ulong worldId, Vector3I chunkPosition) {
         _sentChunks.Add((playerId, worldId, chunkPosition));
     }
@@ -50,7 +51,7 @@ public partial class PlayerManager: IReset, IDisposable {
     public void UnmarkChunkSentForAllPlayers(ulong worldId, Vector3I chunkPosition) {
         _sentChunks.RemoveWhere(x => x.worldId == worldId && x.chunkPosition == chunkPosition);
     }
-    
+
     public void RemovePlayer(long peerId) {
         if (_playersByPeerId.TryGetValue(peerId, out var playerInfo)) {
             _playersById.Remove(playerInfo.playerId);
@@ -58,25 +59,25 @@ public partial class PlayerManager: IReset, IDisposable {
             _sentChunks.RemoveWhere(x => x.playerId == playerInfo.playerId);
         }
     }
-    
+
     public void UpdatePlayerPosition(long peerId, Vector3 position) {
         if (_playersByPeerId.TryGetValue(peerId, out var playerInfo)) {
             playerInfo.position = position;
         }
     }
-    
+
     public void SetPlayerWorld(long peerId, ulong worldId) {
         if (_playersByPeerId.TryGetValue(peerId, out var playerInfo)) {
             playerInfo.worldId = worldId;
         }
     }
-    
+
     public void UpdatePlayerPing(long peerId, uint ping) {
         if (_playersByPeerId.TryGetValue(peerId, out var playerInfo)) {
             playerInfo.ping = ping;
         }
     }
-    
+
     public Vector3 GetPlayerPosition(long peerId) {
         return _playersByPeerId.TryGetValue(peerId, out var playerInfo) ? playerInfo.position : Vector3.Zero;
     }
@@ -85,6 +86,7 @@ public partial class PlayerManager: IReset, IDisposable {
         instance = new PlayerManager();
         Dispose();
     }
+
     public void Dispose() {
         _playersByPeerId.Clear();
         _playersById.Clear();
@@ -93,8 +95,17 @@ public partial class PlayerManager: IReset, IDisposable {
             _animationPlayer.QueueFree();
             _animationPlayer = null;
         }
+
         _animationLibraries.Clear();
         GC.SuppressFinalize(this);
+    }
+
+    public void Archive(Dictionary<string, byte[]> fileList) {
+        throw new NotImplementedException();
+    }
+
+    public void Recover(Func<string, byte[]> getDataFunc) {
+        throw new NotImplementedException();
     }
 }
 

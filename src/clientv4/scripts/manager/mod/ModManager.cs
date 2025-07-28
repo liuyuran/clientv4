@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Text.Json;
 using DotnetNoise;
 using game.scripts.manager.reset;
 using game.scripts.utils;
@@ -17,18 +18,21 @@ using FileAccess = Godot.FileAccess;
 
 namespace game.scripts.manager.mod;
 
-public class ModManager: IReset, IDisposable {
+public class ModManager : IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<ModManager>();
     public static ModManager instance { get; private set; } = new();
+    private const string SettingsFile = "mods.json";
     private const string ModDirectory = "Mods";
     private static bool _loaded;
     private readonly Dictionary<string, IMod> _modInstances = new();
     private readonly Dictionary<string, ModMeta> _modMetas = new();
-    private readonly HashSet<string> _activeMods = [];
+    private readonly List<string> _activeMods = [];
     private readonly Dictionary<string, Assembly> _loadedAssembly = [];
+
     private readonly List<Assembly> _extraAssemblies = [
         typeof(FastNoise).Assembly
     ];
+
     private readonly IModHandler _modHandler = new StandardModHandler();
 
     private ModManager() {
@@ -41,6 +45,7 @@ public class ModManager: IReset, IDisposable {
             var name = extra.GetName().Name;
             if (name != null) _loadedAssembly.TryAdd(name, extra);
         }
+
         if (_loaded) return;
         AppDomain.CurrentDomain.AssemblyResolve += OnCurrentDomainOnAssemblyResolve;
         AssemblyLoadContext.Default.Resolving += OnDefaultOnResolving;
@@ -60,6 +65,7 @@ public class ModManager: IReset, IDisposable {
         if (assemblyName.Name != null && _loadedAssembly.TryGetValue(assemblyName.Name, out var assembly)) {
             return assembly;
         }
+
         return null;
     }
 
@@ -145,7 +151,25 @@ public class ModManager: IReset, IDisposable {
 
         modInstance.OnLoad(_modHandler);
         _activeMods.Add(name);
+        SaveModStatus();
         _logger.LogInformation("Activated mod: {Name}", name);
+    }
+
+    public void SortActiveMods(List<string> modNames) {
+        if (modNames == null || modNames.Count == 0) {
+            _logger.LogWarning("No mod names provided for sorting.");
+            return;
+        }
+
+        var sortedMods = modNames
+            .Where(name => _modInstances.ContainsKey(name))
+            .OrderBy(name => _modMetas[name].priority)
+            .ToList();
+
+        _activeMods.Clear();
+        _activeMods.AddRange(sortedMods);
+        SaveModStatus();
+        _logger.LogInformation("Sorted active mods: {Mods}", string.Join(", ", _activeMods));
     }
 
     public void DeactivateMod(string name) {
@@ -198,10 +222,42 @@ public class ModManager: IReset, IDisposable {
         instance = new ModManager();
         Dispose();
     }
+
     public void Dispose() {
         _modInstances.Clear();
         _modMetas.Clear();
         _activeMods.Clear();
         GC.SuppressFinalize(this);
+    }
+
+    private void SaveModStatus() {
+        var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
+        if (!DirAccess.DirExistsAbsolute(basePath)) {
+            throw new DirectoryNotFoundException($"Settings directory does not exist at path: {basePath}");
+        }
+        var modSorted = new List<string>(_activeMods);
+        var json = JsonSerializer.Serialize(modSorted);
+        var filePath = Path.Combine(basePath, SettingsFile);
+        var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
+        fileHandle.StoreBuffer(System.Text.Encoding.UTF8.GetBytes(json));
+    }
+
+    private void LoadModStatus() {
+        var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
+        var filePath = Path.Combine(basePath, SettingsFile);
+        if (!FileAccess.FileExists(filePath)) {
+            _logger.LogWarning("Mod status file does not exist at path: {Path}", filePath);
+            return;
+        }
+
+        try {
+            var json = FileUtil.RemoveBom(FileAccess.GetFileAsBytes(filePath));
+            var modSorted = JsonSerializer.Deserialize<List<string>>(json);
+            if (modSorted != null) {
+                SortActiveMods(modSorted);
+            }
+        } catch (Exception e) {
+            _logger.LogError("Failed to load mod status from {s}: {eMessage}", filePath, e.Message);
+        }
     }
 }

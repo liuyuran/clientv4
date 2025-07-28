@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using game.scripts.config;
+using game.scripts.manager.archive;
 using game.scripts.manager.reset;
 using game.scripts.renderer;
 using game.scripts.utils;
@@ -17,23 +18,25 @@ using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.manager.map;
 
-public class MapManager: IReset, IDisposable, IMapManager {
+public class MapManager : IReset, IArchive, IDisposable, IMapManager {
     private readonly ILogger _logger = LogManager.GetLogger<MapManager>();
+
     public delegate void BlockChangedCallback(ulong worldId, Vector3 position, ulong blockId, Direction direction);
+
     public static MapManager instance { get; private set; } = new();
     public static long Seed;
     private readonly TerrainGenerator _generator;
     private readonly Dictionary<ulong, Dictionary<Vector3I, BlockData[][][]>> _chunks = new();
     public event BlockChangedCallback OnBlockChanged;
-    
+
     private readonly Dictionary<(ulong, Vector3I), bool> _pendingGenerationTasks = new();
     private readonly object _lockObject = new();
-    
+
     private MapManager() {
         // 初始化地图管理器
         _generator = new TerrainGenerator(Seed);
     }
-    
+
     public void RegisterGenerator<T>(ulong worldId) where T : IWorldGenerator {
         _generator.RegistryGenerator<T>(worldId);
     }
@@ -42,6 +45,7 @@ public class MapManager: IReset, IDisposable, IMapManager {
         if (!_chunks.TryGetValue(worldId, out var chunkData)) {
             _chunks.Add(worldId, new Dictionary<Vector3I, BlockData[][][]>());
         }
+
         chunkData = _chunks[worldId];
         var chunkPosition = position.ToChunkPosition();
         var localPosition = position.ToLocalPosition();
@@ -51,6 +55,7 @@ public class MapManager: IReset, IDisposable, IMapManager {
         if (!chunkData.TryGetValue(chunkPosition, out var blockData)) {
             blockData = GetBlockData(worldId, chunkPosition);
         }
+
         // 设置块数据
         blockData[localPosition.X][localPosition.Y][localPosition.Z] = new BlockData {
             BlockId = blockId,
@@ -66,6 +71,7 @@ public class MapManager: IReset, IDisposable, IMapManager {
         if (!_chunks.TryGetValue(worldId, out var chunkData)) {
             _chunks.Add(worldId, new Dictionary<Vector3I, BlockData[][][]>());
         }
+
         chunkData = _chunks[worldId];
         if (chunkData.TryGetValue(position, out var blockData)) return blockData;
         // 如果不存在对应的块数据且不允许创建，则返回 null
@@ -78,16 +84,14 @@ public class MapManager: IReset, IDisposable, IMapManager {
                 // Generation already in progress, return null
                 return null;
             }
-        
+
             // Mark as generating
             _pendingGenerationTasks[(worldId, position)] = true;
         }
-    
+
         if (sync) {
             // Start generation in thread pool
-            Task.Run(() => {
-                GenerateChunk(worldId, position);
-            });
+            Task.Run(() => { GenerateChunk(worldId, position); });
         } else {
             GenerateChunk(worldId, position);
             // If not syncing, we can directly generate the chunk
@@ -96,11 +100,11 @@ public class MapManager: IReset, IDisposable, IMapManager {
                 return blockData;
             }
         }
-    
+
         // Return null since generation is in progress
         return null;
     }
-    
+
     private void GenerateChunk(ulong worldId, Vector3I position) {
         try {
             var startTime = PlatformUtil.GetTimestamp();
@@ -139,11 +143,12 @@ public class MapManager: IReset, IDisposable, IMapManager {
         var blockData = GetBlockData(0, chunkPosition);
         return blockData?[localPosition.X][localPosition.Y][localPosition.Z].BlockId;
     }
-    
+
     public void OverwriteBlockData(ulong worldId, Vector3I chunkPosition, BlockData[][][] blockData) {
         if (!_chunks.TryGetValue(worldId, out var chunkData)) {
             _chunks.Add(worldId, new Dictionary<Vector3I, BlockData[][][]>());
         }
+
         chunkData = _chunks[worldId];
         chunkData[chunkPosition] = blockData;
         _chunks[worldId] = chunkData;
@@ -156,18 +161,18 @@ public class MapManager: IReset, IDisposable, IMapManager {
         if (localPosition.X < 0) localPosition.X += Config.ChunkSize;
         if (localPosition.Y < 0) localPosition.Y += Config.ChunkSize;
         if (localPosition.Z < 0) localPosition.Z += Config.ChunkSize;
-        
+
         // 计算全局Y坐标
         long globalY = chunkPosition.Y * Config.ChunkSize + localPosition.Y;
-        
+
         // 搜索范围（确保覆盖上下一个区块）
         var searchRange = Config.ChunkSize * 2;
-        
+
         // 先检查当前位置
         if (CheckPositionForEmptySpace(worldId, chunkPosition, localPosition, globalY)) {
             return globalY;
         }
-        
+
         // 交替向下和向上搜索
         for (var i = 1; i <= searchRange; i++) {
             // 向下搜索
@@ -175,17 +180,17 @@ public class MapManager: IReset, IDisposable, IMapManager {
             if (CheckPositionForEmptySpace(worldId, chunkPosition, localPosition, downY)) {
                 return downY;
             }
-            
+
             // 向上搜索
             var upY = globalY + i;
             if (CheckPositionForEmptySpace(worldId, chunkPosition, localPosition, upY)) {
                 return upY;
             }
         }
-        
-        return -1;  // 没找到合适的空间
+
+        return -1; // 没找到合适的空间
     }
-    
+
     // 辅助方法：检查指定全局Y坐标处是否有两格连续的空间
     private bool CheckPositionForEmptySpace(ulong worldId, Vector3I originalChunkPos, Vector3I localPos, long globalY) {
         // 计算区块位置和本地位置
@@ -196,14 +201,14 @@ public class MapManager: IReset, IDisposable, IMapManager {
         );
         var localY = (int)(globalY % Config.ChunkSize);
         if (localY < 0) localY += Config.ChunkSize;
-        
+
         // 获取区块数据
         var blockData = GetBlockData(worldId, chunkPos);
         if (blockData == null) return false;
-        
+
         // 检查当前位置是否为空
         if (blockData[localPos.X][localY][localPos.Z].BlockId != 0) return false;
-        
+
         // 检查上方一格是否为空
         if (localY + 1 < Config.ChunkSize) {
             // 上方格子在同一区块
@@ -220,10 +225,19 @@ public class MapManager: IReset, IDisposable, IMapManager {
         instance = new MapManager();
         Dispose();
     }
+
     public void Dispose() {
         _chunks.Clear();
         _pendingGenerationTasks.Clear();
         OnBlockChanged = null;
         GC.SuppressFinalize(this);
+    }
+
+    public void Archive(Dictionary<string, byte[]> fileList) {
+        throw new NotImplementedException();
+    }
+
+    public void Recover(Func<string, byte[]> getDataFunc) {
+        throw new NotImplementedException();
     }
 }

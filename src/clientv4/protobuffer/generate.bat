@@ -1,4 +1,5 @@
 @echo off
 rd /s /q "generated"
-flatc -I .\proto --csharp .\proto\block-define.fbs
-flatc -I .\proto --csharp .\proto\server-meta.fbs
+for /R %%G in (*.fbs) do (
+    flatc -I .\proto --csharp "%%G"
+)

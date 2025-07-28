@@ -1,0 +1,11 @@
+﻿namespace generated.archive;
+
+table ItemDefineItem {
+  item_id: uint64;
+  type: string;
+}
+
+table ItemDefine {
+  id_breakpoint: uint64;
+  data: [ItemDefineItem];
+}
