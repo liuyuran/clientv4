@@ -11,6 +11,6 @@ grow_vertical = 2
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="Value" type="ProgressBar" parent="."]
+[node name="Value" type="HSlider" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3

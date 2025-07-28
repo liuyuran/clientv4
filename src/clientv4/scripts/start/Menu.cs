@@ -4,11 +4,14 @@ using game.scripts.manager.reset;
 using game.scripts.server;
 using game.scripts.utils;
 using Godot;
+using Microsoft.Extensions.Logging;
+using ModLoader.logger;
 
 namespace game.scripts.start;
 
 [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
 public partial class Menu : Control {
+    private readonly ILogger _logger = LogManager.GetLogger<Menu>();
     [Export] private PackedScene _gameScene;
     private TextureRect _backgroundRect;
     private VBoxContainer _gameBtnContainer;

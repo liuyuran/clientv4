@@ -12,7 +12,7 @@ using ModLoader.logger;
 using ModLoader.setting;
 using FileAccess = Godot.FileAccess;
 
-namespace game.scripts.manager;
+namespace game.scripts.manager.settings;
 
 public class SettingsManager : ISettingsManager, IDisposable, IReset, IArchive {
     private readonly ILogger _logger = LogManager.GetLogger<SettingsManager>();

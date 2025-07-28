@@ -2,6 +2,7 @@
 using game.scripts.manager.item;
 using game.scripts.manager.map;
 using game.scripts.manager.menu;
+using game.scripts.manager.settings;
 using ModLoader.handler;
 
 namespace game.scripts.manager.mod;
