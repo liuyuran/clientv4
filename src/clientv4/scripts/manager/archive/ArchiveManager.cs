@@ -71,7 +71,7 @@ public class ArchiveManager {
                     // 如果有名为instance的静态字段，则直接获取该字段的值
                     var fieldValue = field.GetValue(null);
                     if (fieldValue is IArchive archiveInstance) {
-                        archiveInstance?.Archive(archiveFiles);
+                        archiveInstance.Archive(archiveFiles);
                     }
                 }
             }
@@ -123,18 +123,31 @@ public class ArchiveManager {
                     // 如果有名为instance的静态字段，则直接获取该字段的值
                     var fieldValue = field.GetValue(null);
                     if (fieldValue is IArchive archiveInstance) {
-                        archiveInstance?.Recover(path => {
-                            var filePath = Path.Combine(saveBasePath, _currentSaveName, path);
-                            if (FileAccess.FileExists(filePath)) {
-                                return FileAccess.GetFileAsBytes(filePath);
-                            }
-
-                            return null;
-                        });
+                        archiveInstance.Recover(GetFileAsBytesFromCurrentArchive);
                     }
                 }
             }
         }
+    }
+    
+    public void SaveFileAsBytesToCurrentArchive(string relativePath, byte[] data) {
+        var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
+        var saveBasePath = Path.Combine(basePath, SaveDirectory);
+        var filePath = Path.Combine(saveBasePath, _currentSaveName, relativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? string.Empty);
+        var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
+        fileHandle.StoreBuffer(data);
+    }
+    
+    public byte[] GetFileAsBytesFromCurrentArchive(string relativePath) {
+        var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
+        var saveBasePath = Path.Combine(basePath, SaveDirectory);
+        var filePath = Path.Combine(saveBasePath, _currentSaveName, relativePath);
+        if (FileAccess.FileExists(filePath)) {
+            return FileAccess.GetFileAsBytes(filePath);
+        }
+
+        return null;
     }
 
     public void Load(string saveName) {

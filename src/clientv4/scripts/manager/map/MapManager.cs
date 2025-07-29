@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using game.scripts.config;
 using game.scripts.manager.archive;
 using game.scripts.manager.reset;
-using game.scripts.renderer;
 using game.scripts.utils;
+using generated.archive;
 using Godot;
+using Google.FlatBuffers;
 using Microsoft.Extensions.Logging;
 using ModLoader.config;
 using ModLoader.handler;
@@ -20,6 +20,7 @@ namespace game.scripts.manager.map;
 
 public class MapManager : IReset, IArchive, IDisposable, IMapManager {
     private readonly ILogger _logger = LogManager.GetLogger<MapManager>();
+    private const string MapFilename = "world_{0}/chunk_{1}_{2}_{3}.dat";
 
     public delegate void BlockChangedCallback(ulong worldId, Vector3 position, ulong blockId, Direction direction);
 
@@ -27,6 +28,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
     public static long Seed;
     private readonly TerrainGenerator _generator;
     private readonly Dictionary<ulong, Dictionary<Vector3I, BlockData[][][]>> _chunks = new();
+    private readonly HashSet<(ulong, Vector3I)> _needArchive = [];
     public event BlockChangedCallback OnBlockChanged;
 
     private readonly Dictionary<(ulong, Vector3I), bool> _pendingGenerationTasks = new();
@@ -52,17 +54,20 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         if (localPosition.X < 0) localPosition.X += Config.ChunkSize;
         if (localPosition.Y < 0) localPosition.Y += Config.ChunkSize;
         if (localPosition.Z < 0) localPosition.Z += Config.ChunkSize;
-        if (!chunkData.TryGetValue(chunkPosition, out var blockData)) {
-            blockData = GetBlockData(worldId, chunkPosition);
-        }
+        lock (_lockObject) {
+            if (!chunkData.TryGetValue(chunkPosition, out var blockData)) {
+                blockData = GetBlockData(worldId, chunkPosition);
+            }
 
-        // 设置块数据
-        blockData[localPosition.X][localPosition.Y][localPosition.Z] = new BlockData {
-            BlockId = blockId,
-            Direction = direction
-        };
-        chunkData[chunkPosition] = blockData;
-        _chunks[worldId] = chunkData;
+            // 设置块数据
+            blockData[localPosition.X][localPosition.Y][localPosition.Z] = new BlockData {
+                BlockId = blockId,
+                Direction = direction
+            };
+            chunkData[chunkPosition] = blockData;
+            _chunks[worldId] = chunkData;
+            _needArchive.Add((worldId, chunkPosition));
+        }
         // 触发块改变事件
         OnBlockChanged?.Invoke(worldId, position, blockId, direction);
     }
@@ -87,6 +92,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
 
             // Mark as generating
             _pendingGenerationTasks[(worldId, position)] = true;
+            _needArchive.Add((worldId, position));
         }
 
         if (sync) {
@@ -107,16 +113,26 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
 
     private void GenerateChunk(ulong worldId, Vector3I position) {
         try {
-            var startTime = PlatformUtil.GetTimestamp();
-            var data = _generator.GenerateTerrain(worldId, position);
-            _logger.LogDebug("Generate terrain for chunk {position} in world {worldId} took {time} ms",
-                position, worldId, PlatformUtil.GetTimestamp() - startTime);
+            if (!_chunks.ContainsKey(worldId)) {
+                _chunks.Add(worldId, new Dictionary<Vector3I, BlockData[][][]>());
+            }
+            if (_chunks[worldId].ContainsKey(position)) {
+                return;
+            }
+            var data = TryGetBlockDataFromArchive(worldId, position);
+            if (data == null) {
+                var startTime = PlatformUtil.GetTimestamp();
+                data = _generator.GenerateTerrain(worldId, position);
+                _logger.LogDebug("Generate terrain for chunk {position} in world {worldId} took {time} ms",
+                    position, worldId, PlatformUtil.GetTimestamp() - startTime);
+            }
 
             lock (_lockObject) {
                 // Add the generated data to the chunk dictionary
                 _chunks[worldId][position] = data;
                 // Remove from pending tasks
                 _pendingGenerationTasks.Remove((worldId, position));
+                _needArchive.Add((worldId, position));
             }
         } catch (Exception ex) {
             _logger.LogError(ex, "Error generating terrain for chunk {position} in world {worldId}", position, worldId);
@@ -232,12 +248,72 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         OnBlockChanged = null;
         GC.SuppressFinalize(this);
     }
+    
+    private BlockData[][][] TryGetBlockDataFromArchive(ulong worldId, Vector3I chunkPosition) {
+        var filename = string.Format(MapFilename, worldId, chunkPosition.X, chunkPosition.Y, chunkPosition.Z);
+        var data = ArchiveManager.instance.GetFileAsBytesFromCurrentArchive(filename);
+        if (data == null) {
+            return null;
+        }
+
+        var index = 0;
+        var chunkPackage = ChunkPackage.GetRootAsChunkPackage(new ByteBuffer(data));
+        if (Config.ChunkSize * Config.ChunkSize * Config.ChunkSize != chunkPackage.DataLength) {
+            return null;
+        }
+        var blockData = new BlockData[Config.ChunkSize][][];
+        for (var x = 0; x < Config.ChunkSize; x++) {
+            blockData[x] ??= new BlockData[Config.ChunkSize][];
+            for (var y = 0; y < Config.ChunkSize; y++) {
+                blockData[x][y] = new BlockData[Config.ChunkSize];
+                for (var z = 0; z < Config.ChunkSize; z++) {
+                    var dataItem = chunkPackage.Data(index++);
+                    if (dataItem == null) {
+                        return null;
+                    }
+                    blockData[x][y][z] = new BlockData {
+                        BlockId = dataItem.Value.BlockId,
+                        Direction = (Direction)dataItem.Value.Direction
+                    };
+                }
+            }            
+        }
+        return blockData;
+    }
 
     public void Archive(Dictionary<string, byte[]> fileList) {
-        throw new NotImplementedException();
+        lock (_lockObject) {
+            foreach (var (worldId, chunkPosition) in _needArchive) {
+                if (_chunks.TryGetValue(worldId, out var chunkData) && 
+                    chunkData.TryGetValue(chunkPosition, out var blockData)) {
+                    // 序列化块数据
+                    var fbb = new FlatBufferBuilder(1024);
+                    var dataList = new List<Offset<ChunkBlockData>>();
+                    for (var x = 0; x < Config.ChunkSize; x++) {
+                        for (var y = 0; y < Config.ChunkSize; y++) {
+                            for (var z = 0; z < Config.ChunkSize; z++) {
+                                var block = blockData[x][y][z];
+                                if (block.BlockId == 0) continue;
+                                var blockOffset = ChunkBlockData.CreateChunkBlockData(fbb, block.BlockId, (uint)block.Direction);
+                                dataList.Add(blockOffset);
+                            }
+                        }
+                    }
+                    var dataListOffset = fbb.CreateVectorOfTables(dataList.ToArray());
+                    ChunkPackage.StartChunkPackage(fbb);
+                    ChunkPackage.AddData(fbb, dataListOffset);
+                    var offset = ChunkPackage.EndChunkPackage(fbb);
+                    fbb.Finish(offset.Value);
+                    fileList[string.Format(MapFilename, worldId, chunkPosition.X, chunkPosition.Y, chunkPosition.Z)] = fbb.SizedByteArray();
+                } else {
+                    _logger.LogWarning("Chunk data for world {WorldId} at position {ChunkPosition} not found", worldId, chunkPosition);
+                }
+            }
+            _needArchive.Clear();
+        }
     }
 
     public void Recover(Func<string, byte[]> getDataFunc) {
-        throw new NotImplementedException();
+        // not do anything here
     }
 }

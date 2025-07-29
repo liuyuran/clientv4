@@ -1,0 +1,10 @@
+﻿namespace generated.archive;
+
+table ChunkBlockData {
+  block_id: uint64;
+  direction: uint;
+}
+
+table ChunkPackage {
+  data: [ChunkBlockData];
+}

@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using game.scripts.manager.archive;
 using game.scripts.manager.reset;
+using game.scripts.utils;
+using generated.archive;
 using Godot;
+using Google.FlatBuffers;
 
 namespace game.scripts.manager.player;
 
 public partial class PlayerManager : IReset, IArchive, IDisposable {
     public static PlayerManager instance { get; private set; } = new();
 
+    private const string ArchiveFilename = "players.dat";
+    private const string PlayerArchiveFilename = "player-{0}.json";
     private readonly Dictionary<long, PlayerInfo> _playersByPeerId = new();
     private readonly Dictionary<ulong, PlayerInfo> _playersById = new();
     private readonly HashSet<(ulong playerId, ulong worldId, Vector3I chunkPosition)> _sentChunks = [];
@@ -17,8 +23,9 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
     /// <summary>
     /// only execute on the server or network master, need to read data from archive files
     /// </summary>
-    public void RegisterPlayer(long peerId, string nickname) {
+    public void RegisterPlayer(long peerId, string uuid, string nickname) {
         var playerInfo = new PlayerInfo {
+            uuid = uuid,
             peerId = peerId,
             nickname = nickname,
             playerId = _nextPlayerId++
@@ -100,17 +107,87 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
         GC.SuppressFinalize(this);
     }
 
+    private PlayerInfo TryLoadArchive(string uuid, string nickname, long peerId) {
+        var filename = string.Format(PlayerArchiveFilename, uuid);
+        var bytes = ArchiveManager.instance.GetFileAsBytesFromCurrentArchive(filename);
+        if (bytes == null || bytes.Length == 0) {
+            GD.Print($"No player archive found for {uuid}, creating new player.");
+            return new PlayerInfo {
+                uuid = uuid,
+                nickname = nickname,
+                peerId = peerId,
+                playerId = _nextPlayerId++
+            };
+        }
+        var json = System.Text.Encoding.UTF8.GetString(bytes);
+        var jsonItem = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+        if (jsonItem == null) {
+            GD.PrintErr($"Failed to deserialize player archive for {uuid}, creating new player.");
+            return new PlayerInfo {
+                uuid = uuid,
+                nickname = nickname,
+                peerId = peerId,
+                playerId = _nextPlayerId++
+            };
+        }
+        var playerInfo = new PlayerInfo {
+            uuid = uuid,
+            nickname = nickname,
+            peerId = peerId,
+            playerId = _nextPlayerId++
+        };
+        if (jsonItem.TryGetValue("position", out var positionObj) && positionObj is string positionStr) {
+            if (Vector3.Zero.TryParse(positionStr, out var position)) {
+                playerInfo.position = position;
+            } else {
+                GD.PrintErr($"Failed to parse position for player {uuid}, using default position.");
+                playerInfo.position = Vector3.Zero;
+            }
+        } else {
+            GD.PrintErr($"No position found for player {uuid}, using default position.");
+            playerInfo.position = Vector3.Zero;
+        }
+
+        if (jsonItem.TryGetValue("worldId", out var worldIdStr) && worldIdStr is ulong worldId) {
+            playerInfo.worldId = worldId;
+        } else {
+            playerInfo.worldId = 0;
+        }
+
+        return playerInfo;
+    }
+
     public void Archive(Dictionary<string, byte[]> fileList) {
-        throw new NotImplementedException();
+        var fbb = new FlatBufferBuilder(1024);
+        var offset = PlayerManagerMeta.CreatePlayerManagerMeta(fbb, _nextPlayerId);
+        fbb.Finish(offset.Value);
+        fileList.Add(ArchiveFilename, fbb.SizedByteArray());
+        foreach (var player in _playersById.Values) {
+            var jsonItem = new Dictionary<string, object> {
+                { "position", player.position.ToArchiveString() },
+                { "worldId", player.worldId },
+            };
+            var json = JsonSerializer.Serialize(jsonItem);
+            var playerData = System.Text.Encoding.UTF8.GetBytes(json);
+            fileList.Add(string.Format(PlayerArchiveFilename, player.uuid), playerData);
+        }
     }
 
     public void Recover(Func<string, byte[]> getDataFunc) {
-        throw new NotImplementedException();
+        var data = getDataFunc(ArchiveFilename);
+        if (data == null || data.Length == 0) {
+            GD.Print("No player data found, starting fresh.");
+            return;
+        }
+
+        var playerManagerMeta = PlayerManagerMeta.GetRootAsPlayerManagerMeta(new ByteBuffer(data));
+        _nextPlayerId = playerManagerMeta.IdBreakpoint;
     }
 }
 
 public class PlayerInfo {
     public required long peerId { get; init; }
+    public required string uuid { get; init; }
     public required ulong playerId { get; init; }
     public Vector3 position { get; set; }
     public ulong worldId { get; set; }

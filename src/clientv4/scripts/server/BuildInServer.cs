@@ -37,6 +37,10 @@ public partial class BuildInServer : Node {
         return ServerStartupConfig.instance.nickname;
     }
 
+    private static string GetUuid() {
+        return ServerStartupConfig.instance.uuid;
+    }
+
     public Error JoinGame(string address = DefaultServerIp, int port = Port) {
         var peer = new ENetMultiplayerPeer();
         var error = peer.CreateClient(address, port);
@@ -63,7 +67,7 @@ public partial class BuildInServer : Node {
         }
     
         Multiplayer.MultiplayerPeer = peer;
-        PlayerManager.instance.RegisterPlayer(peer.GetUniqueId(), GetNickname());
+        PlayerManager.instance.RegisterPlayer(peer.GetUniqueId(), GetUuid(), GetNickname());
         
         _pingThread = new Thread(PingMeasurementLoop);
         _pingThread.Start();
@@ -76,10 +80,10 @@ public partial class BuildInServer : Node {
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void LoginAsPlayer(string nickname) {
+    private void LoginAsPlayer(string uuid, string nickname) {
         if (PlatformUtil.isNetworkMaster) {
             var peerId = Multiplayer.GetRemoteSenderId();
-            PlayerManager.instance.RegisterPlayer(peerId, nickname);
+            PlayerManager.instance.RegisterPlayer(peerId, uuid, nickname);
         }
     }
 
@@ -89,7 +93,7 @@ public partial class BuildInServer : Node {
 
     private void OnConnectOk() {
         GD.Print("Connected to server successfully.");
-        Rpc(MethodName.LoginAsPlayer, GetNickname());
+        Rpc(MethodName.LoginAsPlayer, GetUuid(), GetNickname());
     }
 
     private void OnConnectionFail() {

@@ -1,12 +1,5 @@
 ﻿namespace generated.archive;
 
-table PlayerMeta {
-  player_id: uint64;
-  uuid: string;
-  nickname: string;
-  password: string;
-}
-
 table PlayerManagerMeta {
   id_breakpoint: uint64;
 }

@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="protobuffer\proto\block-define.fbs" />
+    <Content Include="protobuffer\proto\chunk-data.fbs" />
     <Content Include="protobuffer\proto\item-define.fbs" />
     <Content Include="protobuffer\proto\player-define.fbs" />
     <Content Include="protobuffer\proto\server-meta.fbs" />
