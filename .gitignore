@@ -6,3 +6,7 @@ riderModule.iml
 src/clientv4/Mods/core/*.dll
 
 *.mo
+
+*.user
+
+.idea/.idea.Clientv4/.idea/.name
