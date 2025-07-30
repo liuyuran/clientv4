@@ -24,16 +24,15 @@ public partial class Menu {
         _modPanel = _modPanelScene.Instantiate<Control>();
         _modalPanel.AddChild(_modPanel);
         _moduleBox = this.FindNodeByName<HBoxContainer>("ModuleBox");
-        _categoryBox = this.FindNodeByName<HBoxContainer>("CategoryBox");
+        _categoryBox = this.FindNodeByName<VBoxContainer>("CategoryBox");
         _contentBox = this.FindNodeByName<VBoxContainer>("ContentBox");
         _settings = SettingsManager.instance.GetSettings();
         LoadSettingModules();
     }
 
     private void LoadSettingModules() {
-        var data = SettingsManager.instance.GetSettings();
         var index = 0;
-        foreach (var moduleEntry in data) {
+        foreach (var moduleEntry in _settings) {
             var currentIndex = index++;
             var child = _moduleItemPrototype.Instantiate<Control>();
             _moduleBox.AddChild(child);
@@ -42,12 +41,12 @@ public partial class Menu {
                 LoadSettingCategories(currentIndex);
             };
         }
-        if (data.Count == 0) return;
+        if (_settings.Count == 0) return;
         LoadSettingCategories(0);
     }
 
     private void LoadSettingCategories(int moduleIndex) {
-        var data = SettingsManager.instance.GetSettings();
+        var data = _settings;
         var categoryIndex = 0;
         foreach (var moduleEntry in data) {
             if (categoryIndex++ != moduleIndex) continue;

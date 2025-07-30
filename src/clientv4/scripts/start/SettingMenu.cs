@@ -31,7 +31,7 @@ public partial class Menu {
         _settingPanel = _settingPanelScene.Instantiate<Control>();
         _modalPanel.AddChild(_settingPanel);
         _moduleBox = this.FindNodeByName<HBoxContainer>("ModuleBox");
-        _categoryBox = this.FindNodeByName<HBoxContainer>("CategoryBox");
+        _categoryBox = this.FindNodeByName<VBoxContainer>("CategoryBox");
         _contentBox = this.FindNodeByName<VBoxContainer>("ContentBox");
         _settings = SettingsManager.instance.GetCoreSettings();
         LoadSettingModules();

@@ -84,7 +84,7 @@ public partial class Menu : Control {
         JumpToGameSceneAndStartLocalServer();*/
         // OpenSettings();
         if (tmp) return;
-        OpenSingle();
+        OpenSettings();
         tmp = true;
     }
 

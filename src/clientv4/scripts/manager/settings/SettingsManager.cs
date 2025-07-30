@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using game.scripts.manager.archive;
 using game.scripts.manager.reset;
+using game.scripts.manager.settings.configs;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader;
@@ -25,7 +26,11 @@ public class SettingsManager : ISettingsManager, IDisposable, IReset, IArchive {
         AddCoreSetting(new SettingDefine {
             Key = "language",
             Category = "language",
-            Config = "",
+            Config = new SelectorSetting {
+                Options = new Dictionary<string, string>() {
+                    {"中文", "zh_CN"}
+                }
+            },
             Value = "zh_CN",
             DefaultValue = "zh_CN",
             Name = I18N.Tr("core", "settings.language"),
