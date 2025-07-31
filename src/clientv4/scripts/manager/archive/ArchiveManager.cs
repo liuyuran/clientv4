@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Godot;
 using Microsoft.Extensions.Logging;
+using ModLoader.archive;
 using ModLoader.logger;
 using FileAccess = Godot.FileAccess;
 

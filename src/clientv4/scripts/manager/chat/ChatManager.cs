@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using game.scripts.manager.archive;
 using game.scripts.manager.reset;
+using ModLoader.archive;
 
 namespace game.scripts.manager.chat;
 

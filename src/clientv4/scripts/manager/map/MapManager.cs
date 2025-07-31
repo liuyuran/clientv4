@@ -8,6 +8,7 @@ using generated.archive;
 using Godot;
 using Google.FlatBuffers;
 using Microsoft.Extensions.Logging;
+using ModLoader.archive;
 using ModLoader.config;
 using ModLoader.handler;
 using ModLoader.logger;

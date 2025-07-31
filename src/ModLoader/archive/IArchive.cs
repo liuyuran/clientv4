@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace game.scripts.manager.archive;
+﻿namespace ModLoader.archive;
 
 public interface IArchive {
     public void Archive(Dictionary<string, byte[]> fileList);

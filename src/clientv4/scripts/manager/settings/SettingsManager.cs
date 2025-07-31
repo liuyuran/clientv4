@@ -8,6 +8,7 @@ using game.scripts.manager.settings.configs;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader;
+using ModLoader.archive;
 using ModLoader.handler;
 using ModLoader.logger;
 using ModLoader.setting;

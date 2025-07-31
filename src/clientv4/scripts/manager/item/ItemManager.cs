@@ -9,6 +9,7 @@ using generated.archive;
 using Godot;
 using Google.FlatBuffers;
 using Microsoft.Extensions.Logging;
+using ModLoader.archive;
 using ModLoader.handler;
 using ModLoader.item;
 using ModLoader.item.composition;

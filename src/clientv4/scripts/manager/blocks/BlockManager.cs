@@ -7,6 +7,7 @@ using game.scripts.manager.reset;
 using generated.archive;
 using Google.FlatBuffers;
 using Microsoft.Extensions.Logging;
+using ModLoader.archive;
 using ModLoader.block;
 using ModLoader.handler;
 using ModLoader.logger;

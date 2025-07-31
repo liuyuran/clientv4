@@ -3,6 +3,7 @@ using game.scripts.manager.map;
 using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
+using Microsoft.Extensions.Logging;
 using ModLoader;
 
 namespace game.scripts.start;
@@ -32,7 +33,7 @@ public partial class Menu {
     /// </summary>
     private void OpenSinglePlayMenu() {
         if (_singlePlayMenu != null) {
-            GD.Print("SinglePlayMenu is already open.");
+            _logger.LogWarning("SinglePlayMenu is already open.");
             return;
         }
 
@@ -59,7 +60,7 @@ public partial class Menu {
     /// </summary>
     private void LoadArchiveList() {
         if (_singlePlayMenu == null) {
-            GD.PrintErr("SinglePlayMenu is not initialized.");
+            _logger.LogError("SinglePlayMenu is not initialized.");
             return;
         }
 
@@ -73,7 +74,7 @@ public partial class Menu {
 
         loadButton.Pressed += () => {
             if (string.IsNullOrEmpty(_selectedArchiveName)) {
-                GD.PrintErr("No archive selected for loading.");
+                _logger.LogWarning("No archive selected for loading.");
                 return;
             }
 
@@ -152,7 +153,7 @@ public partial class Menu {
     private void LoadArchiveItemDetailData(string archiveName) {
         // TODO load archive item detail data
         var archiveInfo = _singlePlayMenu.FindNodeByName<RichTextLabel>("ArchiveInfo");
-        GD.Print("Loading archive item detail data for: ", archiveName);
+        _logger.LogDebug("Loading archive item detail data for: {name}", archiveName);
     }
 
     /// <summary>
@@ -160,7 +161,7 @@ public partial class Menu {
     /// </summary>
     private void DeleteArchiveItem(string archiveName) {
         // TODO delete archive item
-        GD.Print("Deleting archive item: ", archiveName);
+        _logger.LogDebug("Deleting archive item: {name}", archiveName);
     }
 
     /// <summary>

@@ -7,6 +7,7 @@ using game.scripts.utils;
 using generated.archive;
 using Godot;
 using Google.FlatBuffers;
+using ModLoader.archive;
 
 namespace game.scripts.manager.player;
 
