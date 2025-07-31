@@ -34,11 +34,11 @@ public class CoreMod : IMod {
             _logger.LogError("Handler is null, cannot register menu.");
             return;
         }
-        Handler.GetMenuManager().AddMenuGroup("core", -1);
+        Handler.GetMenuManager().AddMenuGroup("core");
         Handler.GetMenuManager().AddMenuItem("core", "core mod settings",
-            I18N.Tr("mod.core", "menu.setting"),
+            () => I18N.Tr("mod.core", "menu.setting"),
             -1,
-            I18N.Tr("mod.core", "menu.setting.desc"),
+            () => I18N.Tr("mod.core", "menu.setting.desc"),
             () => { _logger.LogDebug("Core item clicked!"); });
     }
 

@@ -2,6 +2,7 @@
 using System.Reflection;
 using game.scripts.utils;
 using Godot;
+using ModLoader;
 
 namespace game.scripts.start;
 
@@ -24,6 +25,12 @@ public partial class Menu {
         _aboutLabel = _aboutPanel.FindNodeByName<RichTextLabel>("Text");
         _backButton = _aboutPanel.FindNodeByName<Button>("Back");
         _backButton.Pressed += CloseAboutPanel;
+        UpdateAboutUITranslate();
+    }
+
+    private void UpdateAboutUITranslate() {
+        if (_aboutPanel == null) return;
+        _backButton.Text = I18N.Tr("core.gui", "about.back");
         _aboutLabel.Text = GetAboutText() + "\n\n";
     }
 
@@ -35,6 +42,6 @@ public partial class Menu {
         } else {
             buildDate = DateTime.TryParse(buildDate, out var dateTime) ? dateTime.ToString("yyyy-MM-dd") : "invalid date format";
         }
-        return "This is a demo game for Godot 4.2. Build in " + buildDate;
+        return I18N.Tr("core.gui", "about.text", buildDate);
     }
 }

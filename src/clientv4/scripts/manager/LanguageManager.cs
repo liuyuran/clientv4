@@ -15,10 +15,16 @@ namespace game.scripts.manager;
 public class LanguageManager: ITranslateService, IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<LanguageManager>();
     public static LanguageManager instance { get; private set; } = new();
+    public delegate void LanguageChangedEventHandler();
+    public static event LanguageChangedEventHandler LanguageChanged;
 
     private LanguageManager() {
         TranslationServer.SetLocale("zh_CN");
         I18N.service = this;
+    }
+
+    public void SetLanguage(string language) {
+        TranslationServer.SetLocale(language);
     }
 
     public void ReloadLanguageFiles() {

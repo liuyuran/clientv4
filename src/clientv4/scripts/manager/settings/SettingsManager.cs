@@ -19,22 +19,40 @@ public class SettingsManager : ISettingsManager, IDisposable, IReset, IArchive {
     private readonly ILogger _logger = LogManager.GetLogger<SettingsManager>();
     public static SettingsManager instance { get; private set; } = new();
     private readonly Dictionary<string, List<SettingDefine>> _settings = new();
+    private readonly Dictionary<string, GetString> _moduleNameLinks = new();
     private const string SettingsFile = "settings.json";
     private const string CoreSetting = "core";
 
     private SettingsManager() {
+        AddModuleNameLink(CoreSetting, () => I18N.Tr("core.gui", "settings.module.core"));
         AddCoreSetting(new SettingDefine {
             Key = "language",
-            Category = "language",
+            Category = () => I18N.Tr("core.gui", "settings.category.language"),
             Config = new SelectorSetting {
-                Options = new Dictionary<string, string>() {
-                    {"中文", "zh_CN"}
+                Options = new Dictionary<GetString, string> {
+                    {() => "中文", "zh_CN"}
                 }
             },
             Value = "zh_CN",
-            DefaultValue = "zh_CN",
-            Name = I18N.Tr("core", "settings.language"),
-            Description = I18N.Tr("core", "settings.language.description"),
+            DefaultValue = () => "zh_CN",
+            Name = () => I18N.Tr("core.gui", "settings.language"),
+            Description = () => I18N.Tr("core.gui", "settings.language.description"),
+            OnChange = value => {
+                LanguageManager.instance.SetLanguage(value);
+                SaveCoreSettings();
+            },
+            Order = 0
+        });
+        AddCoreSetting(new SettingDefine {
+            Key = "game.nickname",
+            Category = () => I18N.Tr("core.gui", "settings.category.game"),
+            Config = new InputSetting {
+                Placeholder = () => I18N.Tr("core.gui", "settings.game.nickname.placeholder"),
+            },
+            Value = "",
+            DefaultValue = () => "",
+            Name = () => I18N.Tr("core.gui", "settings.game.nickname"),
+            Description = () => I18N.Tr("core.gui", "settings.game.nickname.description"),
             OnChange = value => {
                 LanguageManager.instance.ReloadLanguageFiles();
                 TranslationServer.SetLocale(value);
@@ -53,6 +71,17 @@ public class SettingsManager : ISettingsManager, IDisposable, IReset, IArchive {
             _settings[module] = [];
         }
         _settings[module].Add(setting);
+    }
+
+    public string GetModuleName(string module) {
+        if (_moduleNameLinks.TryGetValue(module, out var link)) {
+            return link.Invoke();
+        }
+        return module;
+    }
+
+    public void AddModuleNameLink(string module, GetString link) {
+        _moduleNameLinks.TryAdd(module, link);
     }
     
     public Dictionary<string, List<SettingDefine>> GetCoreSettings() {
@@ -109,9 +138,9 @@ public class SettingsManager : ISettingsManager, IDisposable, IReset, IArchive {
         var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
         var data = fileHandle.GetBuffer((int)fileHandle.GetLength());
         var json = System.Text.Encoding.UTF8.GetString(data);
+        if (string.IsNullOrWhiteSpace(json)) return;
         var settingsFromFile = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
         if (settingsFromFile != null) {
-            _settings.Clear();
             foreach (var kvp in settingsFromFile) {
                 if (!_settings.ContainsKey(CoreSetting)) {
                     _settings[CoreSetting] = [];

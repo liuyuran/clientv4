@@ -17,4 +17,9 @@ public partial class Menu {
         _multiPlayMenu = _multiPlayMenuScene.Instantiate<Control>();
         _modalPanel.AddChild(_multiPlayMenu);
     }
+    
+    private void UpdateMultiPlayUITranslate() {
+        if (_multiPlayMenu == null) return;
+        // Update UI elements in the multi-play menu if needed
+    }
 }

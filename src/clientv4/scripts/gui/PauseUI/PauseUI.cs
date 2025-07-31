@@ -162,7 +162,7 @@ public partial class PauseUI : Control {
         var menuButton = new Button();
         parent.AddChild(menuButton);
         menuButton.Name = "menuButton-" + menuItems.Id;
-        menuButton.Text = menuItems.Name;
+        menuButton.Text = menuItems.Name.Invoke();
         menuButton.CustomMinimumSize = new Vector2(ButtonWidth, ButtonHeight);
         menuButton.Pressed += menuItems.Action;
     }
@@ -197,7 +197,7 @@ public partial class PauseUI : Control {
             _parent.Size.X * 0.3,
             (_parent.Size.Y - ButtonHeight) / 2 - ButtonHeight - 15
         );
-        _menuTipText.Text = currentData[_currentGroupIndex][_currentFocusButtonIndex].Description;
+        _menuTipText.Text = currentData[_currentGroupIndex][_currentFocusButtonIndex].Description.Invoke();
     }
 
     /// <summary>
@@ -215,6 +215,6 @@ public partial class PauseUI : Control {
         var currentGroup = _menuGroups[_currentGroupIndex];
         if (index < 0 || index >= currentGroup.GetChildCount()) return;
         currentGroup.Position = new Vector2(currentGroup.Position.X, -index * (ButtonHeight + 15));
-        _menuTipText.Text = currentData[_currentGroupIndex][_currentFocusButtonIndex].Description;
+        _menuTipText.Text = currentData[_currentGroupIndex][_currentFocusButtonIndex].Description.Invoke();
     }
 }

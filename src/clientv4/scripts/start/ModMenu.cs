@@ -36,7 +36,7 @@ public partial class Menu {
             var currentIndex = index++;
             var child = _moduleItemPrototype.Instantiate<Control>();
             _moduleBox.AddChild(child);
-            child.FindNodeByName<Button>("ModuleName").Text = moduleEntry.Key;
+            child.FindNodeByName<Button>("ModuleName").Text = SettingsManager.instance.GetModuleName(moduleEntry.Key);
             child.FindNodeByName<Button>("ModuleName").Pressed += () => {
                 LoadSettingCategories(currentIndex);
             };
@@ -62,7 +62,7 @@ public partial class Menu {
             }
 
             module.Sort((a, b) => {
-                var result = string.Compare(a.Category, b.Category, StringComparison.Ordinal);
+                var result = string.Compare(a.Category.Invoke(), b.Category.Invoke(), StringComparison.Ordinal);
                 if (result != 0) return result;
                 return a.Order.CompareTo(b.Order);
             });
@@ -70,63 +70,65 @@ public partial class Menu {
             var categorySet = new List<string>();
             foreach (var config in module) {
                 var shouldInsertOffset = false;
-                if (!categorySet.Contains(config.Category)) {
-                    categorySet.Add(config.Category);
+                if (!categorySet.Contains(config.Category.Invoke())) {
+                    categorySet.Add(config.Category.Invoke());
                     shouldInsertOffset = true;
                 }
                 switch (config.Config) {
                     case InputSetting inputSetting: {
                         var component = _configInputPrototype.Instantiate<Control>();
                         _contentBox.AddChild(component);
-                        component.FindNodeByName<Label>("Key").Text = config.Name;
+                        component.FindNodeByName<Label>("Key").Text = config.Name.Invoke();
                         var value = component.FindNodeByName<LineEdit>("Value");
-                        value.PlaceholderText = inputSetting.Placeholder;
+                        value.PlaceholderText = inputSetting.Placeholder.Invoke();
                         value.Text = config.Value;
                         if (value.Text.Length == 0) {
-                            value.Text = config.DefaultValue;
+                            value.Text = config.DefaultValue.Invoke();
                         }
 
                         value.TextChanged += text => {
                             config.OnChange.Invoke(text);
                         };
                         if (shouldInsertOffset) {
-                            categoryOffset.Add(config.Category, (int)value.GetRect().Position.Y);
+                            categoryOffset.Add(config.Category.Invoke(), (int)value.GetRect().Position.Y);
                         }
                         break;
                     }
                     case SelectorSetting selectorSetting: {
                         var component = _configSelectorPrototype.Instantiate<Control>();
                         _contentBox.AddChild(component);
-                        component.FindNodeByName<Label>("Key").Text = config.Name;
+                        component.FindNodeByName<Label>("Key").Text = config.Name.Invoke();
                         var value = component.FindNodeByName<OptionButton>("Value");
                         value.AllowReselect = true;
+                        var dict = new Dictionary<string, string>();
                         foreach (var entry in selectorSetting.Options) {
-                            value.AddItem(entry.Key);
+                            value.AddItem(entry.Key.Invoke());
+                            dict.Add(entry.Key.Invoke(), entry.Value);
                         }
-
+                        
                         value.ItemSelected += item => {
                             var selectedItem = value.GetItemText((int)item);
                             if (selectedItem == config.Value) return;
-                            if (!selectorSetting.Options.TryGetValue(selectedItem, out var option)) return;
+                            if (!dict.TryGetValue(selectedItem, out var option)) return;
                             config.OnChange.Invoke(option);
                         };
                         
                         if (shouldInsertOffset) {
-                            categoryOffset.Add(config.Category, (int)value.GetRect().Position.Y);
+                            categoryOffset.Add(config.Category.Invoke(), (int)value.GetRect().Position.Y);
                         }
                         break;
                     }
                     case ProgressSetting progressSetting: {
                         var component = _configProgressPrototype.Instantiate<Control>();
                         _contentBox.AddChild(component);
-                        component.FindNodeByName<Label>("Key").Text = config.Name;
+                        component.FindNodeByName<Label>("Key").Text = config.Name.Invoke();
                         var value = component.FindNodeByName<HSlider>("Value");
                         value.MinValue = progressSetting.MinValue;
                         value.MaxValue = progressSetting.MaxValue;
                         try {
                             value.Value = double.Parse(config.Value);
                         } catch (FormatException) {
-                            value.Value = double.Parse(config.DefaultValue);
+                            value.Value = double.Parse(config.DefaultValue.Invoke());
                         }
 
                         value.ValueChanged += newValue => {
@@ -134,7 +136,7 @@ public partial class Menu {
                         };
                         
                         if (shouldInsertOffset) {
-                            categoryOffset.Add(config.Category, (int)value.GetRect().Position.Y);
+                            categoryOffset.Add(config.Category.Invoke(), (int)value.GetRect().Position.Y);
                         }
                         break;
                     }

@@ -3,6 +3,7 @@ using game.scripts.manager.map;
 using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
+using ModLoader;
 
 namespace game.scripts.start;
 
@@ -38,6 +39,19 @@ public partial class Menu {
         _singlePlayMenu = _singlePlayMenuScene.Instantiate<Control>();
         _modalPanel.AddChild(_singlePlayMenu);
         LoadArchiveList();
+        UpdateSinglePlayUITranslate();
+    }
+
+    private void UpdateSinglePlayUITranslate() {
+        if (_singlePlayMenu == null) return;
+        var createButton = _singlePlayMenu.FindNodeByName<Button>("CreateWorld");
+        var createCancelButton = _createPanel.FindNodeByName<Button>("CreateCancelButton");
+        var loadButton = _singlePlayMenu.FindNodeByName<Button>("LoadButton");
+        var deleteButton = _singlePlayMenu.FindNodeByName<Button>("DeleteButton");
+        createButton.Text = I18N.Tr("core.gui", "single-play.create-world");
+        createCancelButton.Text = I18N.Tr("core.gui", "single-play.create-world.cancel");
+        loadButton.Text = I18N.Tr("core.gui", "single-play.load");
+        deleteButton.Text = I18N.Tr("core.gui", "single-play.delete");
     }
 
     /// <summary>

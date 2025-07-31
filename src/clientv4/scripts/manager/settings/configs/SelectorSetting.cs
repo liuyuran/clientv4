@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using ModLoader.setting;
 
 namespace game.scripts.manager.settings.configs;
 
 public class SelectorSetting {
-    public Dictionary<string, string> Options;
+    public Dictionary<GetString, string> Options;
 }

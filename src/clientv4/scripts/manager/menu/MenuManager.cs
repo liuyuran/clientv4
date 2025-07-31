@@ -5,6 +5,7 @@ using game.scripts.utils;
 using Godot;
 using ModLoader;
 using ModLoader.handler;
+using ModLoader.setting;
 
 namespace game.scripts.manager.menu;
 
@@ -15,13 +16,13 @@ public class MenuManager: IReset, IDisposable, IMenuManager {
     private MenuManager() {
         AddMenuGroup("system", 1);
         AddMenuItem("system", "back-to-start",
-            I18N.Tr("core", "menu.system.back-to-start"), 1,
-            I18N.Tr("core", "menu.system.back-to-start.desc"), () => {
+            () => I18N.Tr("core", "menu.system.back-to-start"), 1,
+            () => I18N.Tr("core", "menu.system.back-to-start.desc"), () => {
                 GameNodeReference.CurrentScene.GetTree().ChangeSceneToPacked(GameNodeReference.StartScenePacked);
             });
         AddMenuItem("system", "exit",
-            I18N.Tr("core", "menu.system.exit"), 1,
-            I18N.Tr("core", "menu.system.exit.desc"), () => {
+            () => I18N.Tr("core", "menu.system.exit"), 1,
+            () => I18N.Tr("core", "menu.system.exit.desc"), () => {
                 GameNodeReference.CurrentScene.GetTree().Quit();
             });
     }
@@ -36,7 +37,7 @@ public class MenuManager: IReset, IDisposable, IMenuManager {
         _menus.Add(group);
     }
     
-    public void AddMenuItem(string groupId, string itemId, string itemName, short order, string description, Action action) {
+    public void AddMenuItem(string groupId, string itemId, GetString itemName, short order, GetString description, Action action) {
         var group = _menus.Find(g => g.Id == groupId);
         if (group.Id == null) {
             GD.PrintErr($"Menu group {groupId} not found.");
@@ -100,10 +101,10 @@ public class MenuManager: IReset, IDisposable, IMenuManager {
     
     public struct MenuItem {
         public string Id;
-        public string Name;
+        public GetString Name;
         public Action Action;
         public short ListOrder;
-        public string Description;
+        public GetString Description;
     }
 
     public void Reset() {

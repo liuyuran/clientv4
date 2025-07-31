@@ -34,6 +34,11 @@ public partial class Menu {
         _categoryBox = this.FindNodeByName<VBoxContainer>("CategoryBox");
         _contentBox = this.FindNodeByName<VBoxContainer>("ContentBox");
         _settings = SettingsManager.instance.GetCoreSettings();
+        UpdateSettingsUITranslate();
+    }
+
+    private void UpdateSettingsUITranslate() {
+        if (_settingPanel == null && _modPanel == null) return;
         LoadSettingModules();
     }
 }

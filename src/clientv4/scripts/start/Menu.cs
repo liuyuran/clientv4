@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using game.scripts.manager;
 using game.scripts.manager.archive;
 using game.scripts.manager.reset;
 using game.scripts.server;
@@ -32,10 +33,21 @@ public partial class Menu : Control {
         GetTree().Root.SizeChanged += OnRootSizeChanged;
         CallDeferred(MethodName.OnRootSizeChanged);
         ResetManager.Reset();
+        ResourcePackManager.instance.ScanResourcePacks();
+        LanguageManager.instance.ReloadLanguageFiles();
+        LanguageManager.LanguageChanged += UpdateUITranslate;
     }
 
     public override void _ExitTree() {
         GetTree().Root.SizeChanged -= OnRootSizeChanged;
+        LanguageManager.LanguageChanged -= UpdateUITranslate;
+    }
+    
+    private void UpdateUITranslate() {
+        UpdateAboutUITranslate();
+        UpdateSettingsUITranslate();
+        UpdateSinglePlayUITranslate();
+        UpdateMultiPlayUITranslate();
     }
 
     private void OnRootSizeChanged() {
@@ -85,6 +97,7 @@ public partial class Menu : Control {
         // OpenSettings();
         if (tmp) return;
         OpenSettings();
+        GetTree().Root.Position = new Vector2I(1920 - GetTree().Root.Size.X, 1080 - GetTree().Root.Size.Y);
         tmp = true;
     }
 
