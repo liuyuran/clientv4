@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using game.scripts.manager.settings;
 using game.scripts.manager.settings.configs;
 using game.scripts.utils;
@@ -27,11 +28,20 @@ public partial class Menu {
         _categoryBox = this.FindNodeByName<VBoxContainer>("CategoryBox");
         _contentBox = this.FindNodeByName<VBoxContainer>("ContentBox");
         _settings = SettingsManager.instance.GetSettings();
+        UpdateModSettingsUITranslate();
+    }
+
+    private void UpdateModSettingsUITranslate() {
+        if (_modPanel == null) return;
+        _settings = SettingsManager.instance.GetSettings();
         LoadSettingModules();
     }
 
     private void LoadSettingModules() {
         var index = 0;
+        foreach (var child in _moduleBox.GetChildren()) {
+            child.QueueFree();
+        }
         foreach (var moduleEntry in _settings) {
             var currentIndex = index++;
             var child = _moduleItemPrototype.Instantiate<Control>();
@@ -61,11 +71,7 @@ public partial class Menu {
                 child.QueueFree();
             }
 
-            module.Sort((a, b) => {
-                var result = string.Compare(a.Category.Invoke(), b.Category.Invoke(), StringComparison.Ordinal);
-                if (result != 0) return result;
-                return a.Order.CompareTo(b.Order);
-            });
+            module.Sort((a, b) => a.Order.CompareTo(b.Order));
             var categoryOffset = new Dictionary<string, int>();
             var categorySet = new List<string>();
             foreach (var config in module) {
@@ -74,10 +80,14 @@ public partial class Menu {
                     categorySet.Add(config.Category.Invoke());
                     shouldInsertOffset = true;
                 }
+
+                var marginBox = new MarginContainer();
+                marginBox.AddThemeConstantOverride("margin_bottom", 10);
                 switch (config.Config) {
                     case InputSetting inputSetting: {
                         var component = _configInputPrototype.Instantiate<Control>();
-                        _contentBox.AddChild(component);
+                        marginBox.AddChild(component);
+                        _contentBox.AddChild(marginBox);
                         component.FindNodeByName<Label>("Key").Text = config.Name.Invoke();
                         var value = component.FindNodeByName<LineEdit>("Value");
                         value.PlaceholderText = inputSetting.Placeholder.Invoke();
@@ -96,16 +106,23 @@ public partial class Menu {
                     }
                     case SelectorSetting selectorSetting: {
                         var component = _configSelectorPrototype.Instantiate<Control>();
-                        _contentBox.AddChild(component);
+                        marginBox.AddChild(component);
+                        _contentBox.AddChild(marginBox);
                         component.FindNodeByName<Label>("Key").Text = config.Name.Invoke();
                         var value = component.FindNodeByName<OptionButton>("Value");
                         value.AllowReselect = true;
                         var dict = new Dictionary<string, string>();
-                        foreach (var entry in selectorSetting.Options) {
+                        var options = selectorSetting.Options.ToList();
+                        foreach (var entry in options) {
                             value.AddItem(entry.Key.Invoke());
                             dict.Add(entry.Key.Invoke(), entry.Value);
                         }
-                        
+
+                        value.Selected = options.FindIndex(entry => entry.Value == config.Value);
+                        if (value.Selected == -1) {
+                            value.Selected = options.FindIndex(entry => entry.Value == config.DefaultValue.Invoke());
+                        }
+
                         value.ItemSelected += item => {
                             var selectedItem = value.GetItemText((int)item);
                             if (selectedItem == config.Value) return;
@@ -120,7 +137,8 @@ public partial class Menu {
                     }
                     case ProgressSetting progressSetting: {
                         var component = _configProgressPrototype.Instantiate<Control>();
-                        _contentBox.AddChild(component);
+                        marginBox.AddChild(component);
+                        _contentBox.AddChild(marginBox);
                         component.FindNodeByName<Label>("Key").Text = config.Name.Invoke();
                         var value = component.FindNodeByName<HSlider>("Value");
                         value.MinValue = progressSetting.MinValue;

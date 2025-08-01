@@ -38,7 +38,8 @@ public partial class Menu {
     }
 
     private void UpdateSettingsUITranslate() {
-        if (_settingPanel == null && _modPanel == null) return;
+        if (_settingPanel == null) return;
+        _settings = SettingsManager.instance.GetCoreSettings();
         LoadSettingModules();
     }
 }

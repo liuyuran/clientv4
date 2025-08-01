@@ -25,6 +25,7 @@ public class LanguageManager: ITranslateService, IReset, IDisposable {
 
     public void SetLanguage(string language) {
         TranslationServer.SetLocale(language);
+        LanguageChanged?.Invoke();
     }
 
     public void ReloadLanguageFiles() {

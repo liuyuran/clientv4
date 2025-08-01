@@ -87,16 +87,19 @@ public class ArchiveManager {
                 case ".dat": {
                     var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
                     fileHandle.StoreBuffer(file.Value);
+                    fileHandle.Flush();
                     break;
                 }
                 case ".log": {
                     using var fileStream = new FileStream(filePath, FileMode.Append);
                     fileStream.Write(file.Value, 0, file.Value.Length);
+                    fileStream.Flush();
                     break;
                 }
                 default: {
                     var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
                     fileHandle.StoreBuffer(file.Value);
+                    fileHandle.Flush();
                     break;
                 }
             }
@@ -138,6 +141,7 @@ public class ArchiveManager {
         Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? string.Empty);
         var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
         fileHandle.StoreBuffer(data);
+        fileHandle.Flush();
     }
     
     public byte[] GetFileAsBytesFromCurrentArchive(string relativePath) {

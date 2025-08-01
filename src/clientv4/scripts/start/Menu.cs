@@ -1,7 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using game.scripts.manager;
 using game.scripts.manager.archive;
+using game.scripts.manager.mod;
 using game.scripts.manager.reset;
+using game.scripts.manager.settings;
 using game.scripts.server;
 using game.scripts.utils;
 using Godot;
@@ -35,6 +37,9 @@ public partial class Menu : Control {
         ResetManager.Reset();
         ResourcePackManager.instance.ScanResourcePacks();
         LanguageManager.instance.ReloadLanguageFiles();
+        // reset to load language setting and mod settings correctly
+        SettingsManager.instance.Reset();
+        ModManager.instance.Reset();
         LanguageManager.LanguageChanged += UpdateUITranslate;
     }
 

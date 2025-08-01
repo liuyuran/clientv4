@@ -10,3 +10,5 @@ src/clientv4/Mods/core/*.dll
 *.user
 
 .idea/.idea.Clientv4/.idea/.name
+
+src/clientv4/settings.json

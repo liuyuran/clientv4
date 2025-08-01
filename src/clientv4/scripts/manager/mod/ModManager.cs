@@ -46,6 +46,7 @@ public class ModManager : IReset, IDisposable {
             if (name != null) _loadedAssembly.TryAdd(name, extra);
         }
 
+        LoadModStatus();
         if (_loaded) return;
         AppDomain.CurrentDomain.AssemblyResolve += OnCurrentDomainOnAssemblyResolve;
         AssemblyLoadContext.Default.Resolving += OnDefaultOnResolving;
