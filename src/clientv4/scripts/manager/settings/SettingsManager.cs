@@ -48,6 +48,7 @@ public class SettingsManager : ISettingsManager, IDisposable, IReset, IArchive {
             DefaultValue = () => "zh_CN",
             Name = () => I18N.Tr("core.gui", "settings.language"),
             Description = () => I18N.Tr("core.gui", "settings.language.description"),
+            ExtraButtons = [],
             OnChange = value => {
                 SetSettingValue(CoreSetting, "language", value);
                 LanguageManager.instance.SetLanguage(value);
@@ -71,14 +72,9 @@ public class SettingsManager : ISettingsManager, IDisposable, IReset, IArchive {
                 SaveCoreSettings();
             },
             ExtraButtons = [
-                new ExtraButton() {
+                new ExtraButton {
                     Name = () => I18N.Tr("core.gui", "settings.game.uuid.generate"),
-                    OnClick = () => {
-                        var uuid = Guid.NewGuid().ToString();
-                        SetSettingValue(CoreSetting, "game.uuid", uuid);
-                        ServerStartupConfig.instance.uuid = uuid;
-                        SaveCoreSettings();
-                    }
+                    OnClick = () => Guid.NewGuid().ToString()
                 }
             ],
             Order = 1
@@ -93,6 +89,7 @@ public class SettingsManager : ISettingsManager, IDisposable, IReset, IArchive {
             DefaultValue = () => "",
             Name = () => I18N.Tr("core.gui", "settings.game.nickname"),
             Description = () => I18N.Tr("core.gui", "settings.game.nickname.description"),
+            ExtraButtons = [],
             OnChange = value => {
                 ServerStartupConfig.instance.nickname = value;
                 SetSettingValue(CoreSetting, "game.nickname", value);

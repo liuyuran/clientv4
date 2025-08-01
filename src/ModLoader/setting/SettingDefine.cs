@@ -2,20 +2,22 @@
 
 public delegate string GetString();
 
+public delegate string? SettingCallback();
+
 public struct SettingDefine {
-    public string Key;
-    public GetString Category;
-    public object Config;
-    public string Value;
-    public GetString DefaultValue;
-    public GetString Name;
-    public GetString Description;
-    public Action<string> OnChange;
-    public List<ExtraButton> ExtraButtons;
-    public int Order;
+    public required string Key;
+    public required GetString Category;
+    public required object Config;
+    public required string Value;
+    public required GetString DefaultValue;
+    public required GetString Name;
+    public required GetString Description;
+    public required Action<string> OnChange;
+    public required List<ExtraButton> ExtraButtons;
+    public required int Order;
 }
 
 public struct ExtraButton {
-    public GetString Name;
-    public Action OnClick;
+    public required GetString Name;
+    public required SettingCallback OnClick;
 }

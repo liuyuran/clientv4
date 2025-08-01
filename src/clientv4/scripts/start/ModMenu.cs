@@ -7,20 +7,21 @@ using game.scripts.manager.settings.configs;
 using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
+using ModLoader.setting;
 
 namespace game.scripts.start;
 
 public partial class Menu {
     [Export] private PackedScene _modPanelScene;
     private Control _modPanel;
-    
+
     private void CloseModPanel() {
         if (_modPanel == null) return;
         _modPanel.QueueFree();
         _modPanel = null;
         _modalPanel.Visible = false;
     }
-    
+
     private void OpenModPanel() {
         _modPanel = _modPanelScene.Instantiate<Control>();
         _modalPanel.AddChild(_modPanel);
@@ -42,17 +43,34 @@ public partial class Menu {
         foreach (var child in _moduleBox.GetChildren()) {
             child.QueueFree();
         }
+
         foreach (var moduleEntry in _settings) {
             var currentIndex = index++;
             var child = _moduleItemPrototype.Instantiate<Control>();
             _moduleBox.AddChild(child);
             child.FindNodeByName<Button>("ModuleName").Text = SettingsManager.instance.GetModuleName(moduleEntry.Key);
-            child.FindNodeByName<Button>("ModuleName").Pressed += () => {
-                LoadSettingCategories(currentIndex);
-            };
+            child.FindNodeByName<Button>("ModuleName").Pressed += () => { LoadSettingCategories(currentIndex); };
         }
+
         if (_settings.Count == 0) return;
         LoadSettingCategories(0);
+    }
+
+    private void InjectExtraButton(Control container, SettingDefine define, Action<string> refreshAction) {
+        var config = define.ExtraButtons;
+        var extraButtonBox = container.FindNodeByName<HBoxContainer>("ExtraBox");
+        foreach (var child in config) {
+            var button = new Button();
+            extraButtonBox.AddChild(button);
+            button.Text = child.Name.Invoke();
+            button.Pressed += () => {
+                var result = child.OnClick.Invoke();
+                if (result != null) {
+                    define.OnChange.Invoke(result);
+                    refreshAction?.Invoke(result);
+                }
+            };
+        }
     }
 
     private void LoadSettingCategories(int moduleIndex) {
@@ -65,7 +83,7 @@ public partial class Menu {
             foreach (var child in children) {
                 child.QueueFree();
             }
-            
+
             children = _contentBox.GetChildren();
             foreach (var child in children) {
                 child.QueueFree();
@@ -96,12 +114,15 @@ public partial class Menu {
                             value.Text = config.DefaultValue.Invoke();
                         }
 
-                        value.TextChanged += text => {
-                            config.OnChange.Invoke(text);
-                        };
+                        value.TextChanged += text => { config.OnChange.Invoke(text); };
+                        InjectExtraButton(component, config, result => {
+                            value.Text = result;
+                        });
+
                         if (shouldInsertOffset) {
                             categoryOffset.Add(config.Category.Invoke(), (int)value.GetRect().Position.Y);
                         }
+
                         break;
                     }
                     case SelectorSetting selectorSetting: {
@@ -129,10 +150,14 @@ public partial class Menu {
                             if (!dict.TryGetValue(selectedItem, out var option)) return;
                             config.OnChange.Invoke(option);
                         };
-                        
+                        InjectExtraButton(component, config, result => {
+                            value.Text = result;
+                        });
+
                         if (shouldInsertOffset) {
                             categoryOffset.Add(config.Category.Invoke(), (int)value.GetRect().Position.Y);
                         }
+
                         break;
                     }
                     case ProgressSetting progressSetting: {
@@ -149,13 +174,19 @@ public partial class Menu {
                             value.Value = double.Parse(config.DefaultValue.Invoke());
                         }
 
-                        value.ValueChanged += newValue => {
-                            config.OnChange.Invoke(newValue.ToString(CultureInfo.InvariantCulture));
-                        };
-                        
+                        value.ValueChanged += newValue => { config.OnChange.Invoke(newValue.ToString(CultureInfo.InvariantCulture)); };
+                        InjectExtraButton(component, config, result => {
+                            try {
+                                value.Value = double.Parse(result);
+                            } catch (FormatException) {
+                                value.Value = double.Parse(config.DefaultValue.Invoke());
+                            }
+                        });
+
                         if (shouldInsertOffset) {
                             categoryOffset.Add(config.Category.Invoke(), (int)value.GetRect().Position.Y);
                         }
+
                         break;
                     }
                     default:
@@ -168,10 +199,9 @@ public partial class Menu {
                 var child = _categoryItemPrototype.Instantiate<Control>();
                 _categoryBox.AddChild(child);
                 child.FindNodeByName<Button>("CategoryName").Text = category;
-                child.FindNodeByName<Button>("CategoryName").Pressed += () => {
-                    _contentBox.GetParent<ScrollContainer>().ScrollVertical = categoryOffset[category];
-                };
+                child.FindNodeByName<Button>("CategoryName").Pressed += () => { _contentBox.GetParent<ScrollContainer>().ScrollVertical = categoryOffset[category]; };
             }
+
             break;
         }
     }
