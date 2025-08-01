@@ -34,14 +34,19 @@ public partial class Menu {
         _aboutLabel.Text = GetAboutText() + "\n\n";
     }
 
-    private string GetAboutText() {
+    private string GetVersion() {
         var buildDate = Assembly.GetExecutingAssembly().GetMetadata("BuildDate");
-        // parse time stamp to date time.
         if (string.IsNullOrEmpty(buildDate)) {
             buildDate = "unknown";
         } else {
             buildDate = DateTime.TryParse(buildDate, out var dateTime) ? dateTime.ToString("yyyy-MM-dd") : "invalid date format";
         }
-        return I18N.Tr("core.gui", "about.text", buildDate);
+
+        return buildDate;
+    }
+
+    private string GetAboutText() {
+        var buildDate = Assembly.GetExecutingAssembly().GetMetadata("BuildDate");
+        return I18N.Tr("core.gui", "about.text", GetVersion());
     }
 }

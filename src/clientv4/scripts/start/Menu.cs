@@ -8,6 +8,7 @@ using game.scripts.server;
 using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
+using ModLoader;
 using ModLoader.logger;
 
 namespace game.scripts.start;
@@ -41,6 +42,7 @@ public partial class Menu : Control {
         SettingsManager.instance.Reset();
         ModManager.instance.Reset();
         LanguageManager.LanguageChanged += UpdateUITranslate;
+        UpdateUITranslate();
     }
 
     public override void _ExitTree() {
@@ -49,10 +51,30 @@ public partial class Menu : Control {
     }
     
     private void UpdateUITranslate() {
+        UpdateMainUITranslate();
         UpdateAboutUITranslate();
         UpdateSettingsUITranslate();
         UpdateSinglePlayUITranslate();
         UpdateMultiPlayUITranslate();
+    }
+
+    private void UpdateMainUITranslate() {
+        var singlePlayerButton = this.FindNodeByName<Button>("SinglePlayer");
+        var multiPlayerButton = this.FindNodeByName<Button>("MultiPlayer");
+        var settingsButton = this.FindNodeByName<Button>("Settings");
+        var modSettingsButton = this.FindNodeByName<Button>("ModSettings");
+        var aboutButton = this.FindNodeByName<Button>("About");
+        var exitButton = this.FindNodeByName<Button>("Exit");
+        var gameTitle = this.FindNodeByName<RichTextLabel>("GameTitle");
+        var versionLabel = this.FindNodeByName<RichTextLabel>("Version");
+        singlePlayerButton.Text = I18N.Tr("core.gui", "main-menu.single-player");
+        multiPlayerButton.Text = I18N.Tr("core.gui", "main-menu.multi-player");
+        settingsButton.Text = I18N.Tr("core.gui", "main-menu.settings");
+        modSettingsButton.Text = I18N.Tr("core.gui", "main-menu.mod-settings");
+        aboutButton.Text = I18N.Tr("core.gui", "main-menu.about");
+        exitButton.Text = I18N.Tr("core.gui", "main-menu.exit");
+        gameTitle.Text = I18N.Tr("core.gui", "main-menu.game-title");
+        versionLabel.Text = I18N.Tr("core.gui", "main-menu.version", GetVersion());
     }
 
     private void OnRootSizeChanged() {
