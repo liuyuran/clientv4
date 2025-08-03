@@ -17,17 +17,18 @@ namespace game.scripts.start;
 [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
 public partial class Menu : Control {
     private readonly ILogger _logger = LogManager.GetLogger<Menu>();
-    [Export] private PackedScene _gameScene;
+    private PackedScene _gameScene;
     private TextureRect _backgroundRect;
     private VBoxContainer _gameBtnContainer;
     private RichTextLabel _gameTitleLabel;
     private Panel _modalPanel;
     private const int SplitBetweenTitleAndButtons = 20;
     private double _backgroundWhRatio = -1;
-    private ulong _lastBackActive = 0;
+    private ulong _lastBackActive;
     private const ulong MinimumBackActiveTime = 300;
     
     public override void _Ready() {
+        _gameScene = ResourceLoader.Load<PackedScene>("res://scenes/game.tscn");
         PlatformUtil.goDotMode = true;
         _backgroundRect = this.FindNodeByName<TextureRect>("Background");
         _gameBtnContainer = this.FindNodeByName<VBoxContainer>("GameButtons");

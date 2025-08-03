@@ -28,8 +28,17 @@ public partial class SettingBackground : Panel {
         var leftBottomRect = new Rect2(margin, bottomAreaY, leftBottomRectWidth, bottomAreaHeight);
         DrawInvertedRoundRect(leftBottomRect, cornerRadius, color, 2);
 
-        // 3. 右下矩形
-        var rightBottomRectX = margin + leftBottomRectWidth + margin;
+        // 3. 右中矩形
+        const float centerBottomRectX = margin + leftBottomRectWidth + margin;
+        var leftWidth = componentSize.X - centerBottomRectX - margin;
+        var centerBottomRectWidth = leftWidth / 2 + margin;
+        if (centerBottomRectWidth > 2 * cornerRadius) {
+            var centerBottomRect = new Rect2(centerBottomRectX, bottomAreaY, centerBottomRectWidth, bottomAreaHeight);
+            DrawInvertedRoundRect(centerBottomRect, cornerRadius, color, 2);
+        }
+        
+        // 4. 右下矩形
+        var rightBottomRectX = centerBottomRectX + centerBottomRectWidth + margin;
         var rightBottomRectWidth = componentSize.X - rightBottomRectX - margin;
         if (rightBottomRectWidth > 2 * cornerRadius) {
             var rightBottomRect = new Rect2(rightBottomRectX, bottomAreaY, rightBottomRectWidth, bottomAreaHeight);

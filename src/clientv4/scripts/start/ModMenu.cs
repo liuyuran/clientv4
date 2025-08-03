@@ -14,6 +14,7 @@ namespace game.scripts.start;
 public partial class Menu {
     [Export] private PackedScene _modPanelScene;
     private Control _modPanel;
+    private RichTextLabel _hoverDescription;
 
     private void CloseModPanel() {
         if (_modPanel == null) return;
@@ -28,6 +29,7 @@ public partial class Menu {
         _moduleBox = this.FindNodeByName<HBoxContainer>("ModuleBox");
         _categoryBox = this.FindNodeByName<VBoxContainer>("CategoryBox");
         _contentBox = this.FindNodeByName<VBoxContainer>("ContentBox");
+        _hoverDescription = this.FindNodeByName<RichTextLabel>("SettingDesc");
         _settings = SettingsManager.instance.GetSettings();
         UpdateModSettingsUITranslate();
     }
@@ -48,7 +50,7 @@ public partial class Menu {
             var currentIndex = index++;
             var child = _moduleItemPrototype.Instantiate<Control>();
             _moduleBox.AddChild(child);
-            child.FindNodeByName<Button>("ModuleName").Text = SettingsManager.instance.GetModuleName(moduleEntry.Key);
+            child.FindNodeByName<Button>("ModuleName").Text = $"   {SettingsManager.instance.GetModuleName(moduleEntry.Key)}   ";
             child.FindNodeByName<Button>("ModuleName").Pressed += () => { LoadSettingCategories(currentIndex); };
         }
 
@@ -71,6 +73,16 @@ public partial class Menu {
                 }
             };
         }
+    }
+    
+    private void ConnectHoverDescriptionEvent(Control control, SettingDefine define) {
+        control.MouseEntered += () => {
+            var description = define.Description.Invoke();
+            _hoverDescription.Text = description;
+        };
+        control.MouseExited += () => {
+            _hoverDescription.Text = "";
+        };
     }
 
     private void LoadSettingCategories(int moduleIndex) {
@@ -115,6 +127,7 @@ public partial class Menu {
                         }
 
                         value.TextChanged += text => { config.OnChange.Invoke(text); };
+                        ConnectHoverDescriptionEvent(component, config);
                         InjectExtraButton(component, config, result => {
                             value.Text = result;
                         });
@@ -150,6 +163,7 @@ public partial class Menu {
                             if (!dict.TryGetValue(selectedItem, out var option)) return;
                             config.OnChange.Invoke(option);
                         };
+                        ConnectHoverDescriptionEvent(component, config);
                         InjectExtraButton(component, config, result => {
                             value.Text = result;
                         });
@@ -175,6 +189,7 @@ public partial class Menu {
                         }
 
                         value.ValueChanged += newValue => { config.OnChange.Invoke(newValue.ToString(CultureInfo.InvariantCulture)); };
+                        ConnectHoverDescriptionEvent(component, config);
                         InjectExtraButton(component, config, result => {
                             try {
                                 value.Value = double.Parse(result);

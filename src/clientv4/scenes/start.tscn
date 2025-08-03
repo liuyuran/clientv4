@@ -1,10 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://2v7krsjntfq"]
+[gd_scene load_steps=14 format=3 uid="uid://2v7krsjntfq"]
 
 [ext_resource type="Script" uid="uid://joix6a68lgkw" path="res://scripts/start/Menu.cs" id="1_u80x2"]
 [ext_resource type="PackedScene" uid="uid://cn4ppnh48p74l" path="res://prefabs/menus/about.tscn" id="2_4ge6i"]
 [ext_resource type="Texture2D" uid="uid://bes6p7rsfglhp" path="res://assets/start-menu-back.png" id="2_u80x2"]
 [ext_resource type="PackedScene" uid="uid://it553qyuja7f" path="res://prefabs/menus/mod-settings.tscn" id="3_8itgj"]
-[ext_resource type="PackedScene" uid="uid://c4l82svkvmewt" path="res://scenes/game.tscn" id="3_tn317"]
 [ext_resource type="PackedScene" uid="uid://coc2dqudywcoq" path="res://prefabs/menus/multi-player.tscn" id="4_tn317"]
 [ext_resource type="PackedScene" uid="uid://cwgwu1mopi6ss" path="res://prefabs/menus/settings.tscn" id="5_m8nf6"]
 [ext_resource type="PackedScene" uid="uid://cw1o7mm248i74" path="res://prefabs/menus/single-player.tscn" id="6_pgjjs"]
@@ -24,7 +23,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_u80x2")
 _aboutPanelScene = ExtResource("2_4ge6i")
-_gameScene = ExtResource("3_tn317")
 _modPanelScene = ExtResource("3_8itgj")
 _multiPlayMenuScene = ExtResource("4_tn317")
 _settingPanelScene = ExtResource("5_m8nf6")

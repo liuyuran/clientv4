@@ -33,6 +33,7 @@ public partial class Menu {
         _moduleBox = this.FindNodeByName<HBoxContainer>("ModuleBox");
         _categoryBox = this.FindNodeByName<VBoxContainer>("CategoryBox");
         _contentBox = this.FindNodeByName<VBoxContainer>("ContentBox");
+        _hoverDescription = this.FindNodeByName<RichTextLabel>("SettingDesc");
         _settings = SettingsManager.instance.GetCoreSettings();
         UpdateSettingsUITranslate();
     }
