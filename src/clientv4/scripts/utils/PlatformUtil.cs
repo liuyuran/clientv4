@@ -16,6 +16,6 @@ public static class PlatformUtil {
             return Time.GetTicksMsec();
         }
 
-        return (ulong)new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();;
+        return (ulong)new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();;
     }
 }

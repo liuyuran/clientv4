@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using game.scripts.config;
 using game.scripts.manager;
 using game.scripts.manager.archive;
 using game.scripts.manager.mod;
@@ -23,8 +24,11 @@ public partial class Menu : Control {
     private Panel _modalPanel;
     private const int SplitBetweenTitleAndButtons = 20;
     private double _backgroundWhRatio = -1;
+    private ulong _lastBackActive = 0;
+    private const ulong MinimumBackActiveTime = 300;
     
     public override void _Ready() {
+        PlatformUtil.goDotMode = true;
         _backgroundRect = this.FindNodeByName<TextureRect>("Background");
         _gameBtnContainer = this.FindNodeByName<VBoxContainer>("GameButtons");
         _gameTitleLabel = this.FindNodeByName<RichTextLabel>("GameTitle");
@@ -114,18 +118,33 @@ public partial class Menu : Control {
         );
     }
 
-    private bool tmp = false;
-
     public override void _Process(double delta) {
-        /*OpenSingle();
-        ResetManager.Reset();
-        ArchiveManager.instance.Load(_selectedArchiveName);
-        JumpToGameSceneAndStartLocalServer();*/
-        // OpenSettings();
-        if (tmp) return;
-        OpenSettings();
-        GetTree().Root.Position = new Vector2I(1920 - GetTree().Root.Size.X, 1080 - GetTree().Root.Size.Y);
-        tmp = true;
+        if (!InputManager.instance.IsKeyPressed(InputKey.UICancel)) return;
+        if (PlatformUtil.GetTimestamp() - _lastBackActive < MinimumBackActiveTime) return;
+        _lastBackActive = PlatformUtil.GetTimestamp();
+        if (_singlePlayMenu != null && _createPanel is { Visible: true }) {
+            CloseSingleCreateWorld();
+            return;
+        }
+        if (_singlePlayMenu != null) {
+            CloseSinglePlayMenu();
+            return;
+        }
+        if (_multiPlayMenu != null) {
+            CloseMultiPlayMenu();
+            return;
+        }
+        if (_settingPanel != null) {
+            CloseSettingPanel();
+            return;
+        }
+        if (_modPanel != null) {
+            CloseModPanel();
+            return;
+        }
+
+        if (_aboutPanel == null) return;
+        CloseAboutPanel();
     }
 
     private void CloseOtherPanel() {
