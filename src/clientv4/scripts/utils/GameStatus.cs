@@ -5,6 +5,7 @@ public static class GameStatus {
         Starting,
         StartMenu,
         Loading,
+        Typing,
         Playing
     }
     

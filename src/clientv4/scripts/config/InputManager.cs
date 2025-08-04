@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 namespace game.scripts.config;
@@ -338,19 +339,7 @@ public class InputManager {
     public bool IsKeyPressed(string keyCode) {
         // Check keyboard bindings
         if (_keyBinds.TryGetValue(keyCode, out var keys)) {
-            foreach (var key in keys) {
-                if (Input.IsKeyPressed(key[0])) {
-                    if (key.Length > 1) {
-                        for (var i = 1; i < key.Length; i++) {
-                            if (!Input.IsKeyPressed(key[i])) {
-                                return false;
-                            }
-                        }
-                    }
-
-                    return true;
-                }
-            }
+            return keys.Any(key => key.Any(Input.IsKeyPressed));
         }
 
         // Check extended bindings

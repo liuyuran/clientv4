@@ -34,16 +34,18 @@ public partial class InGamingUI: CanvasLayer {
 			default:
 				throw new ArgumentOutOfRangeException();
 		}
-		if (_status.Focus != InGameUIFocus.Game && _status.Focus != InGameUIFocus.Input) return;
+		if (_status.Focus != InGameUIFocus.Game && 
+		    GameStatus.currentStatus != GameStatus.Status.Playing &&
+		    GameStatus.currentStatus != GameStatus.Status.Typing) return;
 		if (!InputManager.instance.IsKeyPressed(InputKey.UIConfirm)) return;
 		if (PlatformUtil.GetTimestamp() - _lastActiveInputTime < MinInputInterval) return;
 		_lastActiveInputTime = PlatformUtil.GetTimestamp();
 		if (_msgInput.HasFocus()) {
-			_status.Focus = InGameUIFocus.Game;
 			_msgInput.ReleaseFocus();
+			GameStatus.SetStatus(GameStatus.Status.Playing);
 		} else {
-			_status.Focus = InGameUIFocus.Input;
 			_msgInput.GrabFocus();
+			GameStatus.SetStatus(GameStatus.Status.Typing);
 		}
 	}
 

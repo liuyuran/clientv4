@@ -1,11 +1,15 @@
 using Friflo.Engine.ECS;
 using game.scripts.config;
 using game.scripts.server.ECSBridge.input;
+using game.scripts.utils;
 using Godot;
+using Microsoft.Extensions.Logging;
+using ModLoader.logger;
 
 namespace game.scripts;
 
 public partial class PlayerControl(Entity inputHandler) : CharacterBody3D {
+	private readonly ILogger _logger = LogManager.GetLogger<PlayerControl>();
 	private CInputEvent _lastEvents;
 	private CInputEvent _events;
 
@@ -19,7 +23,7 @@ public partial class PlayerControl(Entity inputHandler) : CharacterBody3D {
 	}
 
 	public override void _Process(double delta) {
-		if (GetTree().Paused) {
+		if (GetTree().Paused || GameStatus.currentStatus != GameStatus.Status.Playing) {
 			Rpc(MethodName.UpdateInputEvent,
 				Vector3.Zero,
 				Vector3.Zero, 
@@ -27,7 +31,9 @@ public partial class PlayerControl(Entity inputHandler) : CharacterBody3D {
 				false,
 				Vector2.Zero
 			);
-			ProcessMode = ProcessModeEnum.Pausable;
+			if (GetTree().Paused) {
+				ProcessMode = ProcessModeEnum.Pausable;
+			}
 			return;
 		}
 		ProcessMode = ProcessModeEnum.Always;
