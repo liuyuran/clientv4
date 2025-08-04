@@ -1,4 +1,5 @@
 using System;
+using game.scripts.config;
 using game.scripts.utils;
 using Godot;
 
@@ -9,12 +10,16 @@ public partial class InGamingUI: CanvasLayer {
 	[Export] public PackedScene PauseUI;
 	[Export] public PackedScene MenusUI;
 	private InGamingUIStatus _status;
+	private LineEdit _msgInput;
+	private ulong _lastActiveInputTime;
+	private const ulong MinInputInterval = 500;
 		
 	public override void _Ready() {
 		GameNodeReference.UI = this;
 		ProcessMode = ProcessModeEnum.Always;
 		_status.Focus = InGameUIFocus.Game;
 		OpenPlayingUI();
+		_msgInput = this.FindNodeByName<LineEdit>("MsgInput");
 	}
 
 	public override void _Process(double delta) {
@@ -28,6 +33,17 @@ public partial class InGamingUI: CanvasLayer {
 				break;
 			default:
 				throw new ArgumentOutOfRangeException();
+		}
+		if (_status.Focus != InGameUIFocus.Game && _status.Focus != InGameUIFocus.Input) return;
+		if (!InputManager.instance.IsKeyPressed(InputKey.UIConfirm)) return;
+		if (PlatformUtil.GetTimestamp() - _lastActiveInputTime < MinInputInterval) return;
+		_lastActiveInputTime = PlatformUtil.GetTimestamp();
+		if (_msgInput.HasFocus()) {
+			_status.Focus = InGameUIFocus.Game;
+			_msgInput.ReleaseFocus();
+		} else {
+			_status.Focus = InGameUIFocus.Input;
+			_msgInput.GrabFocus();
 		}
 	}
 

@@ -60,6 +60,7 @@ layout_mode = 2
 text = "单人游戏"
 
 [node name="MultiPlayer" type="Button" parent="GameButtons"]
+visible = false
 layout_mode = 2
 text = "多人游戏"
 
