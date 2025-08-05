@@ -18,7 +18,7 @@ public class CoreMod : IMod {
         AddItem();
         AddTerrain();
         AddMenu();
-        _logger.LogDebug(I18N.Tr("mod.core", "mod.loaded"));
+        _logger.LogDebug("{message}", I18N.Tr("mod.core", "mod.loaded"));
     }
 
     private void AddTerrain() {

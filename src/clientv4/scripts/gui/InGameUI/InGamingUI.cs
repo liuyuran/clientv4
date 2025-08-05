@@ -11,8 +11,6 @@ public partial class InGamingUI: CanvasLayer {
 	[Export] public PackedScene MenusUI;
 	private InGamingUIStatus _status;
 	private LineEdit _msgInput;
-	private ulong _lastActiveInputTime;
-	private const ulong MinInputInterval = 500;
 		
 	public override void _Ready() {
 		GameNodeReference.UI = this;
@@ -34,19 +32,6 @@ public partial class InGamingUI: CanvasLayer {
 			default:
 				throw new ArgumentOutOfRangeException();
 		}
-		if (_status.Focus != InGameUIFocus.Game && 
-		    GameStatus.currentStatus != GameStatus.Status.Playing &&
-		    GameStatus.currentStatus != GameStatus.Status.Typing) return;
-		if (!InputManager.instance.IsKeyPressed(InputKey.UIConfirm)) return;
-		if (PlatformUtil.GetTimestamp() - _lastActiveInputTime < MinInputInterval) return;
-		_lastActiveInputTime = PlatformUtil.GetTimestamp();
-		if (_msgInput.HasFocus()) {
-			_msgInput.ReleaseFocus();
-			GameStatus.SetStatus(GameStatus.Status.Playing);
-		} else {
-			_msgInput.GrabFocus();
-			GameStatus.SetStatus(GameStatus.Status.Typing);
-		}
 	}
 
 	public override void _Input(InputEvent @event) {
@@ -58,6 +43,17 @@ public partial class InGamingUI: CanvasLayer {
 				break;
 			default:
 				throw new ArgumentOutOfRangeException();
+		}
+		if (_status.Focus != InGameUIFocus.Game && 
+		    GameStatus.currentStatus != GameStatus.Status.Playing &&
+		    GameStatus.currentStatus != GameStatus.Status.Typing) return;
+		if (!InputManager.instance.IsKeyPressed(InputKey.UIConfirm, @event)) return;
+		if (_msgInput.HasFocus()) {
+			_msgInput.ReleaseFocus();
+			GameStatus.SetStatus(GameStatus.Status.Playing);
+		} else {
+			_msgInput.GrabFocus();
+			GameStatus.SetStatus(GameStatus.Status.Typing);
 		}
 	}
 }

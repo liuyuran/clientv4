@@ -269,73 +269,6 @@ public class InputManager {
     /// <summary>
     /// Check if the key is pressed.
     /// </summary>
-    public bool IsKeyPressed(InputEvent @event, string keyCode) {
-        // Check keyboard bindings
-        if (@event is InputEventKey eventKey) {
-            if (_keyBinds.TryGetValue(keyCode, out var keys)) {
-                foreach (var key in keys) {
-                    if (eventKey.IsPressed() && eventKey.Keycode == key[0]) {
-                        if (key.Length > 1) {
-                            for (var i = 1; i < key.Length; i++) {
-                                if (!Input.IsKeyPressed(key[i])) {
-                                    return false;
-                                }
-                            }
-                        }
-
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // Check extended bindings
-        if (_extendedBinds.TryGetValue(keyCode, out var binds)) {
-            foreach (var (type, id, direction) in binds) {
-                switch (type) {
-                    // Check mouse wheel bindings
-                    case InputType.MouseWheel when @event is InputEventMouseButton mouseButton: {
-                        var isWheelUp = mouseButton.ButtonIndex == MouseButton.WheelUp;
-                        var isWheelDown = mouseButton.ButtonIndex == MouseButton.WheelDown;
-                        switch (direction) {
-                            case > 0 when isWheelUp:
-                            case < 0 when isWheelDown:
-                                return true;
-                        }
-
-                        break;
-                    }
-                    // Check joystick button bindings
-                    case InputType.JoystickButton when @event is InputEventJoypadButton joypadButton && joypadButton.ButtonIndex == (JoyButton)direction && joypadButton.Device == id && joypadButton.ButtonIndex == (JoyButton)direction && joypadButton.Device == id:
-                        return joypadButton.Pressed;
-                    // Check D-pad bindings
-                    case InputType.DPad when @event is InputEventJoypadButton dpadButton: {
-                        var dpadJoyButton = direction switch {
-                            (int)DPadDirection.Up => JoyButton.DpadUp,
-                            (int)DPadDirection.Right => JoyButton.DpadRight,
-                            (int)DPadDirection.Down => JoyButton.DpadDown,
-                            (int)DPadDirection.Left => JoyButton.DpadLeft,
-                            _ => JoyButton.Invalid
-                        };
-
-                        if (dpadButton.ButtonIndex == dpadJoyButton && dpadButton.Device == id) {
-                            return dpadButton.Pressed;
-                        }
-
-                        break;
-                    }
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Check if the key is pressed.
-    /// </summary>
     public bool IsKeyPressed(string keyCode) {
         // Check keyboard bindings
         if (_keyBinds.TryGetValue(keyCode, out var keys)) {
@@ -367,6 +300,46 @@ public class InputManager {
                     }
                 }
                 // Mouse wheel is handled through events, not direct polling
+            }
+        }
+
+        return false;
+    }
+
+    public bool IsKeyPressed(string action, InputEvent @event) {
+        // Check keyboard bindings
+        if (_keyBinds.TryGetValue(action, out var keys)) {
+            return keys.Any(key => key.Any(Input.IsKeyPressed)) && @event is InputEventKey keyEvent && keyEvent.Pressed;
+        }
+        
+        // Check extended bindings
+        if (_extendedBinds.TryGetValue(action, out var binds)) {
+            foreach (var (type, id, direction) in binds) {
+                switch (type) {
+                    case InputType.JoystickButton when @event is InputEventJoypadButton joypadButton:
+                        if (joypadButton.ButtonIndex == (JoyButton)direction && joypadButton.Pressed && joypadButton.Device == id) {
+                            return true;
+                        }
+                        break;
+                    case InputType.DPad when @event is InputEventJoypadButton joypadDPad:
+                        var dpadJoyButton = direction switch {
+                            (int)DPadDirection.Up => JoyButton.DpadUp,
+                            (int)DPadDirection.Right => JoyButton.DpadRight,
+                            (int)DPadDirection.Down => JoyButton.DpadDown,
+                            (int)DPadDirection.Left => JoyButton.DpadLeft,
+                            _ => JoyButton.Invalid
+                        };
+                        if (joypadDPad.ButtonIndex == dpadJoyButton && joypadDPad.Pressed) {
+                            return true;
+                        }
+                        break;
+                    case InputType.MouseWheel when @event is InputEventMouseButton mouseWheel:
+                        if ((direction > 0 && mouseWheel.ButtonIndex == MouseButton.WheelUp) ||
+                            (direction < 0 && mouseWheel.ButtonIndex == MouseButton.WheelDown)) {
+                            return mouseWheel.Pressed;
+                        }
+                        break;
+                }
             }
         }
 

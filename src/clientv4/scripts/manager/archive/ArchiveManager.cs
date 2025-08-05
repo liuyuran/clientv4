@@ -81,7 +81,7 @@ public class ArchiveManager {
         foreach (var file in archiveFiles) {
             if (file.Key.Trim().Length == 0) continue;
             var filePath = Path.Combine(saveBasePath, _currentSaveName, file.Key);
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? string.Empty);
+            DirAccess.MakeDirAbsolute(Path.GetDirectoryName(filePath) ?? string.Empty);
             var extension = Path.GetExtension(filePath);
             switch (extension) {
                 case ".dat": {
