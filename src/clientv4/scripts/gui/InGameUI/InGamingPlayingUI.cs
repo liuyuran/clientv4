@@ -2,8 +2,10 @@
 using game.scripts.gui.InGameUI.component;
 using game.scripts.manager;
 using game.scripts.manager.chat;
+using game.scripts.manager.player;
 using game.scripts.utils;
 using Godot;
+using ModLoader.chat;
 
 namespace game.scripts.gui.InGameUI;
 
@@ -70,19 +72,42 @@ public partial class InGamingUI {
     
     /// <summary>
     /// Server broadcast chat message.
+    /// run on server.
     /// </summary>
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Unreliable)]
-    public void BroadcastChatMessage(string message) {
-        Rpc(MethodName.ReceiveChatMessage, message);
+    public void BroadcastChatMessage(ulong timestamp, string message) {
+        var parseResult = CommandManager.instance.TryParseCommand(message);
+        if (parseResult == null) {
+            Rpc(MethodName.ReceiveChatMessage, timestamp, message);
+        } else {
+            var peerId = Multiplayer.GetRemoteSenderId();
+            var playerId = PlayerManager.instance.GetPlayerByPeerId(peerId).playerId;
+            CommandManager.instance.ExecuteCommand(playerId, parseResult.Value.commandName, parseResult.Value.args);
+        }
+    }
+    
+    /// <summary>
+    /// run on a client.
+    /// </summary>
+    [Rpc(CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Unreliable)]
+    public void SendChatMessageToPlayer(ulong timestamp, string message) {
+        var parseResult = CommandManager.instance.TryParseCommand(message);
+        if (parseResult == null) {
+            Rpc(MethodName.ReceiveChatMessage, timestamp, message);
+        } else {
+            var peerId = Multiplayer.GetRemoteSenderId();
+            var playerId = PlayerManager.instance.GetPlayerByPeerId(peerId).playerId;
+            CommandManager.instance.ExecuteCommand(playerId, parseResult.Value.commandName, parseResult.Value.args);
+        }
     }
 
     /// <summary>
     /// Clients receive chat message.
     /// </summary>
     [Rpc(CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Unreliable)]
-    private void ReceiveChatMessage(string message) {
-        ChatManager.instance.AddMessage(new ChatManager.MessageInfo {
-            Timestamp = PlatformUtil.GetTimestamp(),
+    private void ReceiveChatMessage(ulong timestamp, string message) {
+        ChatManager.instance.ReceiveMessage(new MessageInfo {
+            Timestamp = timestamp,
             Message = message
         });
     }

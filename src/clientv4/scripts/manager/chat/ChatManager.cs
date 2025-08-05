@@ -1,26 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using game.scripts.manager.archive;
+using game.scripts.gui.InGameUI;
+using game.scripts.manager.player;
 using game.scripts.manager.reset;
+using game.scripts.utils;
 using ModLoader.archive;
+using ModLoader.chat;
+using ModLoader.handler;
 
 namespace game.scripts.manager.chat;
 
-public class ChatManager: IReset, IArchive, IDisposable {
+public class ChatManager: IReset, IChatManager, IArchive, IDisposable {
     public delegate void MessageAddedHandler(MessageInfo message);
     private const string ArchiveFilename = "chat/chat-history.log";
     private readonly Queue<MessageInfo> _messages = new();
     public event MessageAddedHandler OnMessageAdded;
     public static ChatManager instance { get; private set; } = new();
 
-    public void AddMessage(MessageInfo message) {
+    public void ReceiveMessage(MessageInfo message) {
         _messages.Enqueue(message);
         OnMessageAdded?.Invoke(message);
     }
     
-    public struct MessageInfo {
-        public ulong Timestamp;
-        public string Message;
+    public void BroadcastMessage(MessageInfo message) {
+        if (GameNodeReference.UI == null || !GameNodeReference.UI.CanProcess()) {
+            return; // UI not ready, skip broadcasting
+        }
+        GameNodeReference.UI.Rpc(InGamingUI.MethodName.BroadcastChatMessage, message.Timestamp, message.Message);
+    }
+    
+    public void SendMessage(ulong playerId, MessageInfo message) {
+        if (GameNodeReference.UI == null || !GameNodeReference.UI.CanProcess()) {
+            return; // UI not ready, skip broadcasting
+        }
+
+        if (playerId == 0) {
+            GameNodeReference.UI.BroadcastChatMessage(message.Timestamp, message.Message);
+        } else {
+            var player = PlayerManager.instance.GetPlayerById(playerId);
+            GameNodeReference.UI.RpcId(player.peerId, InGamingUI.MethodName.ReceiveChatMessage, message.Timestamp, message.Message);            
+        }
     }
 
     public void Reset() {
@@ -56,7 +75,7 @@ public class ChatManager: IReset, IArchive, IDisposable {
             if (parts.Length < 3) continue;
             if (!ulong.TryParse(parts[0].Trim('[', ']'), out var timestamp)) continue;
             var message = string.Join(' ', parts, 1, parts.Length - 1).Trim();
-            AddMessage(new MessageInfo { Timestamp = timestamp, Message = message });
+            ReceiveMessage(new MessageInfo { Timestamp = timestamp, Message = message });
         }
     }
 }

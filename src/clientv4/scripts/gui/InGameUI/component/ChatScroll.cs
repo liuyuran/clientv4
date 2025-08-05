@@ -1,7 +1,7 @@
-using game.scripts.manager;
 using game.scripts.manager.chat;
 using game.scripts.utils;
 using Godot;
+using ModLoader.chat;
 
 namespace game.scripts.gui.InGameUI.component;
 
@@ -15,11 +15,11 @@ public partial class ChatScroll: Panel {
 	private const int MaxLine = 300;
 	
 	public override void _Ready() {
-		_chatHistory = GetNode<ScrollContainer>("box/chatHistory");
+		_chatHistory = this.FindNodeByName<ScrollContainer>("chatHistory");
 		_chatBox = _chatHistory.FindNodeByName<VBoxContainer>("chatBox");
-		_chatInputBox = GetNode<HBoxContainer>("box/InputBox");
+		_chatInputBox = this.FindNodeByName<HBoxContainer>("InputBox");
 		_chatInput = _chatInputBox.FindNodeByName<LineEdit>("MsgInput");
-		AddMessage(new ChatManager.MessageInfo {
+		AddMessage(new MessageInfo {
 			Timestamp = PlatformUtil.GetTimestamp(),
 			Message = "[color=yellow]Welcome to Friflo![/color]"
 		});
@@ -37,12 +37,12 @@ public partial class ChatScroll: Panel {
 	
 	private void OnChatInputOnTextSubmitted(string text) {
 		if (string.IsNullOrWhiteSpace(text)) return;
-		ChatManager.instance.AddMessage(new ChatManager.MessageInfo { Timestamp = PlatformUtil.GetTimestamp(), Message = text });
+		ChatManager.instance.ReceiveMessage(new MessageInfo { Timestamp = PlatformUtil.GetTimestamp(), Message = text });
 		SendMessage();
 		_chatInput.Text = string.Empty;
 	}
 
-	private void AddMessage(ChatManager.MessageInfo message) {
+	private void AddMessage(MessageInfo message) {
 		var label = new RichTextLabel();
 		label.Text = message.Message;
 		label.AutowrapMode = TextServer.AutowrapMode.Word;
@@ -59,7 +59,10 @@ public partial class ChatScroll: Panel {
 	}
 
 	private void SendMessage() {
-		InGamingUIInstance.BroadcastChatMessage(_chatInput.Text);
+		ChatManager.instance.BroadcastMessage(new MessageInfo() {
+			Timestamp = PlatformUtil.GetTimestamp(),
+			Message = _chatInput.Text
+		});
 	}
 
 	private void ScrollToBottom() {

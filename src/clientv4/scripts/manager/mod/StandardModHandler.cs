@@ -1,4 +1,5 @@
 ﻿using game.scripts.manager.blocks;
+using game.scripts.manager.chat;
 using game.scripts.manager.item;
 using game.scripts.manager.map;
 using game.scripts.manager.menu;
@@ -26,5 +27,13 @@ public class StandardModHandler : IModHandler {
     
     public ISettingsManager GetSettingsManager() {
         return SettingsManager.instance;
+    }
+    
+    public IChatManager GetChatManager() {
+        return ChatManager.instance;
+    }
+    
+    public ICommandManager GetCommandManager() {
+        return CommandManager.instance;
     }
 }

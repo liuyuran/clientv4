@@ -4,17 +4,18 @@ using game.scripts.manager.chat;
 using game.scripts.utils;
 using Godot;
 using JetBrains.Annotations;
+using ModLoader.chat;
 
 namespace game.unittest.manager;
 
 [UsedImplicitly]
 public class ChatManagerUnitTest: IUnitTest {
-    private List<ChatManager.MessageInfo> _message = [];
+    private List<MessageInfo> _message = [];
     
     public void RunTest(Node node, Action<string> log) {
         try {
             ChatManager.instance.OnMessageAdded += OnInstanceOnOnMessageAdded;
-            ChatManager.instance.AddMessage(new ChatManager.MessageInfo {
+            ChatManager.instance.ReceiveMessage(new MessageInfo {
                 Timestamp = PlatformUtil.GetTimestamp(),
                 Message = "Test message"
             });
@@ -47,7 +48,7 @@ public class ChatManagerUnitTest: IUnitTest {
         }
     }
 
-    private void OnInstanceOnOnMessageAdded(ChatManager.MessageInfo msg) {
+    private void OnInstanceOnOnMessageAdded(MessageInfo msg) {
         _message.Add(msg);
     }
 

@@ -6,4 +6,6 @@ public interface IModHandler {
     public IMapManager GetMapManager();
     public IMenuManager GetMenuManager();
     public ISettingsManager GetSettingsManager();
+    public IChatManager GetChatManager();
+    public ICommandManager GetCommandManager();
 }
