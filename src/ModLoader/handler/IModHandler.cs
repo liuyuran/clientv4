@@ -1,6 +1,7 @@
 ﻿namespace ModLoader.handler;
 
 public interface IModHandler {
+    public IArchiveManager GetArchiveManager();
     public IBlockManager GetBlockManager();
     public IItemManager GetItemManager();
     public IMapManager GetMapManager();
@@ -8,4 +9,6 @@ public interface IModHandler {
     public ISettingsManager GetSettingsManager();
     public IChatManager GetChatManager();
     public ICommandManager GetCommandManager();
+    public IRecipeManager GetRecipeManager();
+    public ISkillManager GetSkillManager();
 }

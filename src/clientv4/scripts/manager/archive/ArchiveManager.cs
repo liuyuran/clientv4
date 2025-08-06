@@ -6,12 +6,13 @@ using System.Reflection;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader.archive;
+using ModLoader.handler;
 using ModLoader.logger;
 using FileAccess = Godot.FileAccess;
 
 namespace game.scripts.manager.archive;
 
-public class ArchiveManager {
+public class ArchiveManager: IArchiveManager {
     private readonly ILogger _logger = LogManager.GetLogger<ArchiveManager>();
     public static ArchiveManager instance { get; private set; } = new();
 

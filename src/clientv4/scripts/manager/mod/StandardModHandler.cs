@@ -1,14 +1,21 @@
-﻿using game.scripts.manager.blocks;
+﻿using game.scripts.manager.archive;
+using game.scripts.manager.blocks;
 using game.scripts.manager.chat;
 using game.scripts.manager.item;
 using game.scripts.manager.map;
 using game.scripts.manager.menu;
+using game.scripts.manager.recipe;
 using game.scripts.manager.settings;
+using game.scripts.manager.skill;
 using ModLoader.handler;
 
 namespace game.scripts.manager.mod;
 
 public class StandardModHandler : IModHandler {
+    public IArchiveManager GetArchiveManager() {
+        return ArchiveManager.instance;
+    }
+    
     public IBlockManager GetBlockManager() {
         return BlockManager.instance;
     }
@@ -35,5 +42,13 @@ public class StandardModHandler : IModHandler {
     
     public ICommandManager GetCommandManager() {
         return CommandManager.instance;
+    }
+
+    public IRecipeManager GetRecipeManager() {
+        return RecipeManager.instance;
+    }
+
+    public ISkillManager GetSkillManager() {
+        return SkillManager.instance;
     }
 }
