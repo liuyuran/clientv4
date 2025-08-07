@@ -16,10 +16,7 @@ run/main_scene="uid://2v7krsjntfq"
 config/features=PackedStringArray("4.4", "C#", "Double Precision", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
-
-[autoload]
-
-StandardNetwork="*res://scripts/network/StandardNetwork.cs"
+config/user_data_path="./RuntimeData"
 
 [dotnet]
 
