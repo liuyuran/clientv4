@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader.archive;
@@ -82,6 +83,8 @@ public class ArchiveManager: IArchiveManager {
         foreach (var file in archiveFiles) {
             if (file.Key.Trim().Length == 0) continue;
             var filePath = Path.Combine(saveBasePath, _currentSaveName, file.Key);
+            if (!filePath.IsSubDirectoryOf(basePath))
+                throw new AccessViolationException("Cannot save file outside of game directory");
             DirAccess.MakeDirAbsolute(Path.GetDirectoryName(filePath) ?? string.Empty);
             var extension = Path.GetExtension(filePath);
             switch (extension) {
@@ -139,6 +142,8 @@ public class ArchiveManager: IArchiveManager {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
         var saveBasePath = Path.Combine(basePath, SaveDirectory);
         var filePath = Path.Combine(saveBasePath, _currentSaveName, relativePath);
+        if (!filePath.IsSubDirectoryOf(basePath))
+            throw new AccessViolationException("Cannot save file outside of game directory");
         Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? string.Empty);
         var fileHandle = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
         fileHandle.StoreBuffer(data);
@@ -149,6 +154,8 @@ public class ArchiveManager: IArchiveManager {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
         var saveBasePath = Path.Combine(basePath, SaveDirectory);
         var filePath = Path.Combine(saveBasePath, _currentSaveName, relativePath);
+        if (!filePath.IsSubDirectoryOf(basePath))
+            throw new AccessViolationException("Cannot load file outside of game directory");
         if (FileAccess.FileExists(filePath)) {
             return FileAccess.GetFileAsBytes(filePath);
         }

@@ -22,8 +22,7 @@ public static class FileUtil {
                 fileBytes = fileBytes.Skip(2).ToArray();
                 break;
             case >= 2: {
-                if (fileBytes[0] == 0xFF && fileBytes[1] == 0xFE)
-                {
+                if (fileBytes[0] == 0xFF && fileBytes[1] == 0xFE) {
                     // UTF-16 Little-Endian BOM
                     fileBytes = fileBytes.Skip(2).ToArray();
                 }
@@ -49,7 +48,7 @@ public static class FileUtil {
         // 将剩余字节转换为字符串
         return Encoding.UTF8.GetString(fileBytes);
     }
-    
+
     public static bool TryCreateUserDataLink(string userDataPath, Node env) {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
         var userDataDir = Path.Combine(basePath, userDataPath);
@@ -60,9 +59,9 @@ public static class FileUtil {
                 dirAccess.MakeDirRecursive(userDataPath);
             }
         }
-    
+
         var absoluteUserDataDir = OS.GetUserDataDir();
-    
+
         // 检查符号链接是否已正确建立
         var folderInfo = new DirectoryInfo(absoluteUserDataDir);
         if (Directory.Exists(absoluteUserDataDir) && folderInfo.Attributes.HasFlag(FileAttributes.ReparsePoint)) {
@@ -71,13 +70,13 @@ public static class FileUtil {
                 return true; // 符号链接已正确建立，直接返回
             }
         }
-    
+
         // 判断是否为Windows系统
         if (OS.GetName() == "Windows") {
             // 检查是否为管理员模式
             var isAdmin = new WindowsPrincipal(WindowsIdentity.GetCurrent())
                 .IsInRole(WindowsBuiltInRole.Administrator);
-    
+
             if (!isAdmin) {
                 // 申请管理员权限并重启自身
                 try {
@@ -98,20 +97,37 @@ public static class FileUtil {
                 }
             }
         }
-    
+
         // 删除旧的符号链接
         if (DirAccess.DirExistsAbsolute(absoluteUserDataDir)) {
             try {
-                if (absoluteUserDataDir != null) Directory.Delete(absoluteUserDataDir, true);
+                Directory.Delete(absoluteUserDataDir, true);
             } catch (IOException e) {
                 GD.PrintErr("Failed to delete old user data link: ", e.Message);
                 return false; // 删除失败，返回false
             }
         }
-    
+
         // 创建符号链接
         var localUserDataPath = DirAccess.Open(userDataDir);
         localUserDataPath.CreateLink(localUserDataPath.GetCurrentDir(), absoluteUserDataDir);
         return true;
+    }
+
+    public static bool IsSubDirectoryOf(this string candidate, string other) {
+        var isChild = false;
+        var candidateInfo = new DirectoryInfo(candidate);
+        var otherInfo = new DirectoryInfo(other);
+
+        while (candidateInfo.Parent != null) {
+            if (candidateInfo.Parent.FullName == otherInfo.FullName) {
+                isChild = true;
+                break;
+            }
+
+            candidateInfo = candidateInfo.Parent;
+        }
+
+        return isChild;
     }
 }
