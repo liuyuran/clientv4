@@ -10,6 +10,7 @@ using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
 using ModLoader;
+using ModLoader.config;
 using ModLoader.logger;
 
 namespace game.scripts.start;
@@ -28,7 +29,11 @@ public partial class Menu : Control {
     private const ulong MinimumBackActiveTime = 300;
     
     public override void _Ready() {
-        FileUtil.TryCreateUserDataLink("RuntimeData");
+        var linkResult = FileUtil.TryCreateUserDataLink(Config.RuntimeFolder, this);
+        if (!linkResult) {
+            // TODO: print error
+            return;
+        }
         _gameScene = ResourceLoader.Load<PackedScene>("res://scenes/game.tscn");
         PlatformUtil.goDotMode = true;
         _backgroundRect = this.FindNodeByName<TextureRect>("Background");
