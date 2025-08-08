@@ -10,13 +10,18 @@ config_version=5
 
 [application]
 
-config/name="无尽魔方"
+config/name="UnlimitedCube"
 config/version="0.0.1-beta"
 run/main_scene="uid://2v7krsjntfq"
 config/features=PackedStringArray("4.4", "C#", "Double Precision", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
-config/user_data_path="./RuntimeData"
+
+[debug]
+
+file_logging/enable_file_logging.pc=false
+file_logging/log_path=""
+file_logging/max_log_files=0
 
 [dotnet]
 

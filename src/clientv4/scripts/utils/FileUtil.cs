@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Text;
+using Godot;
 
 namespace game.scripts.utils;
 
@@ -42,5 +44,28 @@ public static class FileUtil {
 
         // 将剩余字节转换为字符串
         return Encoding.UTF8.GetString(fileBytes);
+    }
+
+    public static void TryCreateUserDataLink(string userDataPath) {
+        var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
+        var userDataDir = Path.Combine(basePath, userDataPath);
+        if (!DirAccess.DirExistsAbsolute(userDataDir)) {
+            var absolutePath = Path.GetFullPath(userDataDir);
+            if (!DirAccess.DirExistsAbsolute(absolutePath)) {
+                var dirAccess = DirAccess.Open(basePath);
+                dirAccess.MakeDirRecursive(userDataPath);
+            }
+        }
+        var absoluteUserDataDir = OS.GetUserDataDir();
+        if (DirAccess.DirExistsAbsolute(absoluteUserDataDir)) {
+            try {
+                Directory.Delete(absoluteUserDataDir, true);
+            } catch (IOException e) {
+                GD.PrintErr("Failed to delete old user data link: ", e.Message);
+            }
+        }
+
+        var localUserDataPath = DirAccess.Open(userDataDir);
+        localUserDataPath.CreateLink(localUserDataPath.GetCurrentDir(), absoluteUserDataDir);
     }
 }

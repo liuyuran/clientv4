@@ -14,3 +14,5 @@ src/clientv4/Mods/core/*.dll
 src/clientv4/settings.json
 
 src/clientv4/mods.json
+
+src/clientv4/RuntimeData/

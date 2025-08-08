@@ -28,6 +28,7 @@ public partial class Menu : Control {
     private const ulong MinimumBackActiveTime = 300;
     
     public override void _Ready() {
+        FileUtil.TryCreateUserDataLink("RuntimeData");
         _gameScene = ResourceLoader.Load<PackedScene>("res://scenes/game.tscn");
         PlatformUtil.goDotMode = true;
         _backgroundRect = this.FindNodeByName<TextureRect>("Background");
