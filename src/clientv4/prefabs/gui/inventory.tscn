@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://ep27r0fecolg"]
+[gd_scene load_steps=2 format=3 uid="uid://ep27r0fecolg"]
+
+[ext_resource type="Script" uid="uid://bchx0g0uuwtox" path="res://scripts/gui/InGameUI/background/InventoryBackground.cs" id="1_ts53b"]
 
 [node name="Inventory" type="Control"]
 layout_mode = 3
@@ -22,3 +24,4 @@ theme_override_constants/margin_bottom = 50
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
 layout_mode = 2
+script = ExtResource("1_ts53b")

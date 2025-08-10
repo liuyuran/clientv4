@@ -18,7 +18,7 @@ public partial class SettingBackground : Panel {
         }
 
         // 下方区域的起始 Y 坐标和可用高度
-        var bottomAreaY = margin + topRectHeight + margin;
+        const float bottomAreaY = margin + topRectHeight + margin;
         var bottomAreaHeight = componentSize.Y - bottomAreaY - margin;
 
         if (!(bottomAreaHeight > 2 * cornerRadius)) return;
