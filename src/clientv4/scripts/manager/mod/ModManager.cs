@@ -210,6 +210,16 @@ public class ModManager : IReset, IDisposable {
             }
         }
     }
+    
+    public string GetModPath(string name) {
+        if (_modMetas.TryGetValue(name, out _)) {
+            var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
+            return Path.Combine(basePath, ModDirectory, name);
+        }
+
+        _logger.LogWarning("Mod with name '{Name}' not found.", name);
+        return null;
+    }
 
     public class ModMeta {
         public string displayName { get; init; }

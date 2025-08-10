@@ -100,16 +100,18 @@ public partial class Menu {
         foreach (var child in archiveList.GetChildren()) {
             child.QueueFree();
         }
-
+        
         var archives = ArchiveManager.instance.List();
         foreach (var archive in archives) {
             var item = _singleArchiveItemScene.Instantiate<HBoxContainer>();
             var displayLabel = item.FindNodeByName<RichTextLabel>("DisplayName");
             item.Name = archive.Name;
             displayLabel.Text = archive.Name;
+            item.MouseFilter = MouseFilterEnum.Pass;
             item.Connect(Control.SignalName.MouseEntered, Callable.From(() => { ArchiveItemMouseEntered(item); }));
             item.Connect(Control.SignalName.MouseExited, Callable.From(() => { ArchiveItemMouseExited(item); }));
-            item.Connect(Control.SignalName.GuiInput, Callable.From(() => { ArchiveItemGuiInput(item); }));
+            // connect callable should have the same parameter type and sum as the override signal usage.
+            item.Connect(Control.SignalName.GuiInput, Callable.From((InputEvent @event) => { ArchiveItemGuiInput(item); }));
             archiveList.AddChild(item);
         }
 
@@ -153,6 +155,7 @@ public partial class Menu {
     private void LoadArchiveItemDetailData(string archiveName) {
         // TODO load archive item detail data
         var archiveInfo = _singlePlayMenu.FindNodeByName<RichTextLabel>("ArchiveInfo");
+        archiveInfo.Text = $"Loading details for archive: {archiveName}";
         _logger.LogDebug("Loading archive item detail data for: {name}", archiveName);
     }
 

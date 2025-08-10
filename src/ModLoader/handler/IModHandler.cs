@@ -1,4 +1,6 @@
-﻿namespace ModLoader.handler;
+﻿using ModLoader.scene;
+
+namespace ModLoader.handler;
 
 public interface IModHandler {
     public IArchiveManager GetArchiveManager();
@@ -11,4 +13,5 @@ public interface IModHandler {
     public ICommandManager GetCommandManager();
     public IRecipeManager GetRecipeManager();
     public ISkillManager GetSkillManager();
+    public ISceneManager GetSceneManager();
 }

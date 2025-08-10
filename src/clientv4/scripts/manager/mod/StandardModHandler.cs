@@ -5,9 +5,11 @@ using game.scripts.manager.item;
 using game.scripts.manager.map;
 using game.scripts.manager.menu;
 using game.scripts.manager.recipe;
+using game.scripts.manager.scene;
 using game.scripts.manager.settings;
 using game.scripts.manager.skill;
 using ModLoader.handler;
+using ModLoader.scene;
 
 namespace game.scripts.manager.mod;
 
@@ -50,5 +52,9 @@ public class StandardModHandler : IModHandler {
 
     public ISkillManager GetSkillManager() {
         return SkillManager.instance;
+    }
+
+    public ISceneManager GetSceneManager() {
+        return SceneManager.instance;
     }
 }

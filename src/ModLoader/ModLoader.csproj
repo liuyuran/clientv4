@@ -14,8 +14,6 @@
 
     <ItemGroup>
       <Folder Include="map\" />
-      <Folder Include="recipe\" />
-      <Folder Include="skill\" />
     </ItemGroup>
 
 </Project>

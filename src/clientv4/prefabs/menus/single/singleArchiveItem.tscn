@@ -16,6 +16,7 @@ size_flags_vertical = 3
 clip_contents = false
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 1
 bbcode_enabled = true
 text = "121212"
 fit_content = true

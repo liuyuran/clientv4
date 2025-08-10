@@ -1,4 +1,15 @@
-[gd_scene format=3 uid="uid://coc2dqudywcoq"]
+[gd_scene load_steps=5 format=3 uid="uid://coc2dqudywcoq"]
+
+[ext_resource type="Script" uid="uid://b6nu36qchoek6" path="res://scripts/start/background/SinglePlayerBackground.cs" id="1_uhpld"]
+
+[sub_resource type="Gradient" id="Gradient_m6xxt"]
+colors = PackedColorArray(0.56985, 0.625954, 0.528781, 1, 0.568627, 0.627451, 0.529412, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rf50a"]
+gradient = SubResource("Gradient_m6xxt")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ibos2"]
+texture = SubResource("GradientTexture1D_rf50a")
 
 [node name="Multi-player" type="Control"]
 layout_mode = 3
@@ -7,3 +18,93 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Back" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_ibos2")
+script = ExtResource("1_uhpld")
+
+[node name="Panel" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 45
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
+layout_mode = 2
+
+[node name="ArchiveBox" type="VBoxContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+
+[node name="CreateWorld2" type="Button" parent="Panel/HBoxContainer/ArchiveBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "搜索本地网络"
+
+[node name="CreateWorld" type="Button" parent="Panel/HBoxContainer/ArchiveBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "新增连接配置"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/HBoxContainer/ArchiveBox"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ServerList" type="VBoxContainer" parent="Panel/HBoxContainer/ArchiveBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 80
+theme_override_constants/margin_right = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_bottom = 60
+
+[node name="InfoScroll" type="ScrollContainer" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InfoBox" type="VBoxContainer" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/InfoScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ServerInfo" type="RichTextLabel" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/MarginContainer/InfoScroll/InfoBox"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="ConnectButton" type="Button" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "连接"
+
+[node name="DeleteButton" type="Button" parent="Panel/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "删除配置"

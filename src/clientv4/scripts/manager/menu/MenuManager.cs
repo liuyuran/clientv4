@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using game.scripts.manager.mod;
 using game.scripts.manager.reset;
+using game.scripts.manager.scene;
 using game.scripts.utils;
 using Godot;
 using ModLoader;
@@ -14,10 +16,17 @@ public class MenuManager: IReset, IDisposable, IMenuManager {
     private List<MenuGroupItem> _menus = [];
 
     private MenuManager() {
-        AddMenuGroup("system", 1);
+        AddMenuGroup("character", 0);
+        AddMenuItem("character", "inventory",
+            () => I18N.Tr("core", "menu.character.inventory"), 1,
+            () => I18N.Tr("core", "menu.character.inventory.desc"), () => {
+                SceneManager.instance.OpenSceneModal("res://prefabs/gui/inventory.tscn");
+            });
+        AddMenuGroup("system", int.MaxValue);
         AddMenuItem("system", "back-to-start",
             () => I18N.Tr("core", "menu.system.back-to-start"), 1,
             () => I18N.Tr("core", "menu.system.back-to-start.desc"), () => {
+                ModManager.instance.OnStopGame();
                 GameNodeReference.CurrentScene.GetTree().ChangeSceneToPacked(GameNodeReference.StartScenePacked);
             });
         AddMenuItem("system", "exit",
@@ -27,17 +36,17 @@ public class MenuManager: IReset, IDisposable, IMenuManager {
             });
     }
     
-    public void AddMenuGroup(string id, short order = -1) {
+    public void AddMenuGroup(string id, int order = -1) {
         var group = new MenuGroupItem {
             Id = id,
             Children = [],
-            ListOrder = order >= 0 ? order : (short)_menus.Count
+            ListOrder = order >= 0 ? order : _menus.Count
         };
         
         _menus.Add(group);
     }
     
-    public void AddMenuItem(string groupId, string itemId, GetString itemName, short order, GetString description, Action action) {
+    public void AddMenuItem(string groupId, string itemId, GetString itemName, int order, GetString description, Action action) {
         var group = _menus.Find(g => g.Id == groupId);
         if (group.Id == null) {
             GD.PrintErr($"Menu group {groupId} not found.");
@@ -48,7 +57,7 @@ public class MenuManager: IReset, IDisposable, IMenuManager {
             Id = itemId,
             Name = itemName,
             Action = action,
-            ListOrder = order >= 0 ? order : (short)group.Children.Count,
+            ListOrder = order >= 0 ? order : group.Children.Count,
             Description = description
         };
         
@@ -96,14 +105,14 @@ public class MenuManager: IReset, IDisposable, IMenuManager {
     private struct MenuGroupItem {
         public string Id;
         public List<MenuItem> Children;
-        public short ListOrder;
+        public int ListOrder;
     }
     
     public struct MenuItem {
         public string Id;
         public GetString Name;
         public Action Action;
-        public short ListOrder;
+        public int ListOrder;
         public GetString Description;
     }
 

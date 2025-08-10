@@ -1,4 +1,5 @@
 ﻿using game.scripts.config;
+using game.scripts.manager.scene;
 using Godot;
 
 namespace game.scripts.gui.InGameUI;
@@ -27,12 +28,17 @@ public partial class InGamingUI {
         if (_status.Focus != InGameUIFocus.Pause) {
             return;
         }
-        if (InputManager.instance.IsKeyPressed(InputKey.UICancel) && _pauseUI != null && Time.GetTicksMsec() - _lastPauseTime > 500) {
-            Input.MouseMode = Input.MouseModeEnum.Captured;
-            _pauseUI.QueueFree();
-            _pauseUI = null;
-            _status.Focus = InGameUIFocus.Game;
+
+        if (!InputManager.instance.IsKeyPressed(InputKey.UICancel) || _pauseUI == null || Time.GetTicksMsec() - _lastPauseTime <= 500) return;
+        var result = SceneManager.instance.TryCloseSceneModal();
+        if (result) {
             _lastPauseTime = Time.GetTicksMsec();
+            return;
         }
+        Input.MouseMode = Input.MouseModeEnum.Captured;
+        _pauseUI.QueueFree();
+        _pauseUI = null;
+        _status.Focus = InGameUIFocus.Game;
+        _lastPauseTime = Time.GetTicksMsec();
     }
 }
