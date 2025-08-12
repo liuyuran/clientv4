@@ -1,6 +1,4 @@
-﻿using ModLoader.scene;
-
-namespace ModLoader.handler;
+﻿namespace ModLoader.handler;
 
 public interface IModHandler {
     public IArchiveManager GetArchiveManager();

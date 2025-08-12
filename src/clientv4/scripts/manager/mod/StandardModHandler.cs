@@ -9,7 +9,6 @@ using game.scripts.manager.scene;
 using game.scripts.manager.settings;
 using game.scripts.manager.skill;
 using ModLoader.handler;
-using ModLoader.scene;
 
 namespace game.scripts.manager.mod;
 

@@ -6,6 +6,7 @@ using game.scripts.manager.mod;
 using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
+using ModLoader.handler;
 using ModLoader.scene;
 using FileAccess = Godot.FileAccess;
 
@@ -46,16 +47,18 @@ public class SceneManager : IReset, ISceneManager, IDisposable {
         return null;
     }
 
-    public void OpenSceneModal(string mod, string path) {
+    public void OpenSceneModal(string mod, string path, NodeController controller) {
         var modal = Instantiate(mod, path);
         if (modal == null) return;
+        modal.SetScript(new BridgeNode(controller));
         GameNodeReference.UI.AddChild(modal);
         _modalStack.Push(modal);
     }
     
-    public void OpenSceneModal(string path) {
+    public void OpenSceneModal(string path, NodeController controller) {
         var modal = ResourceLoader.Load<PackedScene>(path)?.Instantiate<Control>();
         if (modal == null) return;
+        modal.SetScript(new BridgeNode(controller));
         GameNodeReference.UI.AddChild(modal);
         modal.MouseFilter = Control.MouseFilterEnum.Pass;
         _modalStack.Push(modal);

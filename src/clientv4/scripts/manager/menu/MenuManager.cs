@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using game.scripts.manager.menu.controller;
 using game.scripts.manager.mod;
 using game.scripts.manager.reset;
 using game.scripts.manager.scene;
@@ -20,7 +21,7 @@ public class MenuManager: IReset, IDisposable, IMenuManager {
         AddMenuItem("character", "inventory",
             () => I18N.Tr("core", "menu.character.inventory"), 1,
             () => I18N.Tr("core", "menu.character.inventory.desc"), () => {
-                SceneManager.instance.OpenSceneModal("res://prefabs/gui/inventory.tscn");
+                SceneManager.instance.OpenSceneModal("res://prefabs/gui/inventory.tscn", new InventoryController());
             });
         AddMenuGroup("system", int.MaxValue);
         AddMenuItem("system", "back-to-start",
