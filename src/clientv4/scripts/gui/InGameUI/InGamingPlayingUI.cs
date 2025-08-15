@@ -38,14 +38,9 @@ public partial class InGamingUI {
         chatScroll.InGamingUIInstance = this;
         _playingUI.FindNodeByName<Panel>("debug");
     }
-
-    private void ClosePlayingUI() {
-        _playingUI.QueueFree();
-        _playingUI = null;
-    }
     
     private void UpdatePlayingUI(double delta) {
-        if (_playingUI == null) return;
+        if (_playingUI == null || GameStatus.currentStatus != GameStatus.Status.Playing) return;
         if (InputManager.instance.IsKeyPressed(InputKey.SwitchDebugInfo) && _showDebugLogKeyReleased) {
             _debugInfo.Visible = !_debugInfo.Visible;
         } else {
@@ -54,7 +49,7 @@ public partial class InGamingUI {
     }
 
     private void HandleInputOnPlayerUI(InputEvent @event) {
-        if (_playingUI == null) return;
+        if (_playingUI == null || GameStatus.currentStatus != GameStatus.Status.Playing) return;
         if (InputManager.instance.IsKeyPressed(InputKey.SwitchPlayerList, @event)) {
             if (PlatformUtil.isNetworkMaster) {
                 var (players, ping) = GetPlayerList();
