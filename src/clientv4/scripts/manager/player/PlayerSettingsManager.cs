@@ -15,12 +15,17 @@ public class PlayerSettingsManager {
     private const string SettingsFile = "player-settings.json";
     private PlayerSettings _settings;
     
-    public struct PlayerSettings {
-        public ActionBarSettings ActionBar;
+    public class PlayerSettings {
+        public ActionBarSettings ActionBar = new() {
+            Mode = ActionBarMode.Keyboard
+        };
     }
     
     private PlayerSettingsManager() {
+        _settings = null;
         ReloadSettings();
+        if (_settings != null) return;
+        _settings = new PlayerSettings();
     }
 
     public PlayerSettings GetSettings() {

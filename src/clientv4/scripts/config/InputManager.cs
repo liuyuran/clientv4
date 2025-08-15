@@ -128,7 +128,7 @@ public class InputManager {
             return;
         }
 
-        if (direction < 0 || direction > 3) {
+        if (direction is < 0 or > 3) {
             GD.PushError("Invalid D-pad direction. Must be 0-3.");
             return;
         }
