@@ -9,17 +9,12 @@
 
     <ItemGroup>
       <PackageReference Include="DotnetNoise" Version="1.0.0" />
+      <PackageReference Include="GodotSharp" Version="4.4.1" />
       <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.6" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="map\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="GodotSharp">
-        <HintPath>..\..\..\..\IDE\godot-4.4.1-stable\bin\GodotSharp\Api\Debug\GodotSharp.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>
