@@ -1,15 +1,7 @@
-﻿using ModLoader.scene;
+﻿using Godot;
 
 namespace game.scripts.manager.menu.controller;
 
-public class InventoryController: NodeController {
-    public InventoryController()
-    {
-        ClickEvent += HandleClick;
-    }
-
-    private void HandleClick(string name)
-    {
-        //
-    }
+public partial class InventoryController: Control {
+    
 }

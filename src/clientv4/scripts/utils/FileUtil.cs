@@ -49,6 +49,7 @@ public static class FileUtil {
         return Encoding.UTF8.GetString(fileBytes);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1416:Validate platform compatibility", Justification = "This method is intended for use in different platform via multiple branch.")]
     public static bool TryCreateUserDataLink(string userDataPath, Node env) {
         var basePath = OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
         var userDataDir = Path.Combine(basePath, userDataPath);
@@ -74,8 +75,7 @@ public static class FileUtil {
         // 判断是否为Windows系统
         if (OS.GetName() == "Windows") {
             // 检查是否为管理员模式
-            var isAdmin = new WindowsPrincipal(WindowsIdentity.GetCurrent())
-                .IsInRole(WindowsBuiltInRole.Administrator);
+            var isAdmin = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
             if (!isAdmin) {
                 // 申请管理员权限并重启自身

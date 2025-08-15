@@ -47,19 +47,19 @@ public class SceneManager : IReset, ISceneManager, IDisposable {
         return null;
     }
 
-    public void OpenSceneModal(string mod, string path, NodeController controller) {
+    public void OpenSceneModal(string mod, string path, Node node) {
         var modal = Instantiate(mod, path);
         if (modal == null) return;
-        modal.SetScript(new BridgeNode(controller));
         GameNodeReference.UI.AddChild(modal);
+        modal.SetScript(node);
         _modalStack.Push(modal);
     }
     
-    public void OpenSceneModal(string path, NodeController controller) {
+    public void OpenSceneModal(string path, Node node) {
         var modal = ResourceLoader.Load<PackedScene>(path)?.Instantiate<Control>();
         if (modal == null) return;
-        modal.SetScript(new BridgeNode(controller));
         GameNodeReference.UI.AddChild(modal);
+        modal.SetScript(node);
         modal.MouseFilter = Control.MouseFilterEnum.Pass;
         _modalStack.Push(modal);
     }
