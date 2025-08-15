@@ -33,7 +33,6 @@ public partial class Loading : CanvasLayer {
 				_text.Text = "[center]Loading...[/center]";
 				break;
 			case GameStatus.Status.Playing:
-			case GameStatus.Status.Starting:
 			case GameStatus.Status.StartMenu:
 			default:
 				Visible = false;

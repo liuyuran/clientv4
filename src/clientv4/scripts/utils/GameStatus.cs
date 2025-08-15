@@ -2,11 +2,10 @@
 
 public static class GameStatus {
     public enum Status {
-        Starting,
-        StartMenu,
-        Loading,
-        Typing,
-        Playing
+        StartMenu, // in the start menu
+        Loading, // in loading screen
+        Typing, // game is in input to chat window state
+        Playing // game is in the main play state
     }
     
     public static Status currentStatus { get; private set; } = Status.Loading;

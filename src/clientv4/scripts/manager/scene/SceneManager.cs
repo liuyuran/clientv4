@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using game.scripts.config;
 using game.scripts.manager.mod;
 using game.scripts.manager.reset;
 using game.scripts.utils;
 using Godot;
 using ModLoader.handler;
-using ModLoader.scene;
 using FileAccess = Godot.FileAccess;
 
 namespace game.scripts.manager.scene;

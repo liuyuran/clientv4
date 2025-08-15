@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using game.scripts.manager;
 using game.scripts.manager.settings;
 using game.scripts.utils;
 using Godot;

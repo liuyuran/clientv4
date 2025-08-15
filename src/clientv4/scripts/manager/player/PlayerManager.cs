@@ -120,6 +120,7 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
                 playerId = _nextPlayerId++
             };
         }
+
         var json = System.Text.Encoding.UTF8.GetString(bytes);
         var jsonItem = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
         if (jsonItem == null) {
@@ -131,6 +132,7 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
                 playerId = _nextPlayerId++
             };
         }
+
         var playerInfo = new PlayerInfo {
             uuid = uuid,
             nickname = nickname,

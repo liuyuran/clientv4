@@ -5,7 +5,6 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using Godot;
-using Environment = Godot.Environment;
 
 namespace game.scripts.utils;
 

@@ -3,7 +3,6 @@ using System.Linq;
 using game.scripts.manager.blocks;
 using game.scripts.manager.item;
 using game.scripts.manager.reset;
-using game.scripts.utils;
 using Godot;
 using Godot.Collections;
 using Microsoft.Extensions.Logging;

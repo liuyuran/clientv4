@@ -5,7 +5,6 @@ using game.scripts.manager;
 using game.scripts.manager.map;
 using game.scripts.manager.player;
 using game.scripts.renderer;
-using game.scripts.server.ECSBridge.gravity;
 using game.scripts.server.ECSBridge.input;
 using game.scripts.utils;
 using Godot;

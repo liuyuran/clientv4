@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
@@ -31,6 +30,8 @@ public class InputManager {
     }
 
     private InputManager() {
+        RegistryKeyBind(InputKey.SwitchDebugInfo, Key.F4);
+        RegistryKeyBind(InputKey.SwitchPlayerList, Key.Tab);
         RegistryKeyBind(InputKey.MoveForward, Key.W);
         RegistryKeyBind(InputKey.MoveBackward, Key.S);
         RegistryKeyBind(InputKey.MoveLeft, Key.A);
@@ -40,7 +41,7 @@ public class InputManager {
         RegistryKeyBind(InputKey.Crouch, Key.Ctrl);
         RegistryJoystickButtonBind(InputKey.Crouch, JoyButton.B);
         RegistryKeyBind(InputKey.Pause, Key.Escape);
-        RegistryJoystickButtonBind(InputKey.Crouch, JoyButton.Start);
+        RegistryJoystickButtonBind(InputKey.Pause, JoyButton.Start);
         RegistryDPadBind(InputKey.MoveForward, 0, (int)DPadDirection.Up);
         RegistryDPadBind(InputKey.MoveBackward, 0, (int)DPadDirection.Down);
         RegistryDPadBind(InputKey.MoveLeft, 0, (int)DPadDirection.Left);

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using game.scripts.config;
-using game.scripts.manager;
 using game.scripts.manager.menu;
 using game.scripts.utils;
 using Godot;

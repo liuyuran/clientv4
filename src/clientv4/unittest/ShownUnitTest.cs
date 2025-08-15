@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using game.scripts.config;
-using game.unittest.manager;
 using Godot;
 
 namespace game.unittest;

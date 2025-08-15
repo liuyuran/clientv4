@@ -1,6 +1,5 @@
 ﻿using game.scripts.config;
 using game.scripts.gui.InGameUI.component;
-using game.scripts.manager;
 using game.scripts.manager.chat;
 using game.scripts.manager.player;
 using game.scripts.utils;
@@ -47,18 +46,16 @@ public partial class InGamingUI {
     
     private void UpdatePlayingUI(double delta) {
         if (_playingUI == null) return;
-        /*if (InputManager.instance.IsKeyPressed(InputKey.SwitchDebugInfo) && _showDebugLogKeyReleased) {
-            _config.ShowDebugInfo = !_config.ShowDebugInfo;
+        if (InputManager.instance.IsKeyPressed(InputKey.SwitchDebugInfo) && _showDebugLogKeyReleased) {
+            _debugInfo.Visible = !_debugInfo.Visible;
         } else {
             _showDebugLogKeyReleased = true;
         }
-        
-        _debugInfo.Visible = _config.ShowDebugInfo;*/
     }
 
     private void HandleInputOnPlayerUI(InputEvent @event) {
         if (_playingUI == null) return;
-        if (@event is InputEventKey eventKey && eventKey.IsPressed() && eventKey.Keycode == Key.Tab) {
+        if (InputManager.instance.IsKeyPressed(InputKey.SwitchPlayerList, @event)) {
             if (PlatformUtil.isNetworkMaster) {
                 var (players, ping) = GetPlayerList();
                 ShowPlayerList(players, ping);
@@ -68,7 +65,7 @@ public partial class InGamingUI {
         }
     }
 
-    /* well, because that all panel is prefab now, sometimes they may not be in the node tree, so rpc method must be place in here */
+    /* well, because that all panels are prefab now, sometimes they may not be in the node tree, so rpc method must be place in here */
     
     /// <summary>
     /// Server broadcast chat message.

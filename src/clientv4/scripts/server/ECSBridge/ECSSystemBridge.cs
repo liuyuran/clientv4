@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
-using game.scripts.config;
-using game.scripts.manager;
 using game.scripts.manager.map;
 using game.scripts.manager.player;
 using game.scripts.server.ECSBridge.block;
