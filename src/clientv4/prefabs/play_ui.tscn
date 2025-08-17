@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://d0hob8q7d1mgt"]
+[gd_scene load_steps=5 format=3 uid="uid://d0hob8q7d1mgt"]
 
 [ext_resource type="Script" uid="uid://d4igu4hbil66m" path="res://scripts/gui/InGameUI/component/DebugInfo.cs" id="1_72yxq"]
 [ext_resource type="Script" uid="uid://cggymnu4qij1o" path="res://scripts/gui/InGameUI/component/ChatScroll.cs" id="2_a7jcy"]
+[ext_resource type="PackedScene" uid="uid://cgpsw7fehl4cg" path="res://prefabs/gui/action-bar.tscn" id="3_a7jcy"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xry13"]
 
@@ -71,3 +72,11 @@ layout_mode = 2
 [node name="MsgInput" type="LineEdit" parent="chat/box/InputBox"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="ActionBar" parent="." instance=ExtResource("3_a7jcy")]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+grow_vertical = 0

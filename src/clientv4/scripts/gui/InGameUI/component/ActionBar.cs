@@ -10,6 +10,7 @@ namespace game.scripts.gui.InGameUI.component;
 /// gamepad/keyboard action bar
 /// </summary>
 public partial class ActionBar: Panel {
+    [Export] private PackedScene _actionBarItem;
     private PlayerSettingsManager.PlayerSettings settings => PlayerSettingsManager.instance.GetSettings();
     private Panel _keyboardActionBar;
     private Panel _gamepadActionBar;
@@ -18,6 +19,7 @@ public partial class ActionBar: Panel {
     public override void _Ready() {
         _keyboardActionBar = this.FindNodeByName<Panel>("KeyboardActionBar");
         _gamepadActionBar = this.FindNodeByName<Panel>("GamepadActionBar");
+        UpdateActionBar();
         for (var i = 0; i < 32; i++) {
             var area = (ActionArea) Mathf.FloorToInt(i / 8);
             var btn = _gamepadActionBar.FindNodeByName<Button>("GamepadBtn" + (i + 1));
@@ -27,14 +29,24 @@ public partial class ActionBar: Panel {
                 OnGamePadButtonPressed(index % 8);
             };
         }
-        UpdateActionBar();
     }
 
     private void UpdateActionBar() {
         _keyboardActionBar.Visible = settings.ActionBar.Mode == ActionBarMode.Keyboard;
         _gamepadActionBar.Visible = settings.ActionBar.Mode == ActionBarMode.Gamepad;
-        ClearAndFillIconToActionBar();
+        UpdateActionBarGamepad();
+        UpdateActionBarKeyboard();
     }
+
+    private void UpdateActionBarGamepad() {
+        for (var i = 0; i < 32; i++) {
+            var area = (ActionArea) Mathf.FloorToInt(i / 8);
+            var btn = _gamepadActionBar.FindNodeByName<Button>("GamepadBtn" + (i + 1));
+            // TODO draw
+        }
+    }
+    
+    private void UpdateActionBarKeyboard() {}
 
     public override void _Process(double delta) {
         if (GameStatus.currentStatus != GameStatus.Status.Playing) return;
@@ -55,14 +67,6 @@ public partial class ActionBar: Panel {
 
     private void OnActiveAction(ref List<ActionItem> item, int index) {
         //
-    }
-
-    private void ClearAndFillIconToActionBar() {
-        for (var i = 0; i < 32; i++) {
-            var area = (ActionArea) Mathf.FloorToInt(i / 8);
-            var btn = _gamepadActionBar.FindNodeByName<Button>("GamepadBtn" + (i + 1));
-            // TODO draw
-        }
     }
 
     private enum ActionArea {

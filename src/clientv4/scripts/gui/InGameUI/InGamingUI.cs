@@ -13,7 +13,12 @@ public partial class InGamingUI: CanvasLayer {
     private LineEdit _msgInput;
     private ulong _lastActiveInputTime;
     private const ulong MinInputInterval = 500;
-		
+
+    private void AddChild(Node child) {
+        var box = this.FindNodeByName<Control>("Root");
+        box.AddChild(child);
+    }
+    
     public override void _Ready() {
         GameNodeReference.UI = this;
         ProcessMode = ProcessModeEnum.Always;
@@ -55,9 +60,8 @@ public partial class InGamingUI: CanvasLayer {
                 HandleInputOnPlayerUI(@event);
                 break;
             case InGameUIFocus.Pause:
-                break;
             default:
-                throw new ArgumentOutOfRangeException();
+                break;
         }
     }
 }

@@ -1,5 +1,6 @@
-[gd_scene load_steps=14 format=3 uid="uid://2v7krsjntfq"]
+[gd_scene load_steps=15 format=3 uid="uid://2v7krsjntfq"]
 
+[ext_resource type="Theme" uid="uid://8xr0shky8lla" path="res://theme/global.tres" id="1_r8uic"]
 [ext_resource type="Script" uid="uid://joix6a68lgkw" path="res://scripts/start/Menu.cs" id="1_u80x2"]
 [ext_resource type="PackedScene" uid="uid://cn4ppnh48p74l" path="res://prefabs/menus/about.tscn" id="2_4ge6i"]
 [ext_resource type="Texture2D" uid="uid://bes6p7rsfglhp" path="res://assets/start-menu-back.png" id="2_u80x2"]
@@ -21,6 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_r8uic")
 script = ExtResource("1_u80x2")
 _aboutPanelScene = ExtResource("2_4ge6i")
 _modPanelScene = ExtResource("3_8itgj")

@@ -27,6 +27,10 @@ file_logging/max_log_files=0
 
 project/assembly_name="Clientv4"
 
+[gui]
+
+theme/custom="uid://8xr0shky8lla"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

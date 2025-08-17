@@ -1,0 +1,64 @@
+[gd_scene load_steps=2 format=3 uid="uid://mjf24a4l4t8g"]
+
+[ext_resource type="PackedScene" uid="uid://jf8225evjsyu" path="res://prefabs/gui/action-bar-item.tscn" id="1_nybs5"]
+
+[node name="ActionBarGroup" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ActionBarItem" parent="." instance=ExtResource("1_nybs5")]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 15.0
+offset_top = 40.0
+offset_right = 55.0
+offset_bottom = 80.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="ActionBarItem2" parent="." instance=ExtResource("1_nybs5")]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 110.0
+offset_top = 40.0
+offset_right = 150.0
+offset_bottom = 80.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="ActionBarItem3" parent="." instance=ExtResource("1_nybs5")]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 61.0
+offset_top = 18.0
+offset_right = 101.0
+offset_bottom = 58.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="ActionBarItem4" parent="." instance=ExtResource("1_nybs5")]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 62.0
+offset_top = 68.0
+offset_right = 102.0
+offset_bottom = 108.0
+grow_horizontal = 1
+grow_vertical = 1

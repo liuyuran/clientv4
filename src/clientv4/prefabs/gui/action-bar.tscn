@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://cgpsw7fehl4cg"]
+
+[ext_resource type="Script" uid="uid://cnnva5bt1x7mn" path="res://scripts/gui/InGameUI/component/ActionBar.cs" id="1_dr016"]
+[ext_resource type="PackedScene" uid="uid://jf8225evjsyu" path="res://prefabs/gui/action-bar-item.tscn" id="2_wg5ru"]
+
+[node name="ActionBar" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dr016")
+_actionBarItem = ExtResource("2_wg5ru")
+
+[node name="KeyboardActionBar" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GamepadActionBar" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
