@@ -84,6 +84,8 @@ public partial class BuildInServer : Node {
         if (PlatformUtil.isNetworkMaster) {
             var peerId = Multiplayer.GetRemoteSenderId();
             PlayerManager.instance.RegisterPlayer(peerId, uuid, nickname);
+            var playerInfo = PlayerManager.instance.GetPlayerByPeerId(peerId);
+            RpcId(peerId, MethodName.SyncPlayerInfo, playerInfo.playerId);
         }
     }
 
@@ -94,6 +96,10 @@ public partial class BuildInServer : Node {
     private void OnConnectOk() {
         GD.Print("Connected to server successfully.");
         Rpc(MethodName.LoginAsPlayer, GetUuid(), GetNickname());
+    }
+
+    private void SyncPlayerInfo(ulong playerId) {
+        PlayerManager.instance.SetCurrentPlayerId(playerId);
     }
 
     private void OnConnectionFail() {

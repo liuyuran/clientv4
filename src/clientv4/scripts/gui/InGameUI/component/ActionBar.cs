@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using game.scripts.manager.item;
 using game.scripts.manager.player;
 using game.scripts.manager.player.settings;
 using game.scripts.utils;
@@ -10,7 +11,7 @@ namespace game.scripts.gui.InGameUI.component;
 /// gamepad/keyboard action bar
 /// </summary>
 public partial class ActionBar: Panel {
-    [Export] private PackedScene _actionBarItem;
+    [Export] public PackedScene ActionItem;
     private PlayerSettingsManager.PlayerSettings settings => PlayerSettingsManager.instance.GetSettings();
     private Panel _keyboardActionBar;
     private Panel _gamepadActionBar;
@@ -39,14 +40,27 @@ public partial class ActionBar: Panel {
     }
 
     private void UpdateActionBarGamepad() {
-        for (var i = 0; i < 32; i++) {
-            var area = (ActionArea) Mathf.FloorToInt(i / 8);
-            var btn = _gamepadActionBar.FindNodeByName<Button>("GamepadBtn" + (i + 1));
-            // TODO draw
+        // nothing to do
+    }
+
+    private void UpdateActionBarKeyboard() {
+        var childCount = (ulong)_keyboardActionBar.GetChildCount();
+        var actionBarCount = InventoryManager.instance.GetToolSlotCount(PlayerManager.instance.GetCurrentPlayerId());
+        if (childCount == actionBarCount) return;
+        var children = _keyboardActionBar.GetChildren();
+        // remove if more
+        if (childCount > actionBarCount) {
+            for (var i = childCount - 1; i >= actionBarCount; i--) {
+                _keyboardActionBar.RemoveChild(children[(int)i]);
+            }
+            return;
+        }
+        // add if less
+        for (var i = (ulong) 0; i < actionBarCount - childCount; i++) {
+            var instance = ActionItem.Instantiate<Node>();
+            _keyboardActionBar.AddChild(instance);
         }
     }
-    
-    private void UpdateActionBarKeyboard() {}
 
     public override void _Process(double delta) {
         if (GameStatus.currentStatus != GameStatus.Status.Playing) return;

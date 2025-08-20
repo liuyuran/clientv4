@@ -20,6 +20,7 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
     private readonly Dictionary<ulong, PlayerInfo> _playersById = new();
     private readonly HashSet<(ulong playerId, ulong worldId, Vector3I chunkPosition)> _sentChunks = [];
     private ulong _nextPlayerId = 1;
+    private ulong _currentPlayerId = 0;
 
     /// <summary>
     /// only execute on the server or network master, need to read data from archive files
@@ -93,6 +94,14 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
     public void Reset() {
         instance = new PlayerManager();
         Dispose();
+    }
+
+    public void SetCurrentPlayerId(ulong playerId) {
+        _currentPlayerId = playerId;   
+    }
+
+    public ulong GetCurrentPlayerId() {
+        return _currentPlayerId;
     }
 
     public void Dispose() {
