@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://ep27r0fecolg"]
+[gd_scene load_steps=3 format=3 uid="uid://ep27r0fecolg"]
 
-[ext_resource type="Script" uid="uid://bchx0g0uuwtox" path="res://scripts/gui/InGameUI/background/InventoryBackground.cs" id="1_ts53b"]
+[ext_resource type="Script" uid="uid://bchx0g0uuwtox" path="res://scripts/gui/InGameUI/component/Inventory.cs" id="1_ts53b"]
+[ext_resource type="PackedScene" uid="uid://cfnilx1ux2n2n" path="res://prefabs/gui/inventory-item.tscn" id="2_p2ikj"]
 
 [node name="Inventory" type="Control"]
 layout_mode = 3
@@ -24,4 +25,17 @@ theme_override_constants/margin_bottom = 50
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
 layout_mode = 2
+theme_type_variation = &"InGamingPanel"
 script = ExtResource("1_ts53b")
+_inventoryItem = ExtResource("2_p2ikj")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ItemBox" type="GridContainer" parent="MarginContainer/Panel/MarginContainer"]
+layout_mode = 2
