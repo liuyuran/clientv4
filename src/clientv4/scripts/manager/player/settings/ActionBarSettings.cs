@@ -7,9 +7,13 @@ public enum ActionBarMode {
     Gamepad
 }
 
+public enum ActionItemType {
+    Item
+}
+
 public struct ActionItem {
-    public string Type;
-    public string Id;
+    public ActionItemType Type;
+    public ulong Id;
 }
 
 public struct ActionBarSettings {

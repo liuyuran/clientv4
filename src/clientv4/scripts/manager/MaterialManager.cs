@@ -16,6 +16,7 @@ public class MaterialManager: IReset, IDisposable {
     public static MaterialManager instance { get; private set; } = new();
     private readonly Dictionary<ulong, Dictionary<Direction, Vector2[]>> _uvs = new();
     private readonly Dictionary<ulong, Dictionary<Direction, Vector2[]>> _itemUvs = new();
+    private readonly Dictionary<ulong, Texture2D> _itemTextures = new();
     private Material _defaultMaterial;
     private ShaderMaterial _defaultWaterMaterial;
     private Material _defaultItemMaterial;
@@ -28,6 +29,7 @@ public class MaterialManager: IReset, IDisposable {
         _defaultWaterMaterial = GenerateWaterShaderMaterial();
         _logger.LogDebug("Default water material generated with shader: {Shader}", _defaultWaterMaterial.Shader);
         _itemUvs.Clear();
+        _itemTextures.Clear();
         _defaultItemMaterial = new StandardMaterial3D();
         GenerateItemTexture();
         _logger.LogDebug("Default item material generated with texture: {Texture}", ((StandardMaterial3D)_defaultItemMaterial).AlbedoTexture);
@@ -200,7 +202,6 @@ public class MaterialManager: IReset, IDisposable {
         var itemManager = ItemManager.instance;
 
         // 收集所有物品纹理
-        var textures = new Dictionary<ulong, Texture2D>();
         foreach (var itemId in itemManager.GetItemIds()) {
             var item = itemManager.GetItem(itemId);
             var texturePath = item.iconPath;
@@ -214,16 +215,16 @@ public class MaterialManager: IReset, IDisposable {
                 continue;
             }
 
-            textures[itemId] = texture;
+            _itemTextures[itemId] = texture;
         }
 
-        if (textures.Count == 0) {
+        if (_itemTextures.Count == 0) {
             GD.PrintErr("没有找到有效的纹理！");
             return;
         }
 
         // 创建纹理图集
-        var atlasTexture = CreateItemTextureAtlas(textures, out var uvCoordinates);
+        var atlasTexture = CreateItemTextureAtlas(_itemTextures, out var uvCoordinates);
 
         // 设置材质
         ((StandardMaterial3D)_defaultItemMaterial).AlbedoTexture = atlasTexture;
@@ -389,6 +390,14 @@ public class MaterialManager: IReset, IDisposable {
 
     public Material GetItemMaterial() {
         return _defaultItemMaterial;
+    }
+    
+    public Texture2D GetItemTexture(ulong itemId) {
+        if (!_itemTextures.TryGetValue(itemId, out var texture)) {
+            throw new Exception($"ItemId {itemId} not found");
+        }
+
+        return texture;
     }
 
     public Vector2[] GetItemUVs(ulong itemId, Direction direction) {

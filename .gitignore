@@ -16,3 +16,5 @@ src/clientv4/settings.json
 src/clientv4/mods.json
 
 src/clientv4/RuntimeData/
+
+.idea/.idea.Clientv4/.idea/libraries/

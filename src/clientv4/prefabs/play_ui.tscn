@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://d0hob8q7d1mgt"]
+[gd_scene load_steps=6 format=3 uid="uid://d0hob8q7d1mgt"]
 
 [ext_resource type="Script" uid="uid://d4igu4hbil66m" path="res://scripts/gui/InGameUI/component/DebugInfo.cs" id="1_72yxq"]
 [ext_resource type="Script" uid="uid://cggymnu4qij1o" path="res://scripts/gui/InGameUI/component/ChatScroll.cs" id="2_a7jcy"]
 [ext_resource type="PackedScene" uid="uid://cgpsw7fehl4cg" path="res://prefabs/gui/action-bar.tscn" id="3_a7jcy"]
+[ext_resource type="PackedScene" uid="uid://jf8225evjsyu" path="res://prefabs/gui/action-bar-item.tscn" id="4_476ha"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xry13"]
 
@@ -39,7 +40,7 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_top = -175.0
-offset_right = 356.0
+offset_right = 310.0
 grow_vertical = 0
 script = ExtResource("2_a7jcy")
 
@@ -79,4 +80,12 @@ anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -236.0
+offset_top = -170.0
+offset_right = 649.0
+offset_bottom = 130.0
+grow_horizontal = 2
 grow_vertical = 0
+scale = Vector2(0.5, 0.5)
+ActionItem = ExtResource("4_476ha")

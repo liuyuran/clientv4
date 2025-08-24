@@ -17,7 +17,9 @@ public class PlayerSettingsManager {
     
     public class PlayerSettings {
         public ActionBarSettings ActionBar = new() {
-            Mode = ActionBarMode.Keyboard
+            Mode = ActionBarMode.Gamepad,
+            GamePadItems = [],
+            KeyboardItems = []
         };
     }
     

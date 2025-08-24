@@ -1,20 +1,16 @@
 [gd_scene load_steps=3 format=3 uid="uid://cgpsw7fehl4cg"]
 
 [ext_resource type="Script" uid="uid://cnnva5bt1x7mn" path="res://scripts/gui/InGameUI/component/ActionBar.cs" id="1_dr016"]
-[ext_resource type="PackedScene" uid="uid://jf8225evjsyu" path="res://prefabs/gui/action-bar-item.tscn" id="2_wg5ru"]
+[ext_resource type="PackedScene" uid="uid://mjf24a4l4t8g" path="res://prefabs/gui/action-bar-group.tscn" id="2_wg5ru"]
 
 [node name="ActionBar" type="Control"]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
+offset_right = 885.0
+offset_bottom = 300.0
 script = ExtResource("1_dr016")
-_actionBarItem = ExtResource("2_wg5ru")
 
-[node name="KeyboardActionBar" type="Panel" parent="."]
-visible = false
+[node name="KeyboardActionBar" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,10 +18,49 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GamepadActionBar" type="Panel" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="KeyboardActionBar"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 12
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 0
+
+[node name="GamepadActionBar" type="Control" parent="."]
+layout_mode = 1
+anchor_right = 2.0
+anchor_bottom = 2.0
+offset_right = -885.0
+offset_bottom = -300.0
+grow_horizontal = 2
 grow_vertical = 2
+
+[node name="LLT" parent="GamepadActionBar" instance=ExtResource("2_wg5ru")]
+layout_mode = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = -535.0
+offset_bottom = -150.0
+
+[node name="RRT" parent="GamepadActionBar" instance=ExtResource("2_wg5ru")]
+layout_mode = 1
+offset_left = 535.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = -150.0
+
+[node name="LB" parent="GamepadActionBar" instance=ExtResource("2_wg5ru")]
+layout_mode = 1
+offset_left = 85.0
+offset_top = 130.0
+offset_right = -450.0
+offset_bottom = -20.0
+
+[node name="RB" parent="GamepadActionBar" instance=ExtResource("2_wg5ru")]
+layout_mode = 1
+offset_left = 450.0
+offset_top = 130.0
+offset_right = -85.0
+offset_bottom = -20.0
