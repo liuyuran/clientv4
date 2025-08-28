@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using game.scripts.config;
 using game.scripts.manager;
 using game.scripts.manager.item;
 using game.scripts.manager.player;
@@ -29,6 +28,9 @@ public partial class ActionBar : Control {
         UpdateActionBar();
     }
 
+    /// <summary>
+    /// refresh action bar status
+    /// </summary>
     private void UpdateActionBar() {
         _keyboardActionBar.Visible = settings.ActionBar.Mode == ActionBarMode.Keyboard;
         _gamepadActionBar.Visible = settings.ActionBar.Mode == ActionBarMode.Gamepad;
@@ -36,6 +38,9 @@ public partial class ActionBar : Control {
         UpdateActionBarKeyboard();
     }
 
+    /// <summary>
+    /// Fill action to gamepad mod action bar
+    /// </summary>
     private void UpdateActionBarGamepad() {
         var lltGroup = _gamepadActionBar.FindNodeByName<Control>("LLT");
         var rrtGroup = _gamepadActionBar.FindNodeByName<Control>("RRT");
@@ -60,29 +65,23 @@ public partial class ActionBar : Control {
                 _ => throw new ArgumentOutOfRangeException()
             };
             var btn = trulyIndex switch {
-                0 => group.FindNodeByName<Control>("LLButton"),
-                1 => group.FindNodeByName<Control>("LTButton"),
-                2 => group.FindNodeByName<Control>("LRButton"),
-                3 => group.FindNodeByName<Control>("LBButton"),
-                4 => group.FindNodeByName<Control>("RLButton"),
-                5 => group.FindNodeByName<Control>("RTButton"),
-                6 => group.FindNodeByName<Control>("RRButton"),
-                7 => group.FindNodeByName<Control>("RBButton"),
+                0 => group.FindNodeByName<ActionBarItem>("LLButton"),
+                1 => group.FindNodeByName<ActionBarItem>("LTButton"),
+                2 => group.FindNodeByName<ActionBarItem>("LRButton"),
+                3 => group.FindNodeByName<ActionBarItem>("LBButton"),
+                4 => group.FindNodeByName<ActionBarItem>("RLButton"),
+                5 => group.FindNodeByName<ActionBarItem>("RTButton"),
+                6 => group.FindNodeByName<ActionBarItem>("RRButton"),
+                7 => group.FindNodeByName<ActionBarItem>("RBButton"),
                 _ => null
             };
-            var icon = btn?.FindNodeByName<TextureRect>("ClickArea");
-            if (icon == null) continue;
-            switch (configItem.Type) {
-                case ActionItemType.Item: {
-                    icon.Texture = MaterialManager.instance.GetItemTexture(configItem.Id);
-                    break;
-                }
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            btn?.SetItem(ActionBarItemType.GamepadActionBar, configItem, i);
         }
     }
-
+    
+    /// <summary>
+    /// Fill action to keyboard mod action bar
+    /// </summary>
     private void UpdateActionBarKeyboard() {
         var childCount = (ulong)_keyboardActionBar.GetChildCount();
         var actionBarCount = InventoryManager.instance.GetToolSlotCount(PlayerManager.instance.GetCurrentPlayerId());
@@ -115,15 +114,19 @@ public partial class ActionBar : Control {
 
     private bool ShouldRepeatButton(int button) {
         // TODO 根据快捷键类型决定是否重复触发
-        return button < 4;
+        return true;
     }
     
+    /// <summary>
+    /// handle input
+    /// </summary>
     public override void _Process(double delta) {
         if (GameStatus.currentStatus != GameStatus.Status.Playing) return;
 
         // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
         switch (settings.ActionBar.Mode) {
             case ActionBarMode.Keyboard: {
+                // TODO handle quick slot key
                 break;
             }
             case ActionBarMode.Gamepad: {
@@ -229,9 +232,11 @@ public partial class ActionBar : Control {
 
     private Control _lastActiveControl;
 
+    /// <summary>
+    /// scale gampad action bar area when active
+    /// </summary>
     private void OnGamepadOnActiveArea(ActionArea area) {
         _activeArea = area;
-        _logger.Log(LogLevel.Debug, "ActionBar: OnGamepadOnActiveArea {area}", area);
 
         // 重置上一个激活控件的缩放
         if (_lastActiveControl != null) {
@@ -255,6 +260,9 @@ public partial class ActionBar : Control {
         _lastActiveControl = targetControl;
     }
 
+    /// <summary>
+    /// handle action when gamepad button pressed
+    /// </summary>
     private void OnGamePadButtonPressed(int button) {
         _logger.Log(LogLevel.Debug, "ActionBar: OnGamePadButtonPressed {button} in area {area}", button, _activeArea);
         if (_activeArea == ActionArea.None) return;
@@ -265,6 +273,9 @@ public partial class ActionBar : Control {
         OnActiveAction(ref actions, action);
     }
 
+    /// <summary>
+    /// handle action when action item activated
+    /// </summary>
     private void OnActiveAction(ref List<ActionItem> item, int index) {
         _logger.LogDebug("ActionBar: OnActiveAction {index}", index);
     }
