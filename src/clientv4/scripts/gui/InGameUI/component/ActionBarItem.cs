@@ -38,12 +38,17 @@ public partial class ActionBarItem : Control {
         var icon = this.FindNodeByName<TextureRect>("ClickArea");
         if (icon == null) return;
         // set icon
-        icon.Texture = configItem.Type switch {
-            ActionItemType.Item => MaterialManager.instance.GetItemTexture(configItem.Id),
-            ActionItemType.None => null,
-            ActionItemType.Skill => null,
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        switch (configItem.Type) {
+            case ActionItemType.Item:
+                icon.Texture = MaterialManager.instance.GetItemTexture(configItem.Id);
+                break;
+            case ActionItemType.Skill:
+                break;
+            case ActionItemType.None:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public override Variant _GetDragData(Vector2 atPosition) {
