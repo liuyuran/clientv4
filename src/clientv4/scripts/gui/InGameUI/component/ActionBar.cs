@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using game.scripts.manager;
 using game.scripts.manager.item;
 using game.scripts.manager.player;
 using game.scripts.manager.player.settings;
@@ -75,7 +74,21 @@ public partial class ActionBar : Control {
                 7 => group.FindNodeByName<ActionBarItem>("RBButton"),
                 _ => null
             };
-            btn?.SetItem(ActionBarItemType.GamepadActionBar, configItem, i);
+            btn?.SetItem(ActionBarItemType.GamepadActionBar, configItem, i, 1);
+        }
+        ActionBarItem.OnItemChanged += RefreshActionBar;
+    }
+
+    private void RefreshActionBar(ActionBarItemType barType) {
+        switch (barType) {
+            case ActionBarItemType.GamepadActionBar: {
+                UpdateActionBarGamepad();
+                break;
+            }
+            case ActionBarItemType.KeyboardActionBar: {
+                UpdateActionBarKeyboard();
+                break;
+            }
         }
     }
     

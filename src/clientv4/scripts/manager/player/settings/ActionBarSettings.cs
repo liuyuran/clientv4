@@ -8,7 +8,7 @@ public enum ActionBarMode {
 }
 
 public enum ActionItemType {
-    Item
+    None, Item, Skill
 }
 
 public struct ActionItem {
