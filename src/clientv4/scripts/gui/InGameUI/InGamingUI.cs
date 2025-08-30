@@ -33,9 +33,10 @@ public partial class InGamingUI: CanvasLayer {
                 UpdatePlayingUI(delta);
                 TryOpenPauseUI();
                 break;
-            case InGameUIFocus.Pause:
+            case InGameUIFocus.Pause: {
                 TryClosePauseUI();
                 break;
+            }
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -45,12 +46,14 @@ public partial class InGamingUI: CanvasLayer {
         if (!InputManager.instance.IsKeyPressed(InputKey.UIConfirm)) return;
         if (PlatformUtil.GetTimestamp() - _lastActiveInputTime < MinInputInterval) return;
         _lastActiveInputTime = PlatformUtil.GetTimestamp();
-        if (_msgInput.HasFocus()) {
-            _msgInput.ReleaseFocus();
-            GameStatus.SetStatus(GameStatus.Status.Playing);
-        } else {
-            _msgInput.GrabFocus();
-            GameStatus.SetStatus(GameStatus.Status.Typing);
+        if (_status.Focus == InGameUIFocus.Game) {
+            if (_msgInput.HasFocus()) {
+                _msgInput.ReleaseFocus();
+                GameStatus.SetStatus(GameStatus.Status.Playing);
+            } else {
+                _msgInput.GrabFocus();
+                GameStatus.SetStatus(GameStatus.Status.Typing);
+            }
         }
     }
 
