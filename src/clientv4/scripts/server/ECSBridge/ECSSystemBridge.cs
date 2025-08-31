@@ -126,6 +126,10 @@ public partial class ECSSystemBridge: Node {
                     PlayerRenderUtil.CreatePlayer(false, entity, _playerPrototype, GetParent(), _entityNodes);
                     break;
                 }
+                case ERenderType.Item: {
+                    ItemRenderUtil.CreateItemEntity(entity, GetParent(), _entityNodes);
+                    break;
+                }
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -6,6 +6,9 @@ using ModLoader.util;
 
 namespace game.scripts.renderer;
 
+/// <summary>
+/// an 2D piece for dropped item, auto rotating
+/// </summary>
 public partial class DropItem2D: MeshInstance3D {
     private ulong _itemId;
     private bool _needRender;

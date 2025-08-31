@@ -37,5 +37,63 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ItemBox" type="GridContainer" parent="MarginContainer/Panel/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Panel/MarginContainer"]
 layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 10
+
+[node name="EquipmentBox" type="VBoxContainer" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer2"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer2/EquipmentBox"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer2/EquipmentBox/SubViewportContainer"]
+size = Vector2i(250, 200)
+
+[node name="Control" type="Control" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer2/EquipmentBox"]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer2/EquipmentBox"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="stats" type="Control" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer2/EquipmentBox/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="equipment" type="Control" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer2/EquipmentBox/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Panel" type="Panel" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer/Panel"]
+layout_mode = 2
+offset_right = 768.0
+offset_bottom = 528.0
+
+[node name="InventoryBox" type="GridContainer" parent="MarginContainer/Panel/MarginContainer/HBoxContainer/MarginContainer/Panel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

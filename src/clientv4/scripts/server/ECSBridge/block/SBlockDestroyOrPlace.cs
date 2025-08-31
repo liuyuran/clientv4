@@ -45,6 +45,7 @@ public class SBlockDestroyOrPlace : QuerySystem<CPhysicsVelocity, CCamera, CInpu
                     // Here you can add logic to handle the block interaction, like breaking or placing blocks
                     var blockId = MapManager.instance.GetBlockIdByPosition(target);
                     if (blockId != 0 && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
+                        // TODO add block breaking animation and sound and place drop item
                         entity.EmitSignal(new SignalBlockChanged {
                             Position = target,
                             BlockId = 0,

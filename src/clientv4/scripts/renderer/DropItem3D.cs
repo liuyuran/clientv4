@@ -5,6 +5,9 @@ using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.renderer;
 
+/// <summary>
+/// an 3D piece for dropped block item, auto rotating
+/// </summary>
 public partial class DropItem3D: MeshInstance3D {
     private ulong _itemId;
     private bool _needRender;
