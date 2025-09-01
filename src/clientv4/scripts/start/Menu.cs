@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using game.scripts.config;
 using game.scripts.manager;
+using game.scripts.manager.archive;
 using game.scripts.manager.mod;
 using game.scripts.manager.reset;
 using game.scripts.manager.settings;
@@ -53,6 +55,12 @@ public partial class Menu : Control {
         ModManager.instance.Reset();
         LanguageManager.LanguageChanged += UpdateUITranslate;
         UpdateUITranslate();
+        // if command line arguments include --test-game, then start a test game.
+        if (OS.GetCmdlineArgs().Contains("--test-game")) {
+            ResetManager.Reset();
+            ArchiveManager.instance.Load("new world");
+            JumpToGameSceneAndStartLocalServer();
+        }
     }
 
     public override void _ExitTree() {

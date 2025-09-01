@@ -24,6 +24,7 @@ public partial class ECSSystemBridge: Node {
     private readonly Dictionary<Entity, Node3D> _entityNodes = new();
     private bool _isInitialized;
     [Export] private PackedScene _playerPrototype;
+    [Export] private PackedScene _itemPrototype;
 
     public override void _Ready() {
         _world = new EntityStore();
@@ -34,7 +35,7 @@ public partial class ECSSystemBridge: Node {
         _systemRoot = new SystemRoot(_world) {
             new SMoveSystem(_world),
             new SJumpAndGravity(_world),
-            new SBlockDestroyOrPlace()
+            new SBlockDestroyOrPlace(_world)
         };
     }
     
@@ -127,7 +128,7 @@ public partial class ECSSystemBridge: Node {
                     break;
                 }
                 case ERenderType.Item: {
-                    ItemRenderUtil.CreateItemEntity(entity, GetParent(), _entityNodes);
+                    ItemRenderUtil.CreateItemEntity(entity, _itemPrototype, GetParent(), _entityNodes);
                     break;
                 }
                 default:

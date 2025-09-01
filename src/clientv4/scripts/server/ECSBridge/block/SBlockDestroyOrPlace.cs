@@ -10,7 +10,7 @@ using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.server.ECSBridge.block;
 
-public class SBlockDestroyOrPlace : QuerySystem<CPhysicsVelocity, CCamera, CInputEvent> {
+public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPhysicsVelocity, CCamera, CInputEvent> {
     private ulong _lastActive;
     private const ulong ActiveCooldown = 300;
     private const ulong RayRange = 5;
@@ -34,8 +34,7 @@ public class SBlockDestroyOrPlace : QuerySystem<CPhysicsVelocity, CCamera, CInpu
                 if (result.Count > 0) {
                     var hitPosition = (Vector3)result["position"];
                     var hitNormal = (Vector3)result["normal"];
-                    // is collider a StaticBody3D?
-                    // if not, we can ignore it
+                    // is collider a StaticBody3D? if not, we can ignore it
                     var collider = result["collider"].As<StaticBody3D>().GetParent();
                     var target = new Vector3I();
                     var targetF = hitPosition - hitNormal * 0.01f;
@@ -46,6 +45,7 @@ public class SBlockDestroyOrPlace : QuerySystem<CPhysicsVelocity, CCamera, CInpu
                     var blockId = MapManager.instance.GetBlockIdByPosition(target);
                     if (blockId != 0 && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
                         // TODO add block breaking animation and sound and place drop item
+                        GenerateDropItem(target);
                         entity.EmitSignal(new SignalBlockChanged {
                             Position = target,
                             BlockId = 0,
@@ -96,5 +96,9 @@ public class SBlockDestroyOrPlace : QuerySystem<CPhysicsVelocity, CCamera, CInpu
             }
         });
     }
-
+    
+    private void GenerateDropItem(Vector3I position) {
+        var blockId = MapManager.instance.GetBlockIdByPosition(position);
+        var entity = world.CreateEntity();
+    }
 }
