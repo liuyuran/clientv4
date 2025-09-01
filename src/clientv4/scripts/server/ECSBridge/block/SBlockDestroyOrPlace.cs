@@ -1,8 +1,12 @@
 ﻿using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
 using game.scripts.manager.blocks;
+using game.scripts.manager.loot;
 using game.scripts.manager.map;
+using game.scripts.manager.player;
 using game.scripts.server.ECSBridge.input;
+using game.scripts.server.ECSBridge.render;
+using game.scripts.server.ECSBridge.sync;
 using Godot;
 using ModLoader.block.util;
 using ModLoader.util;
@@ -10,13 +14,13 @@ using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.server.ECSBridge.block;
 
-public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPhysicsVelocity, CCamera, CInputEvent> {
+public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPeer, CPhysicsVelocity, CCamera, CInputEvent> {
     private ulong _lastActive;
     private const ulong ActiveCooldown = 300;
     private const ulong RayRange = 5;
     
     protected override void OnUpdate() {
-        Query.ForEachEntity((ref CPhysicsVelocity velocity, ref CCamera camera, ref CInputEvent inputEvent, Entity entity) => {
+        Query.ForEachEntity((ref CPeer peer, ref CPhysicsVelocity velocity, ref CCamera camera, ref CInputEvent inputEvent, Entity entity) => {
             if (inputEvent.Digging) {
                 // check raycast, which face clicked
                 var ray = camera.Camera.ProjectRayOrigin(inputEvent.MouseClickPosition);
@@ -45,7 +49,8 @@ public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPhysicsVeloc
                     var blockId = MapManager.instance.GetBlockIdByPosition(target);
                     if (blockId != 0 && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
                         // TODO add block breaking animation and sound and place drop item
-                        GenerateDropItem(target);
+                        var player = PlayerManager.instance.GetPlayerByPeerId(peer.PeerId);
+                        GenerateDropItem(target, player.playerId);
                         entity.EmitSignal(new SignalBlockChanged {
                             Position = target,
                             BlockId = 0,
@@ -97,8 +102,20 @@ public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPhysicsVeloc
         });
     }
     
-    private void GenerateDropItem(Vector3I position) {
+    private void GenerateDropItem(Vector3I position, ulong playerId) {
         var blockId = MapManager.instance.GetBlockIdByPosition(position);
+        if (blockId == null) return;
         var entity = world.CreateEntity();
+        entity.AddComponent(new CRenderType {
+            Type = ERenderType.DropItemPack
+        });
+        entity.AddComponent(new CTransform {
+            Position = position
+        });
+        entity.AddComponent(new CPhysicsVelocity());
+        entity.AddComponent(new CDropItem {
+            BlockId = blockId.Value,
+            PlayerId = playerId
+        });
     }
 }

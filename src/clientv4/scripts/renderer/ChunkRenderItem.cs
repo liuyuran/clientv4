@@ -15,6 +15,15 @@ public partial class ChunkRenderItem : MeshInstance3D {
     private ArrayMesh _readyMesh;
     private ArrayMesh _colliderMesh;
     private bool _isDirty;
+    private DigShadowInstance3D _digShadow;
+
+    public override void _Ready() {
+        _digShadow = new DigShadowInstance3D();
+    }
+
+    public override void _ExitTree() {
+        _digShadow.QueueFree();
+    }
 
     public override void _Process(double delta) {
         if (_isDirty) {
@@ -40,6 +49,11 @@ public partial class ChunkRenderItem : MeshInstance3D {
             UpdateCollider();
         }
         _readyMesh = null;
+    }
+    
+    [Rpc(CallLocal = true)]
+    private void SetBlockDigProgress(Vector3I pos, float progress) {
+        _digShadow.SetDigProgress(pos, progress);
     }
 
     [Rpc(CallLocal = true)]

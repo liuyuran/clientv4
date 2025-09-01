@@ -21,7 +21,7 @@ public static class ItemRenderUtil {
 
     public static Entity CreateItemEntity(EntityStore world, ulong itemId, Vector3 position) {
         var entity = world.CreateEntity(new CRenderType {
-            Type = ERenderType.Item
+            Type = ERenderType.DropItemPack
         }, new CTransform {
             Position = position
         }, new CPhysicsVelocity());

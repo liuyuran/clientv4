@@ -127,7 +127,7 @@ public partial class ECSSystemBridge: Node {
                     PlayerRenderUtil.CreatePlayer(false, entity, _playerPrototype, GetParent(), _entityNodes);
                     break;
                 }
-                case ERenderType.Item: {
+                case ERenderType.DropItemPack: {
                     ItemRenderUtil.CreateItemEntity(entity, _itemPrototype, GetParent(), _entityNodes);
                     break;
                 }

@@ -24,6 +24,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
     private const string MapFilename = "world_{0}/chunk_{1}_{2}_{3}.dat";
 
     public delegate void BlockChangedCallback(ulong worldId, Vector3 position, ulong blockId, Direction direction);
+    public delegate void BlockDigProgressChangedCallback(ulong worldId, Vector3 position, float progress);
 
     public static MapManager instance { get; private set; } = new();
     public static long Seed;
@@ -31,6 +32,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
     private readonly Dictionary<ulong, Dictionary<Vector3I, BlockData[][][]>> _chunks = new();
     private readonly HashSet<(ulong, Vector3I)> _needArchive = [];
     public event BlockChangedCallback OnBlockChanged;
+    public event BlockDigProgressChangedCallback OnBlockDigProgressChanged; // TODO how to use it?
 
     private readonly Dictionary<(ulong, Vector3I), bool> _pendingGenerationTasks = new();
     private readonly object _lockObject = new();
