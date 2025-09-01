@@ -15,8 +15,8 @@ public class MaterialManager: IReset, IDisposable {
     private readonly ILogger _logger = LogManager.GetLogger<MaterialManager>();
     public static MaterialManager instance { get; private set; } = new();
     
-    private readonly string _itemObjShaderCode = ResourceLoader.Load<string>("res://shader/item-obj.gdshader");
-    private readonly string _waterShaderCode = ResourceLoader.Load<string>("res://shader/water.gdshader");
+    private readonly Shader _itemObjShader = ResourceLoader.Load<Shader>("res://shader/item-obj.gdshader");
+    private readonly Shader _waterShader = ResourceLoader.Load<Shader>("res://shader/water.gdshader");
     
     private readonly Dictionary<ulong, Dictionary<Direction, Vector2[]>> _uvs = new();
     private readonly Dictionary<ulong, Dictionary<Direction, Vector2[]>> _itemUvs = new();
@@ -45,10 +45,7 @@ public class MaterialManager: IReset, IDisposable {
         // Create shader material
         var material = new ShaderMaterial();
         // Define shader code with item object rendering
-        var shader = new Shader();
-        shader.Code = _itemObjShaderCode;
-
-        material.Shader = shader;
+        material.Shader = _itemObjShader;
         material.SetShaderParameter("albedo_texture", ((StandardMaterial3D)_defaultItemMaterial).AlbedoTexture);
         material.SetShaderParameter("alpha_scissor_threshold", 0.9f);
         material.RenderPriority = -10; // 确保透明材质正确渲染
@@ -60,9 +57,7 @@ public class MaterialManager: IReset, IDisposable {
         var material = new ShaderMaterial();
 
         // Define shader code with water animation
-        var shader = new Shader();
-        shader.Code = _waterShaderCode;
-        material.Shader = shader;
+        material.Shader = _waterShader;
         
         // Create the first noise texture for waves
         var noiseTexture = new NoiseTexture2D();
