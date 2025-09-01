@@ -128,7 +128,8 @@ public partial class ECSSystemBridge: Node {
                     break;
                 }
                 case ERenderType.DropItemPack: {
-                    ItemRenderUtil.CreateItemEntity(entity, _itemPrototype, GetParent(), _entityNodes);
+                    ItemRenderUtil.CreateItemEntity(entity, _itemPrototype, GetParent());
+                    entity.DeleteEntity();
                     break;
                 }
                 default:
