@@ -5,7 +5,7 @@ using ModLoader.loot;
 namespace Core.loot;
 
 public class DirtLootConfig: LootConfig {
-    public override string blockName => new Dirt().name;
+    public override string blockName => new Stone().name;
     public override string[] allDropItem => [new DirtItem().name];
 
     public override LootItem[] LootDropItem(float random, ulong playerId) {

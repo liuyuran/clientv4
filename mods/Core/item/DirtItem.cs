@@ -1,4 +1,5 @@
 ﻿using ModLoader.item;
+using ModLoader.item.composition;
 
 namespace Core.item;
 
@@ -9,4 +10,8 @@ namespace Core.item;
 public class DirtItem: Item {
     public override string name => "";
     public override string iconPath => "core:/texture/item/dirt.png";
+
+    public DirtItem() {
+        this.SetBlock(new Block.BlockConfig(1));
+    }
 }
