@@ -105,15 +105,16 @@ public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPeer, CPhysi
     private void GenerateDropItem(Vector3I position, ulong playerId) {
         var blockId = MapManager.instance.GetBlockIdByPosition(position);
         if (blockId == null) return;
-        var entity = world.CreateEntity();
-        entity.AddComponent(new CRenderType {
+        var buffer = CommandBuffer;
+        var entity = buffer.CreateEntity();
+        buffer.AddComponent(entity, new CRenderType {
             Type = ERenderType.DropItemPack
         });
-        entity.AddComponent(new CTransform {
+        buffer.AddComponent(entity, new CTransform {
             Position = position
         });
-        entity.AddComponent(new CPhysicsVelocity());
-        entity.AddComponent(new CDropItem {
+        buffer.AddComponent(entity, new CPhysicsVelocity());
+        buffer.AddComponent(entity, new CDropItem {
             BlockId = blockId.Value,
             PlayerId = playerId
         });

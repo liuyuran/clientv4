@@ -161,7 +161,8 @@ public partial class ECSSystemBridge: Node {
     /// add or replace component callback
     /// </summary>
     private void WorldOnOnComponentAdded(ComponentChanged obj) {
-        if (!obj.Entity.HasComponent<CRenderType>()) return;
+        // the truth callback
+        if (obj.Entity.IsNull || !obj.Entity.HasComponent<CRenderType>()) return;
         if (_entityNodes.TryGetValue(obj.Entity, out var node)) {
             PlayerRenderUtil.UpdatePlayer(obj.Entity, node);
         } else {

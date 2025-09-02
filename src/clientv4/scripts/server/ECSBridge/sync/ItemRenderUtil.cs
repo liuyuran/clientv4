@@ -17,6 +17,7 @@ public static class ItemRenderUtil {
         var worldContainerNode = root.FindNodeByName<WorldContainer>("worlds");
         var worldNode = worldContainerNode.GetCurrentSubViewport();
         foreach (var lootItem in lootResult) {
+            GD.Print($"Generating drop item: {lootItem.ItemName} x{lootItem.amount}");
             var node = itemPrototype.Instantiate<Node>();
             // need check should show a cube model or pieces model
             var itemModal = ItemManager.instance.GetItemDropModel(lootItem);
