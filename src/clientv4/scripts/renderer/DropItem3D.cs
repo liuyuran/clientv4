@@ -1,5 +1,13 @@
-﻿using game.scripts.manager;
+﻿using System;
+using System.Collections.Generic;
+using game.scripts.manager;
+using game.scripts.manager.item;
+using game.scripts.manager.player;
+using game.scripts.server.ECSBridge.sync;
+using game.scripts.utils;
 using Godot;
+using Microsoft.Extensions.Logging;
+using ModLoader.logger;
 using ModLoader.util;
 using Vector3I = Godot.Vector3I;
 
@@ -9,12 +17,60 @@ namespace game.scripts.renderer;
 /// an 3D piece for dropped block item, auto rotating
 /// </summary>
 public partial class DropItem3D: MeshInstance3D {
+    private readonly ILogger _logger = LogManager.GetLogger<DropItem3D>();
     private ulong _itemId;
+    private long _amount;
+    private Dictionary<string, object> _lootItemData;
+    private Area3D _area;
     private bool _needRender;
     private bool _needRotate;
-    
-    public void SetItemId(ulong itemId) {
+
+    public override void _Ready() {
+        _area = this.GetParent<Node>().FindNodeByName<Area3D>("Area3D");
+        _area.Transform = new Transform3D {
+            Origin = new Vector3(-.25, -.25, -.25),
+        };
+        if (_area == null) {
+            GD.PrintErr("DropItem3D: Area3D node not found");
+            return;
+        }
+        var collisionShape = _area.GetParent<Node>().FindNodeByName<CollisionShape3D>("CollisionShape3D");
+        if (collisionShape == null) {
+            GD.PrintErr("DropItem3D: CollisionShape3D node not found");
+            return;
+        }
+        var boxShape = new BoxShape3D();
+        boxShape.Size = new Vector3(0.5f, 0.5f, 0.5f);
+        collisionShape.Shape = boxShape;
+        _area.BodyShapeEntered += AreaOnBodyShapeEntered;
+    }
+
+    public override void _ExitTree() {
+        _area.BodyShapeEntered -= AreaOnBodyShapeEntered;
+    }
+
+    private void AreaOnBodyShapeEntered(Rid bodyRid, Node3D body, long bodyShapeIndex, long localShapeIndex) {
+        _logger.Log(LogLevel.Debug, "DropItem3D: BodyShapeEntered {Body} {BodyShapeIndex} {LocalShapeIndex}", body.Name, bodyShapeIndex, localShapeIndex);
+        var nodeName = body.Name.ToString();
+        if (nodeName.StartsWith("Player_")) {
+            var entityId = nodeName["Player_".Length..];
+            var entity = GameNodeReference.World.GetEntityById(Convert.ToInt32(entityId));
+            if (!entity.HasComponent<CPeer>()) return;
+            var peer = entity.GetComponent<CPeer>();
+            var player = PlayerManager.instance.GetPlayerByPeerId(peer.PeerId);
+            if (player == null) return;
+            InventoryManager.instance.AddItemToInventory(player.playerId, _itemId, _amount, _lootItemData);
+            var playerPosition = player.position;
+            var tween = new Tween();
+            tween.TweenProperty(this, "transform/origin", playerPosition, 0.5f).SetTrans(Tween.TransitionType.Linear);
+            tween.Play();
+        }
+    }
+
+    public void SetItem(ulong itemId, long amount, Dictionary<string, object> lootItemData) {
         _itemId = itemId;
+        _amount = amount;
+        _lootItemData = lootItemData;
         _needRender = true;
     }
     

@@ -1,4 +1,5 @@
-﻿using game.scripts.manager;
+﻿using System.Collections.Generic;
+using game.scripts.manager;
 using game.scripts.manager.item;
 using Godot;
 using ModLoader.item.composition;
@@ -11,11 +12,15 @@ namespace game.scripts.renderer;
 /// </summary>
 public partial class DropItem2D: MeshInstance3D {
     private ulong _itemId;
+    private long _amount;
+    private Dictionary<string, object> _lootItemData;
     private bool _needRender;
     private bool _needRotate;
     
-    public void SetItemId(ulong itemId) {
+    public void SetItem(ulong itemId, long amount, Dictionary<string, object> lootItemData) {
         _itemId = itemId;
+        _amount = amount;
+        _lootItemData = lootItemData;
         _needRender = true;
     }
     

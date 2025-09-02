@@ -28,6 +28,7 @@ public partial class ECSSystemBridge: Node {
 
     public override void _Ready() {
         _world = new EntityStore();
+        GameNodeReference.World = _world;
         _world.OnEntityCreate += WorldOnOnEntityCreate;
         _world.OnEntityDelete += WorldOnOnEntityDelete;
         _world.OnComponentAdded += WorldOnOnComponentAdded;

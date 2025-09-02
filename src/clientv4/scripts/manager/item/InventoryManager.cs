@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using ModLoader.item;
 using ModLoader.item.composition;
 
@@ -65,11 +66,12 @@ public class InventoryManager {
     /// <summary>
     /// Add an item to the player's inventory.
     /// </summary>
-    public ulong AddItemToInventory(ulong playerId, ulong itemId, ulong amount) {
+    public void AddItemToInventory(ulong playerId, ulong itemId, long amount, Dictionary<string, object> config) {
         if (!_equipment.TryGetValue(playerId, out var equipments)) {
-            return amount;
+            return;
         }
-
+        
+        var itemMeta = ItemManager.instance.GetItem(itemId);
         var count = amount;
         foreach (var (_, equipment) in equipments) {
             if (!equipment.IsEquipable()) {
@@ -79,35 +81,31 @@ public class InventoryManager {
             var items = equipment.GetAllInventoryItems();
             for (var index = 0; index < items.Length; index++) {
                 var item = items[index];
+                if (item != null && item.name != itemMeta.name) continue;
+                if (item != null && config != item.Config) continue;
+                var freeStackCount = item != null ? itemMeta.maxStack - item.stackCount : itemMeta.maxStack;
+                if (freeStackCount <= 0) continue;
+                var changeCount = freeStackCount > count ? count : freeStackCount;
                 if (item == null) {
-                    items[index] = ItemManager.instance.GetItemPrototype(itemId);
-                    if (items[index].maxStack <= amount) {
-                        items[index].stackCount = items[index].maxStack;
-                        count -= items[index].maxStack;
-                    } else {
-                        items[index].stackCount = amount;
-                        count = 0;
+                    var newItem = ItemManager.instance.GetItemPrototype(itemId);
+                    foreach (var pair in config) {
+                        newItem.Config[pair.Key] = pair.Value;
                     }
-                } else if (itemId == ItemManager.instance.GetItemId(item.name)) {
-                    if (item.stackCount + amount <= item.maxStack) {
-                        item.stackCount += amount;
-                        return 0;
-                    }
-
-                    count -= item.maxStack - item.stackCount;
-                    item.stackCount = item.maxStack;
+                    newItem.stackCount = changeCount;
+                    items[index] = newItem;
+                } else {
+                    item.stackCount += changeCount;
                 }
-                if (count == 0) return 0;
+                count -= changeCount;
+                if (count == 0) return;
             }
         }
-
-        return count;
     }
 
     /// <summary>
     /// Remove an item from the player's inventory.
     /// </summary>
-    public ulong RemoveItemFromInventory(ulong playerId, ulong itemId, ulong amount) {
+    public long RemoveItemFromInventory(ulong playerId, ulong itemId, long amount) {
         if (!_equipment.TryGetValue(playerId, out var equipments)) {
             return amount;
         }

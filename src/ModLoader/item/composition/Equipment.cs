@@ -59,7 +59,7 @@ public static class Equipment {
         return [];
     }
     
-    public static Item[] GetAllInventoryItems(this Item item) {
+    public static Item?[] GetAllInventoryItems(this Item item) {
         if (!item.Config.TryGetValue(EquipmentConfigKey, out var value)) {
             return [];
         }
@@ -71,7 +71,7 @@ public static class Equipment {
         return [];
     }
 
-    public static ulong AddItem(this Item item, Item itemToAdd) {
+    public static long AddItem(this Item item, Item itemToAdd) {
         if (!item.Config.TryGetValue(EquipmentConfigKey, out var value)) {
             return itemToAdd.stackCount;
         }
@@ -117,7 +117,7 @@ public static class Equipment {
         return false;
     }
 
-    public static ulong RemoveItem(this Item item, Item itemToRemove, ulong amount = 1) {
+    public static long RemoveItem(this Item item, Item itemToRemove, long amount = 1) {
         if (!item.Config.TryGetValue(EquipmentConfigKey, out var value)) {
             return amount;
         }
@@ -179,6 +179,6 @@ public static class Equipment {
         public readonly ulong EquipmentSlot = equipmentSlot;
         public readonly uint ToolSlot = toolSlot;
         public readonly uint InventorySlot = inventorySlot;
-        public Item[] items { get; set; } = new Item[toolSlot + inventorySlot];
+        public Item?[] items { get; set; } = new Item?[toolSlot + inventorySlot];
     }
 }

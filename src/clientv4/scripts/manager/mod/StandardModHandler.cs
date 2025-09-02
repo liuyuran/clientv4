@@ -2,6 +2,7 @@
 using game.scripts.manager.blocks;
 using game.scripts.manager.chat;
 using game.scripts.manager.item;
+using game.scripts.manager.loot;
 using game.scripts.manager.map;
 using game.scripts.manager.menu;
 using game.scripts.manager.recipe;
@@ -55,5 +56,9 @@ public class StandardModHandler : IModHandler {
 
     public ISceneManager GetSceneManager() {
         return SceneManager.instance;
+    }
+    
+    public ILootManager GetLootManager() {
+        return LootManager.instance;
     }
 }

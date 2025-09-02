@@ -1,5 +1,7 @@
-﻿using Core.block;
+﻿using System.Reflection.Metadata;
+using Core.block;
 using Core.item;
+using Core.loot;
 using Core.terrain.generator;
 using Microsoft.Extensions.Logging;
 using ModLoader;
@@ -50,6 +52,7 @@ public class CoreMod : IMod {
 
         Handler.GetBlockManager().Register<Water>();
         Handler.GetBlockManager().Register<Dirt>();
+        Handler.GetLootManager().Register<DirtLootConfig>();
         Handler.GetBlockManager().Register<Stone>();
     }
 

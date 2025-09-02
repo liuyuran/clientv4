@@ -18,7 +18,9 @@ public static class ItemRenderUtil {
         var worldNode = worldContainerNode.GetCurrentSubViewport();
         foreach (var lootItem in lootResult) {
             var node = itemPrototype.Instantiate<Node>();
-            // TODO add item object
+            // need check should show a cube model or pieces model
+            var itemModal = ItemManager.instance.GetItemDropModel(lootItem);
+            node.AddChild(itemModal);
             worldNode.AddChild(node);
         }
     }

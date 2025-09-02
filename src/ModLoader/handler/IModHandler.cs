@@ -12,4 +12,5 @@ public interface IModHandler {
     public IRecipeManager GetRecipeManager();
     public ISkillManager GetSkillManager();
     public ISceneManager GetSceneManager();
+    public ILootManager GetLootManager();
 }

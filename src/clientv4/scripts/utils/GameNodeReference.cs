@@ -1,4 +1,5 @@
-﻿using game.scripts.gui.InGameUI;
+﻿using Friflo.Engine.ECS;
+using game.scripts.gui.InGameUI;
 using Godot;
 
 namespace game.scripts.utils;
@@ -8,4 +9,5 @@ public static class GameNodeReference {
     public static PackedScene StartScenePacked;
     public static PackedScene GamingScenePacked;
     public static InGamingUI UI;
+    public static EntityStore World;
 }

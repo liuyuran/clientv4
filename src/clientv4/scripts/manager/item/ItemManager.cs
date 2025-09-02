@@ -13,6 +13,7 @@ using ModLoader.handler;
 using ModLoader.item;
 using ModLoader.item.composition;
 using ModLoader.logger;
+using ModLoader.loot;
 
 namespace game.scripts.manager.item;
 
@@ -69,7 +70,8 @@ public class ItemManager : IReset, IArchive, IDisposable, IItemManager {
         return item.Clone();
     }
 
-    public Node3D GetItemDropModel(ulong itemId) {
+    public Node3D GetItemDropModel(LootItem lootItem) {
+        var itemId = GetItemId(lootItem.ItemName);
         if (!_items.TryGetValue(itemId, out var item)) {
             throw new Exception($"ItemId {itemId} not found");
         }
@@ -77,11 +79,11 @@ public class ItemManager : IReset, IArchive, IDisposable, IItemManager {
         Node3D node;
         if (item.IsBlock()) {
             var childNode = new DropItem3D();
-            childNode.SetItemId(itemId);
+            childNode.SetItem(itemId, lootItem.amount, lootItem.Data);
             node = childNode;
         } else {
             var childNode = new DropItem2D();
-            childNode.SetItemId(itemId);
+            childNode.SetItem(itemId, lootItem.amount, lootItem.Data);
             node = childNode;
         }
 
