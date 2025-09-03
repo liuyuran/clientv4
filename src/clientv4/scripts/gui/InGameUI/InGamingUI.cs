@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using game.scripts.config;
 using game.scripts.utils;
 using Godot;
@@ -25,6 +26,9 @@ public partial class InGamingUI: CanvasLayer {
         _status.Focus = InGameUIFocus.Game;
         OpenPlayingUI();
         _msgInput = this.FindNodeByName<LineEdit>("MsgInput");
+        if (OS.GetCmdlineArgs().Contains("--test-game")) {
+            Visible = false;
+        }
     }
 
     public override void _Process(double delta) {

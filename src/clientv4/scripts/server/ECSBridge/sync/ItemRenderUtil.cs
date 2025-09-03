@@ -4,6 +4,7 @@ using game.scripts.manager.item;
 using game.scripts.manager.loot;
 using game.scripts.renderer;
 using game.scripts.server.ECSBridge.block;
+using game.scripts.server.ECSBridge.input;
 using game.scripts.utils;
 using Godot;
 
@@ -16,9 +17,11 @@ public static class ItemRenderUtil {
         var lootResult = LootManager.instance.GetLootItems(blockName, dropItemComponent.PlayerId);
         var worldContainerNode = root.FindNodeByName<WorldContainer>("worlds");
         var worldNode = worldContainerNode.GetCurrentSubViewport();
+        var transformPos = entity.GetComponent<CTransform>();
+        var transform = transformPos.Position + new Vector3(0.5f, 0.5f, 0.5f);
         foreach (var lootItem in lootResult) {
-            GD.Print($"Generating drop item: {lootItem.ItemName} x{lootItem.amount}");
-            var node = itemPrototype.Instantiate<Node>();
+            var node = itemPrototype.Instantiate<Node3D>();
+            node.Transform = node.Transform with { Origin = transform };
             // need check should show a cube model or pieces model
             var itemModal = ItemManager.instance.GetItemDropModel(lootItem);
             node.AddChild(itemModal);
