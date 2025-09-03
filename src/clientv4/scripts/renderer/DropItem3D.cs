@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using game.scripts.manager;
+using game.scripts.manager.blocks;
 using game.scripts.manager.item;
 using game.scripts.manager.player;
 using game.scripts.server.ECSBridge.sync;
 using game.scripts.utils;
 using Godot;
 using Microsoft.Extensions.Logging;
+using ModLoader.item.composition;
 using ModLoader.logger;
 using ModLoader.util;
 using Vector3I = Godot.Vector3I;
@@ -26,22 +28,7 @@ public partial class DropItem3D: MeshInstance3D {
     private bool _needRotate;
 
     public override void _Ready() {
-        _area = this.GetParent<Node>().FindNodeByName<Area3D>("Area3D");
-        _area.Transform = new Transform3D {
-            Origin = new Vector3(-.25, -.25, -.25),
-        };
-        if (_area == null) {
-            GD.PrintErr("DropItem3D: Area3D node not found");
-            return;
-        }
-        var collisionShape = _area.GetParent<Node>().FindNodeByName<CollisionShape3D>("CollisionShape3D");
-        if (collisionShape == null) {
-            GD.PrintErr("DropItem3D: CollisionShape3D node not found");
-            return;
-        }
-        var boxShape = new BoxShape3D();
-        boxShape.Size = new Vector3(0.5f, 0.5f, 0.5f);
-        collisionShape.Shape = boxShape;
+        _area = this.GetParent<Node>().FindNodeByName<Area3D>("PickArea");
         _area.BodyShapeEntered += AreaOnBodyShapeEntered;
     }
 
@@ -50,7 +37,6 @@ public partial class DropItem3D: MeshInstance3D {
     }
 
     private void AreaOnBodyShapeEntered(Rid bodyRid, Node3D body, long bodyShapeIndex, long localShapeIndex) {
-        _logger.Log(LogLevel.Debug, "DropItem3D: BodyShapeEntered {Body} {BodyShapeIndex} {LocalShapeIndex}", body.Name, bodyShapeIndex, localShapeIndex);
         var nodeName = body.Name.ToString();
         if (nodeName.StartsWith("Player_")) {
             var entityId = nodeName["Player_".Length..];
@@ -60,10 +46,11 @@ public partial class DropItem3D: MeshInstance3D {
             var player = PlayerManager.instance.GetPlayerByPeerId(peer.PeerId);
             if (player == null) return;
             InventoryManager.instance.AddItemToInventory(player.playerId, _itemId, _amount, _lootItemData);
+            _logger.LogDebug("player {nickname} picked up item {id}, amount: {amount}", player.nickname, _itemId, _amount);
             var playerPosition = player.position;
-            var tween = new Tween();
-            tween.TweenProperty(this, "transform/origin", playerPosition, 0.5f).SetTrans(Tween.TransitionType.Linear);
-            tween.Play();
+            var tween = CreateTween();
+            tween.TweenProperty(this, "global_position", playerPosition, .25f).SetTrans(Tween.TransitionType.Linear);
+            tween.TweenCallback(Callable.From(QueueFree));
         }
     }
 
@@ -95,15 +82,17 @@ public partial class DropItem3D: MeshInstance3D {
         flags |= 1 << (int)Direction.West;
         flags |= 1 << (int)Direction.Up;
         flags |= 1 << (int)Direction.Down;
-        AddCubeMesh(meshTool, _itemId, flags, ref baseIndex, Vector3I.Zero);
+        var item = ItemManager.instance.GetItem(_itemId);
+        var blockId = BlockManager.instance.GetBlockId(item.GetBlockName());
+        AddCubeMesh(meshTool, blockId, flags, ref baseIndex, new Vector3(-0.5f, -0.5f, -0.5f));
         var mesh = meshTool.Commit();
         var material = MaterialManager.instance.GetMaterial();
         mesh.SurfaceSetMaterial(0, material);
         Mesh = mesh;
-        Scale = new Vector3(0.1, 0.1, 0.1);
+        Scale = new Vector3(0.3, 0.3, 0.3);
     }
     
-    private static void AddCubeMesh(SurfaceTool tool, ulong blockId, int directionFlag, ref int baseIndex, Vector3I point) {
+    private static void AddCubeMesh(SurfaceTool tool, ulong blockId, int directionFlag, ref int baseIndex, Vector3 point) {
         if (directionFlag == 0) {
             return;
         }

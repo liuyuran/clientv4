@@ -52,8 +52,8 @@ public class CoreMod : IMod {
 
         Handler.GetBlockManager().Register<Water>();
         Handler.GetBlockManager().Register<Dirt>();
-        Handler.GetLootManager().Register<DirtLootConfig>();
         Handler.GetBlockManager().Register<Stone>();
+        Handler.GetLootManager().Register<StoneLootConfig>();
     }
 
     private void AddItem() {

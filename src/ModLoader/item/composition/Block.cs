@@ -11,19 +11,19 @@ public static class Block {
         item.Config[BlockConfigKey] = block;
     }
     
-    public static ulong GetBlockId(this Item item) {
+    public static string GetBlockName(this Item item) {
         if (!item.Config.TryGetValue(BlockConfigKey, out var value)) {
             throw new Exception($"Item {item.name} is not a block");
         }
         
         if (value is BlockConfig config) {
-            return config.BlockId;
+            return config.BlockName;
         }
         
         throw new Exception($"Item {item.name} has invalid block configuration");
     }
     
-    public struct BlockConfig(ulong blockId) {
-        public readonly ulong BlockId = blockId;
+    public struct BlockConfig(string blockName) {
+        public readonly string BlockName = blockName;
     }
 }

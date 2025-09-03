@@ -39,7 +39,8 @@ public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPeer, CPhysi
                     var hitPosition = (Vector3)result["position"];
                     var hitNormal = (Vector3)result["normal"];
                     // is collider a StaticBody3D? if not, we can ignore it
-                    var collider = result["collider"].As<StaticBody3D>().GetParent();
+                    // if (result["collider"].GetType() != typeof(StaticBody3D)) return;
+                    // var collider = result["collider"].As<StaticBody3D>().GetParent();
                     var target = new Vector3I();
                     var targetF = hitPosition - hitNormal * 0.01f;
                     target.X = Mathf.FloorToInt(targetF.X);

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using game.scripts.manager;
+using game.scripts.manager.blocks;
 using game.scripts.manager.item;
 using Godot;
+using ModLoader.handler;
 using ModLoader.item.composition;
 using ModLoader.util;
 
@@ -42,7 +44,8 @@ public partial class DropItem2D: MeshInstance3D {
         flags |= 1 << (int)Direction.North;
         flags |= 1 << (int)Direction.South;
         var item = ItemManager.instance.GetItem(_itemId);
-        AddCubeMesh(meshTool, item.GetBlockId(), flags, ref baseIndex);
+        var blockId = BlockManager.instance.GetBlockId(item.GetBlockName());
+        AddCubeMesh(meshTool, blockId, flags, ref baseIndex);
         var mesh = meshTool.Commit();
         var material = MaterialManager.instance.GetItemMaterial();
         mesh.SurfaceSetMaterial(0, material);

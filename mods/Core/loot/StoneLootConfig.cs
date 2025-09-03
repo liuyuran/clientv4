@@ -4,7 +4,7 @@ using ModLoader.loot;
 
 namespace Core.loot;
 
-public class DirtLootConfig: LootConfig {
+public class StoneLootConfig: LootConfig {
     public override string blockName => new Stone().name;
     public override string[] allDropItem => [new DirtItem().name];
 

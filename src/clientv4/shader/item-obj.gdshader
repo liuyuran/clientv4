@@ -1,7 +1,7 @@
 ﻿shader_type spatial;
 render_mode cull_disabled, unshaded; // 禁用背面剔除，实现双面渲染；unshaded避免默认光照影响
 uniform sampler2D albedo_texture : source_color, filter_nearest; // 大Atlas纹理，source_color保留Alpha，filter_nearest避免模糊
-instance uniform vec4 atlas_rect : hint_range(0.0, 1.0) = vec4(0.0, 0.0, 1.0, 1.0); // Atlas子区域：vec4(offset_x, offset_y, scale_x, scale_y)
+instance uniform vec4 atlas_rect : source_color = vec4(0.0, 0.0, 1.0, 1.0); // Atlas子区域：vec4(offset_x, offset_y, scale_x, scale_y)
 uniform float alpha_scissor_threshold : hint_range(0.0, 1.0) = 0.9; // Alpha剪切阈值
 void fragment() {
     vec2 modified_uv = UV; // 从UV开始（Sprite3D的UV是0-1范围）
