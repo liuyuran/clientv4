@@ -8,11 +8,7 @@ namespace Core.item;
 /// example item for the dirt block.
 /// it should be used in the game as a dirt item and place a dirt block when used it.
 /// </summary>
-public class DirtItem: Item {
-    public override string name => "core:dirt";
-    public override string iconPath => "core:/texture/item/dirt.png";
-
-    public DirtItem() {
-        this.SetBlock(new Block.BlockConfig(new Dirt().name));
-    }
+public class TestItem: Item {
+    public override string name => "core:test";
+    public override string iconPath => "core:/texture/item/test.png";
 }

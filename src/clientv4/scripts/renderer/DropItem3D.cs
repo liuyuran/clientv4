@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using ModLoader.item.composition;
 using ModLoader.logger;
 using ModLoader.util;
-using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.renderer;
 
@@ -28,7 +27,7 @@ public partial class DropItem3D: MeshInstance3D {
     private bool _needRotate;
 
     public override void _Ready() {
-        _area = this.GetParent<Node>().FindNodeByName<Area3D>("PickArea");
+        _area = this.GetParent<Node>().FindNodeByName<Area3D>("ColliderArea");
         _area.BodyShapeEntered += AreaOnBodyShapeEntered;
     }
 
@@ -36,10 +35,13 @@ public partial class DropItem3D: MeshInstance3D {
         _area.BodyShapeEntered -= AreaOnBodyShapeEntered;
     }
 
+    /// <summary>
+    /// it should be active when a pickup area that attached on player object starting include the cube area
+    /// </summary>
     private void AreaOnBodyShapeEntered(Rid bodyRid, Node3D body, long bodyShapeIndex, long localShapeIndex) {
         var nodeName = body.Name.ToString();
-        if (nodeName.StartsWith("Player_")) {
-            var entityId = nodeName["Player_".Length..];
+        if (nodeName.StartsWith("Player_Pickup_")) {
+            var entityId = nodeName["Player_Pickup_".Length..];
             var entity = GameNodeReference.World.GetEntityById(Convert.ToInt32(entityId));
             if (!entity.HasComponent<CPeer>()) return;
             var peer = entity.GetComponent<CPeer>();
@@ -63,6 +65,7 @@ public partial class DropItem3D: MeshInstance3D {
     
     public override void _Process(double delta) {
         if (_needRotate) {
+            // auto rotate when mesh has been built
             RotateY(Mathf.DegToRad(0.5));
         }
         if (!_needRender) return;
@@ -84,6 +87,7 @@ public partial class DropItem3D: MeshInstance3D {
         flags |= 1 << (int)Direction.Down;
         var item = ItemManager.instance.GetItem(_itemId);
         var blockId = BlockManager.instance.GetBlockId(item.GetBlockName());
+        // must make the cube center at origin, otherwise the rotation will be around with the (0,0,0) point
         AddCubeMesh(meshTool, blockId, flags, ref baseIndex, new Vector3(-0.5f, -0.5f, -0.5f));
         var mesh = meshTool.Commit();
         var material = MaterialManager.instance.GetMaterial();

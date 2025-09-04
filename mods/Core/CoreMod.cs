@@ -62,6 +62,7 @@ public class CoreMod : IMod {
             return;
         }
         Handler.GetItemManager().Register<DirtItem>();
+        Handler.GetItemManager().Register<TestItem>();
     }
 
     public void OnUnload() {

@@ -19,7 +19,7 @@ public class MaterialManager: IReset, IDisposable {
     private readonly Shader _waterShader = ResourceLoader.Load<Shader>("res://shader/water.gdshader");
     
     private readonly Dictionary<ulong, Dictionary<Direction, Vector2[]>> _uvs = new();
-    private readonly Dictionary<ulong, Dictionary<Direction, Vector2[]>> _itemUvs = new();
+    private readonly Dictionary<ulong, Vector2[]> _itemUvs = new();
     private readonly Dictionary<ulong, Texture2D> _itemTextures = new();
     private Material _defaultMaterial;
     private ShaderMaterial _defaultWaterMaterial;
@@ -261,8 +261,8 @@ public class MaterialManager: IReset, IDisposable {
         return atlasTexture;
     }
 
-    private static ImageTexture CreateItemTextureAtlas(Dictionary<ulong, Texture2D> textures, out Dictionary<ulong, Dictionary<Direction, Vector2[]>> uvCoordinates) {
-        uvCoordinates = new Dictionary<ulong, Dictionary<Direction, Vector2[]>>();
+    private static ImageTexture CreateItemTextureAtlas(Dictionary<ulong, Texture2D> textures, out Dictionary<ulong, Vector2[]> uvCoordinates) {
+        uvCoordinates = new Dictionary<ulong, Vector2[]>();
 
         // 获取单个纹理的尺寸
         var firstTexture = textures.Values.First();
@@ -280,7 +280,6 @@ public class MaterialManager: IReset, IDisposable {
         foreach (var (blockId, texture) in textures) {
             var image = texture.GetImage();
             image.Resize(blockTextureWidth, blockTextureHeight);
-            var blockUVs = new Dictionary<Direction, Vector2[]>();
 
             // 图标无需计算位置
             const int srcX = 0;
@@ -295,10 +294,8 @@ public class MaterialManager: IReset, IDisposable {
 
             // 计算UV坐标
             var uvs = CalculateUVs(destX, destY, blockTextureWidth, blockTextureHeight, blockTextureWidth, atlasHeight);
-            blockUVs[Direction.South] = uvs;
-            blockUVs[Direction.North] = uvs;
             faceIndex++;
-            uvCoordinates[blockId] = blockUVs;
+            uvCoordinates[blockId] = uvs;
         }
 
         // 创建图集纹理
@@ -330,7 +327,7 @@ public class MaterialManager: IReset, IDisposable {
         return _defaultWaterMaterial;
     }
     
-    public Material GetItemObjectMaterial() {
+    public ShaderMaterial GetItemObjectMaterial() {
         return _defaultItemObjectMaterial;
     }
 
@@ -358,16 +355,12 @@ public class MaterialManager: IReset, IDisposable {
         return texture;
     }
 
-    public Vector2[] GetItemUVs(ulong itemId, Direction direction) {
+    public Vector2[] GetItemUVs(ulong itemId) {
         if (!_itemUvs.TryGetValue(itemId, out var uv)) {
             throw new Exception($"BlockId {itemId} not found");
         }
-
-        if (!uv.ContainsKey(direction)) {
-            throw new Exception($"Direction {direction} not found for BlockId {itemId}");
-        }
-
-        return _itemUvs[itemId][direction];
+        
+        return uv;
     }
 
     public void Reset() {
