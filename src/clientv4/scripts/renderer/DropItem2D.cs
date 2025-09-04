@@ -78,6 +78,6 @@ public partial class DropItem2D: Sprite3D {
         var rect = new Vector4(uv[0].X, uv[0].Y, uv[2].X, uv[2].Y);
         material.SetShaderParameter("atlas_rect", rect);
         MaterialOverride = material;
-        Scale = new Vector3(0.3, 0.3, 0.3);
+        Scale = new Vector3(0.4, 0.4, 0.4);
     }
 }
