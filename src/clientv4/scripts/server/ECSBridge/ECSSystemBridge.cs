@@ -20,6 +20,7 @@ namespace game.scripts.server.ECSBridge;
 /// </summary>
 public partial class ECSSystemBridge: Node {
     private EntityStore _world;
+    private ParallelJobRunner _runner;
     private SystemRoot _systemRoot;
     private readonly Dictionary<Entity, Node3D> _entityNodes = new();
     private bool _isInitialized;
@@ -27,7 +28,10 @@ public partial class ECSSystemBridge: Node {
     [Export] private PackedScene _itemPrototype;
 
     public override void _Ready() {
-        _world = new EntityStore();
+        _runner  = new ParallelJobRunner(OS.GetProcessorCount());
+        _world = new EntityStore {
+            JobRunner = _runner
+        };
         GameNodeReference.World = _world;
         _world.OnEntityCreate += WorldOnOnEntityCreate;
         _world.OnEntityDelete += WorldOnOnEntityDelete;
@@ -114,6 +118,7 @@ public partial class ECSSystemBridge: Node {
             }
         }
         _entityNodes.Clear();
+        _runner.Dispose();
     }
     
     private void CreateNodeByComponents(Entity entity) {
