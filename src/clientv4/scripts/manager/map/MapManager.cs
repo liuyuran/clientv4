@@ -23,18 +23,18 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
     private readonly ILogger _logger = LogManager.GetLogger<MapManager>();
     private const string MapFilename = "world_{0}/chunk_{1}_{2}_{3}.dat";
 
-    public delegate void BlockChangedCallback(ulong worldId, Vector3 position, ulong blockId, Direction direction);
-    public delegate void BlockDigProgressChangedCallback(ulong worldId, Vector3 position, float progress);
+    public delegate void BlockChangedCallback(int worldId, Vector3 position, ulong blockId, Direction direction);
+    public delegate void BlockDigProgressChangedCallback(int worldId, Vector3 position, float progress);
 
     public static MapManager instance { get; private set; } = new();
     public static long Seed;
     private readonly TerrainGenerator _generator;
-    private readonly Dictionary<ulong, Dictionary<Vector3I, BlockData[][][]>> _chunks = new();
-    private readonly HashSet<(ulong, Vector3I)> _needArchive = [];
+    private readonly Dictionary<int, Dictionary<Vector3I, BlockData[][][]>> _chunks = new();
+    private readonly HashSet<(int, Vector3I)> _needArchive = [];
     public event BlockChangedCallback OnBlockChanged;
     public event BlockDigProgressChangedCallback OnBlockDigProgressChanged; // TODO how to use it?
 
-    private readonly Dictionary<(ulong, Vector3I), bool> _pendingGenerationTasks = new();
+    private readonly Dictionary<(int, Vector3I), bool> _pendingGenerationTasks = new();
     private readonly object _lockObject = new();
 
     private MapManager() {
@@ -42,11 +42,11 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         _generator = new TerrainGenerator(Seed);
     }
 
-    public void RegisterGenerator<T>(ulong worldId) where T : IWorldGenerator {
+    public void RegisterGenerator<T>(int worldId) where T : IWorldGenerator {
         _generator.RegistryGenerator<T>(worldId);
     }
 
-    public void SetBlock(ulong worldId, Vector3 position, ulong blockId, Direction direction) {
+    public void SetBlock(int worldId, Vector3 position, ulong blockId, Direction direction) {
         if (!_chunks.TryGetValue(worldId, out var chunkData)) {
             _chunks.Add(worldId, new Dictionary<Vector3I, BlockData[][][]>());
         }
@@ -75,7 +75,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         OnBlockChanged?.Invoke(worldId, position, blockId, direction);
     }
 
-    public BlockData[][][] GetBlockData(ulong worldId, Vector3I position, bool createIfNotExists = true, bool sync = true) {
+    public BlockData[][][] GetBlockData(int worldId, Vector3I position, bool createIfNotExists = true, bool sync = true) {
         if (!_chunks.TryGetValue(worldId, out var chunkData)) {
             _chunks.Add(worldId, new Dictionary<Vector3I, BlockData[][][]>());
         }
@@ -114,7 +114,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         return null;
     }
 
-    private void GenerateChunk(ulong worldId, Vector3I position) {
+    private void GenerateChunk(int worldId, Vector3I position) {
         try {
             if (!_chunks.ContainsKey(worldId)) {
                 _chunks.Add(worldId, new Dictionary<Vector3I, BlockData[][][]>());
@@ -163,7 +163,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         return blockData?[localPosition.X][localPosition.Y][localPosition.Z].BlockId;
     }
 
-    public void OverwriteBlockData(ulong worldId, Vector3I chunkPosition, BlockData[][][] blockData) {
+    public void OverwriteBlockData(int worldId, Vector3I chunkPosition, BlockData[][][] blockData) {
         if (!_chunks.TryGetValue(worldId, out var chunkData)) {
             _chunks.Add(worldId, new Dictionary<Vector3I, BlockData[][][]>());
         }
@@ -174,7 +174,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         _logger.LogDebug("Overwrote block data for chunk {chunkPosition} in world {worldId}", chunkPosition, worldId);
     }
 
-    public long GetNearestLand(ulong worldId, Vector3 position) {
+    public long GetNearestLand(int worldId, Vector3 position) {
         var chunkPosition = position.ToChunkPosition();
         var localPosition = position.ToLocalPosition();
         if (localPosition.X < 0) localPosition.X += Config.ChunkSize;
@@ -211,7 +211,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
     }
 
     // 辅助方法：检查指定全局Y坐标处是否有两格连续的空间
-    private bool CheckPositionForEmptySpace(ulong worldId, Vector3I originalChunkPos, Vector3I localPos, long globalY) {
+    private bool CheckPositionForEmptySpace(int worldId, Vector3I originalChunkPos, Vector3I localPos, long globalY) {
         // 计算区块位置和本地位置
         var chunkPos = new Vector3I(
             originalChunkPos.X,
@@ -252,7 +252,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         GC.SuppressFinalize(this);
     }
     
-    private BlockData[][][] TryGetBlockDataFromArchive(ulong worldId, Vector3I chunkPosition) {
+    private BlockData[][][] TryGetBlockDataFromArchive(int worldId, Vector3I chunkPosition) {
         var filename = string.Format(MapFilename, worldId, chunkPosition.X, chunkPosition.Y, chunkPosition.Z);
         var data = ArchiveManager.instance.GetFileAsBytesFromCurrentArchive(filename);
         if (data == null) {

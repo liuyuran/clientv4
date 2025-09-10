@@ -10,9 +10,9 @@ namespace game.scripts.manager.map;
 
 public class TerrainGenerator(long seed) {
     private readonly ILogger _logger = LogManager.GetLogger<TerrainGenerator>();
-    private readonly Dictionary<ulong, IWorldGenerator> _generators = new();
+    private readonly Dictionary<int, IWorldGenerator> _generators = new();
 
-    public void RegistryGenerator<T>(ulong worldId) where T: IWorldGenerator {
+    public void RegistryGenerator<T>(int worldId) where T: IWorldGenerator {
         var generator = (IWorldGenerator)Activator.CreateInstance(typeof(T));
         if (generator == null) {
             _logger.LogWarning("cannot create instance for {TypeName}", typeof(T).Name);
@@ -22,7 +22,7 @@ public class TerrainGenerator(long seed) {
         _generators[worldId] = generator;
     }
 
-    public BlockData[][][] GenerateTerrain(ulong worldId, Vector3I chunkPosition) {
+    public BlockData[][][] GenerateTerrain(int worldId, Vector3I chunkPosition) {
         if (_generators.TryGetValue(worldId, out var generator)) 
             return generator.GenerateTerrain(new ModLoader.util.Vector3I(chunkPosition.X, chunkPosition.Y, chunkPosition.Z));
         _logger.LogWarning("no available generate for world {worldId1}", worldId);

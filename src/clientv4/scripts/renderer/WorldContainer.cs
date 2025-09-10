@@ -18,8 +18,8 @@ public partial class WorldContainer: Control {
     [Export] private PackedScene _worldPrototype;
     [Export] private PackedScene _uiPrototype;
     [Export] private PackedScene _loadingPrototype;
-    private readonly ConcurrentDictionary<ulong, SubViewport> _subViewports = new();
-    private ulong _currentWorldId;
+    private readonly ConcurrentDictionary<int, SubViewport> _subViewports = new();
+    private int _currentWorldId;
 
     public override void _Ready() {
         GameNodeReference.StartScenePacked = ResourceLoader.Load<PackedScene>("res://scenes/start.tscn");
@@ -40,7 +40,7 @@ public partial class WorldContainer: Control {
         MapManager.instance.OnBlockChanged += OnInstanceOnOnBlockChanged;
     }
 
-    private void OnInstanceOnOnBlockChanged(ulong worldId, Vector3 position, ulong blockId, Direction direction) {
+    private void OnInstanceOnOnBlockChanged(int worldId, Vector3 position, ulong blockId, Direction direction) {
         if (_subViewports.ContainsKey(worldId)) return;
         CreateSubViewport(worldId);
     }
@@ -70,7 +70,7 @@ public partial class WorldContainer: Control {
         MapManager.instance.OnBlockChanged -= OnInstanceOnOnBlockChanged;
     }
     
-    public void SetCurrentWorld(ulong targetWorldId) {
+    public void SetCurrentWorld(int targetWorldId) {
         foreach (var (worldId, viewport) in _subViewports) {
             ((SubViewportContainer)viewport.GetParent()).Visible = worldId == targetWorldId;
         }
@@ -86,7 +86,7 @@ public partial class WorldContainer: Control {
         return _subViewports[_currentWorldId];
     }
 
-    private void CreateSubViewport(ulong worldId) {
+    private void CreateSubViewport(int worldId) {
         if (_subViewports.ContainsKey(worldId)) return;
         var viewportContainer = _worldPrototype.Instantiate<SubViewportContainer>();
         AddChild(viewportContainer);

@@ -3,5 +3,5 @@
 namespace ModLoader.handler;
 
 public interface IMapManager {
-    public void RegisterGenerator<T>(ulong worldId) where T : IWorldGenerator;
+    public void RegisterGenerator<T>(int worldId) where T : IWorldGenerator;
 }

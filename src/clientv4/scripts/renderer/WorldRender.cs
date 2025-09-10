@@ -16,8 +16,8 @@ namespace game.scripts.renderer;
 /// <summary>
 /// chunk manage node but only include block data
 /// </summary>
-public partial class WorldRender(ulong worldId): Node3D {
-    private ulong _worldId = worldId;
+public partial class WorldRender(int worldId): Node3D {
+    private int _worldId = worldId;
     private readonly System.Collections.Generic.Dictionary<Vector3I, ChunkRenderItem> _loadedChunks = new();
     
     private IEnumerable<Vector3I> GetLoadedChunkCoordinates() {
@@ -36,7 +36,7 @@ public partial class WorldRender(ulong worldId): Node3D {
         MapManager.instance.OnBlockChanged += OnInstanceOnOnBlockChanged;
     }
 
-    private void OnInstanceOnOnBlockChanged(ulong worldId, Vector3 position, ulong blockId, Direction direction) {
+    private void OnInstanceOnOnBlockChanged(int worldId, Vector3 position, ulong blockId, Direction direction) {
         if (worldId != _worldId) return;
         var chunkCoord = position.ToChunkPosition();
         var localPosition = position.ToLocalPosition();
@@ -139,7 +139,7 @@ public partial class WorldRender(ulong worldId): Node3D {
         }
     }
 
-    private static BlockData[][][] GetBlockData(ulong worldId, Vector3I chunkPosition) {
+    private static BlockData[][][] GetBlockData(int worldId, Vector3I chunkPosition) {
         return MapManager.instance.GetBlockData(worldId, chunkPosition, PlatformUtil.isNetworkMaster);
     }
 
@@ -148,7 +148,7 @@ public partial class WorldRender(ulong worldId): Node3D {
     /// </summary>
     [Rpc(CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    private void ReceiveChunkData(ulong worldId, Vector3I chunkPosition, Array<ulong> blocks, Array<Direction> directions) {
+    private void ReceiveChunkData(int worldId, Vector3I chunkPosition, Array<ulong> blocks, Array<Direction> directions) {
         if (blocks == null || blocks.Count == 0) {
             GD.PrintErr($"Received empty chunk data for {chunkPosition}");
             return;

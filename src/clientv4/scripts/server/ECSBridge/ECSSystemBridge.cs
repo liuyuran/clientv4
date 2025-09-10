@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Friflo.Engine.ECS;
+using Friflo.Engine.ECS.Serialize;
 using Friflo.Engine.ECS.Systems;
 using game.scripts.manager.map;
 using game.scripts.manager.player;
@@ -9,6 +12,7 @@ using game.scripts.server.ECSBridge.gravity;
 using game.scripts.server.ECSBridge.input;
 using game.scripts.server.ECSBridge.render;
 using game.scripts.server.ECSBridge.sync;
+using game.scripts.server.utils;
 using game.scripts.utils;
 using Godot;
 using ModLoader.config;
@@ -24,6 +28,7 @@ public partial class ECSSystemBridge: Node {
     private SystemRoot _systemRoot;
     private readonly Dictionary<Entity, Node3D> _entityNodes = new();
     private bool _isInitialized;
+    private EntitySerializer _serializer = new();
     [Export] private PackedScene _playerPrototype;
     [Export] private PackedScene _itemPrototype;
 
@@ -195,5 +200,48 @@ public partial class ECSSystemBridge: Node {
         if (!obj.Entity.HasComponent<CRenderType>()) return;
         if (_entityNodes.ContainsKey(obj.Entity)) return;
         CreateNodeByComponents(obj.Entity);
+    }
+    
+    [Rpc(CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void RpcSync(byte[] data) {
+        var op = (ESyncOp)BitConverter.ToInt32(data, 0);
+        var entityId = BitConverter.ToInt32(data, 4);
+        var payload = data.Skip(8).ToArray();
+        switch (op) {
+            case ESyncOp.Create: {
+                using var strStream = new MemoryStream(payload);
+                _serializer.ReadIntoStore(_world, strStream);
+                break;
+            }
+            case ESyncOp.Remove: {
+                var entity = _world.GetEntityById(entityId);
+                entity.DeleteEntity();
+                break;
+            }
+            case ESyncOp.Update: {
+                using var strStream = new MemoryStream(payload);
+                _serializer.ReadIntoStore(_world, strStream);
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
+    private byte[] BuildSyncData(ESyncOp op, int entityId, Entity payload) {
+        var entityStr = _serializer.WriteEntity(payload);
+        var entityBuffer = System.Text.Encoding.UTF8.GetBytes(entityStr);
+        if (op == ESyncOp.Remove) {
+            var buffer = new byte[8];
+            BitConverter.GetBytes((int)op).CopyTo(buffer, 0);
+            BitConverter.GetBytes(entityId).CopyTo(buffer, 4);
+            return buffer;
+        } else {
+            var buffer = new byte[8 + entityBuffer.Length];
+            BitConverter.GetBytes((int)op).CopyTo(buffer, 0);
+            BitConverter.GetBytes(entityId).CopyTo(buffer, 4);
+            entityBuffer.CopyTo(buffer, 8);
+            return buffer;
+        }
     }
 }

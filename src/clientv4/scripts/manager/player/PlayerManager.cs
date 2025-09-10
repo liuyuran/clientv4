@@ -18,7 +18,7 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
     private const string PlayerArchiveFilename = "player-{0}.json";
     private readonly Dictionary<long, PlayerInfo> _playersByPeerId = new();
     private readonly Dictionary<ulong, PlayerInfo> _playersById = new();
-    private readonly HashSet<(ulong playerId, ulong worldId, Vector3I chunkPosition)> _sentChunks = [];
+    private readonly HashSet<(ulong playerId, int worldId, Vector3I chunkPosition)> _sentChunks = [];
     private ulong _nextPlayerId = 1;
     private ulong _currentPlayerId = 0;
 
@@ -49,15 +49,15 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
         return _playersById.Values;
     }
 
-    public bool HasSentChunk(ulong playerId, ulong worldId, Vector3I chunkPosition) {
+    public bool HasSentChunk(ulong playerId, int worldId, Vector3I chunkPosition) {
         return _sentChunks.Contains((playerId, worldId, chunkPosition));
     }
 
-    public void MarkChunkSent(ulong playerId, ulong worldId, Vector3I chunkPosition) {
+    public void MarkChunkSent(ulong playerId, int worldId, Vector3I chunkPosition) {
         _sentChunks.Add((playerId, worldId, chunkPosition));
     }
 
-    public void UnmarkChunkSentForAllPlayers(ulong worldId, Vector3I chunkPosition) {
+    public void UnmarkChunkSentForAllPlayers(int worldId, Vector3I chunkPosition) {
         _sentChunks.RemoveWhere(x => x.worldId == worldId && x.chunkPosition == chunkPosition);
     }
 
@@ -75,7 +75,7 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
         }
     }
 
-    public void SetPlayerWorld(long peerId, ulong worldId) {
+    public void SetPlayerWorld(long peerId, int worldId) {
         if (_playersByPeerId.TryGetValue(peerId, out var playerInfo)) {
             playerInfo.worldId = worldId;
         }
@@ -160,7 +160,7 @@ public partial class PlayerManager : IReset, IArchive, IDisposable {
             playerInfo.position = Vector3.Zero;
         }
 
-        if (jsonItem.TryGetValue("worldId", out var worldIdStr) && worldIdStr is ulong worldId) {
+        if (jsonItem.TryGetValue("worldId", out var worldIdStr) && worldIdStr is int worldId) {
             playerInfo.worldId = worldId;
         } else {
             playerInfo.worldId = 0;
@@ -202,7 +202,7 @@ public class PlayerInfo {
     public required string uuid { get; init; }
     public required ulong playerId { get; init; }
     public Vector3 position { get; set; }
-    public ulong worldId { get; set; }
+    public int worldId { get; set; }
     public uint ping { get; set; }
     public string nickname { get; set; } = "Player";
 }

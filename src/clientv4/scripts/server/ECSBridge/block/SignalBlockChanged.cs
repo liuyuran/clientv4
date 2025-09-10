@@ -6,6 +6,6 @@ namespace game.scripts.server.ECSBridge.block;
 public struct SignalBlockChanged {
     public ulong BlockId;
     public Direction Direction;
-    public ulong WorldId;
+    public int WorldId;
     public Vector3 Position;
 }
