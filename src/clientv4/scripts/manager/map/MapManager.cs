@@ -145,7 +145,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         }
     }
 
-    public ulong? GetBlockIdByPosition(Vector3 staticBodyGlobalPosition) {
+    public ulong? GetBlockIdByPosition(int worldId, Vector3 staticBodyGlobalPosition) {
         var chunkPosition = new Vector3I(
             (int)Mathf.Floor(staticBodyGlobalPosition.X / Config.ChunkSize),
             (int)Mathf.Floor(staticBodyGlobalPosition.Y / Config.ChunkSize),
@@ -159,7 +159,7 @@ public class MapManager : IReset, IArchive, IDisposable, IMapManager {
         if (localPosition.X < 0) localPosition.X += Config.ChunkSize;
         if (localPosition.Y < 0) localPosition.Y += Config.ChunkSize;
         if (localPosition.Z < 0) localPosition.Z += Config.ChunkSize;
-        var blockData = GetBlockData(0, chunkPosition);
+        var blockData = GetBlockData(worldId, chunkPosition);
         return blockData?[localPosition.X][localPosition.Y][localPosition.Z].BlockId;
     }
 

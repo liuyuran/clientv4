@@ -38,6 +38,7 @@ public partial class WorldContainer: Control {
         ArchiveManager.instance.RecoverData();
         ModManager.instance.OnStartGame();
         MapManager.instance.OnBlockChanged += OnInstanceOnOnBlockChanged;
+        GameNodeReference.WorldContainer = this;
     }
 
     private void OnInstanceOnOnBlockChanged(int worldId, Vector3 position, ulong blockId, Direction direction) {
@@ -72,18 +73,24 @@ public partial class WorldContainer: Control {
     
     public void SetCurrentWorld(int targetWorldId) {
         foreach (var (worldId, viewport) in _subViewports) {
-            ((SubViewportContainer)viewport.GetParent()).Visible = worldId == targetWorldId;
+            viewport.GetParent<SubViewportContainer>().Visible = worldId == targetWorldId;
         }
         _currentWorldId = targetWorldId;
+        var currentViewport = GetCurrentSubViewport();
+        currentViewport.GetParent<SubViewportContainer>().Visible = true;
         _logger.LogDebug("Set current world to {WorldId}", targetWorldId);
     }
     
     public SubViewport GetCurrentSubViewport() {
-        if (_subViewports.TryGetValue(_currentWorldId, out var viewport)) {
+        return GetSubViewport(_currentWorldId);
+    }
+
+    public SubViewport GetSubViewport(int worldId) {
+        if (_subViewports.TryGetValue(worldId, out var viewport)) {
             return viewport;
         }
-        CreateSubViewport(_currentWorldId);
-        return _subViewports[_currentWorldId];
+        CreateSubViewport(worldId);
+        return _subViewports[worldId];
     }
 
     private void CreateSubViewport(int worldId) {
@@ -94,6 +101,7 @@ public partial class WorldContainer: Control {
         var subViewport = viewportContainer.FindNodeByName<SubViewport>("world");
         subViewport.Name = $"World_{worldId}";
         var world = new WorldRender(worldId);
+        world.Name = "ChunkContainer";
         subViewport.AddChild(world);
         var light = new DirectionalLight3D();
         subViewport.AddChild(light);

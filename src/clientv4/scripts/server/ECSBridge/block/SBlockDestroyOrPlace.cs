@@ -47,7 +47,7 @@ public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPeer, CPhysi
                     target.Y = Mathf.FloorToInt(targetF.Y);
                     target.Z = Mathf.FloorToInt(targetF.Z);
                     // Here you can add logic to handle the block interaction, like breaking or placing blocks
-                    var blockId = MapManager.instance.GetBlockIdByPosition(target);
+                    var blockId = MapManager.instance.GetBlockIdByPosition(0, target);
                     if (blockId != 0 && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
                         // TODO add block breaking animation and sound and place drop item
                         var player = PlayerManager.instance.GetPlayerByPeerId(peer.PeerId);
@@ -88,7 +88,7 @@ public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPeer, CPhysi
                     target.Y = Mathf.FloorToInt(targetF.Y);
                     target.Z = Mathf.FloorToInt(targetF.Z);
                     // Here you can add logic to handle the block interaction, like breaking or placing blocks
-                    var blockId = MapManager.instance.GetBlockIdByPosition(target);
+                    var blockId = MapManager.instance.GetBlockIdByPosition(0, target);
                     if (blockId != null && (blockId == 0 || BlockManager.instance.GetBlock(blockId.Value).blockType != EBlockType.Solid) && _lastActive + ActiveCooldown < Time.GetTicksMsec()) {
                         entity.EmitSignal(new SignalBlockChanged {
                             Position = target,
@@ -104,7 +104,7 @@ public class SBlockDestroyOrPlace(EntityStore world) : QuerySystem<CPeer, CPhysi
     }
     
     private void GenerateDropItem(Vector3I position, ulong playerId) {
-        var blockId = MapManager.instance.GetBlockIdByPosition(position);
+        var blockId = MapManager.instance.GetBlockIdByPosition(0, position);
         if (blockId == null) return;
         var buffer = CommandBuffer;
         var entity = buffer.CreateEntity();

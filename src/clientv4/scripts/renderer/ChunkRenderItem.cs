@@ -126,7 +126,7 @@ public partial class ChunkRenderItem : MeshInstance3D {
         }
         var neighborPos = pos + offset;
         if (!IsValidPositionInChunk(neighborPos)) {
-            var blockId = MapManager.instance.GetBlockIdByPosition(_chunkPosition * Config.ChunkSize + neighborPos);
+            var blockId = MapManager.instance.GetBlockIdByPosition(0, _chunkPosition * Config.ChunkSize + neighborPos);
             return blockId switch {
                 null or 0 => true,
                 _ => BlockManager.instance.GetBlock(blockId.Value).transparent
@@ -173,7 +173,7 @@ public partial class ChunkRenderItem : MeshInstance3D {
         }
         var neighborPos = pos + offset;
         if (!IsValidPositionInChunk(neighborPos)) {
-            var blockId = MapManager.instance.GetBlockIdByPosition(_chunkPosition * Config.ChunkSize + neighborPos);
+            var blockId = MapManager.instance.GetBlockIdByPosition(0, _chunkPosition * Config.ChunkSize + neighborPos);
             return blockId == 0;
         }
         var neighborBlockData = GetBlockData(neighborPos);
