@@ -28,7 +28,7 @@ public partial class ECSSystemBridge: Node {
     private SystemRoot _systemRoot;
     private readonly Dictionary<Entity, Node3D> _entityNodes = new();
     private bool _isInitialized;
-    private EntitySerializer _serializer = new();
+    private readonly EntitySerializer _serializer = new();
     [Export] private PackedScene _playerPrototype;
     [Export] private PackedScene _itemPrototype;
 
@@ -43,6 +43,8 @@ public partial class ECSSystemBridge: Node {
         _world.OnComponentAdded += WorldOnOnComponentAdded;
         _world.OnComponentRemoved += WorldOnOnComponentRemoved;
         _systemRoot = new SystemRoot(_world) {
+            new SChunkLoadSystem(_world),
+            new SChunkRenderSystem(_world),
             new SMoveSystem(_world),
             new SJumpAndGravity(_world),
             new SBlockDestroyOrPlace(_world)

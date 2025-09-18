@@ -17,6 +17,10 @@ using Vector3I = Godot.Vector3I;
 
 namespace game.scripts.server.ECSBridge.render;
 
+/// <summary>
+/// used to render chunk entity that created by SChunkLoadSystem
+/// </summary>
+/// <see cref="SChunkLoadSystem"/>
 public class SChunkRenderSystem(EntityStore world) : QuerySystem<CNodeLink, CGridIndex> {
     private readonly ConcurrentDictionary<Vector4I, CNodeLink> _chunkCache = new(); // cache chunk nodes via its location
     private readonly ConcurrentBag<Vector4I> _processing = []; // processing chunk render thread
@@ -25,20 +29,16 @@ public class SChunkRenderSystem(EntityStore world) : QuerySystem<CNodeLink, CGri
     protected override void OnUpdate() {
         if (!_processing.IsEmpty) return;
         var commandBuffer = world.GetCommandBuffer().Synced;
-        var chunkNeedUpdate = new ConcurrentDictionary<Vector4I, List<Entity>>();
+        var chunkNeedUpdate = new ConcurrentBag<Vector4I>();
         Query.ForEachEntity((ref CNodeLink link, ref CGridIndex grid, Entity entity) => {
             if (!link.Dirty) return;
-            if (!chunkNeedUpdate.TryGetValue(grid.GetIndexedValue(), out var entities)) {
-                entities = [];
-                chunkNeedUpdate.TryAdd(grid.GetIndexedValue(), entities);
-            }
-            entities.Add(entity);
+            chunkNeedUpdate.Add(grid.GetIndexedValue());
             link.Dirty = false;
         });
-        var chunkNeedUpdateKeys = chunkNeedUpdate.Keys.ToImmutableArray();
+        var chunkNeedUpdateKeys = chunkNeedUpdate.ToArray();
         var groupTask = WorkerThreadPool.AddGroupTask(Callable.From<int>(index => {
             _processing.Add(chunkNeedUpdateKeys[index]);
-            var unit = chunkNeedUpdate[chunkNeedUpdateKeys[index]];
+            var unit = _index[chunkNeedUpdateKeys[index]];
             UpdateGridNode(chunkNeedUpdateKeys[index], unit, ref commandBuffer);
             _processing.TryTake(out _);
         }), chunkNeedUpdateKeys.Length);
@@ -46,7 +46,7 @@ public class SChunkRenderSystem(EntityStore world) : QuerySystem<CNodeLink, CGri
         commandBuffer.Playback();
     }
     
-    private void UpdateGridNode(Vector4I position, List<Entity> entities, ref CommandBufferSynced commandBufferSynced) {
+    private void UpdateGridNode(Vector4I position, Entities entities, ref CommandBufferSynced commandBufferSynced) {
         var worldId = position.X;
         var chunkLocation = new Vector3I(position.Y, position.Z, position.W);
         var chunkData = MapManager.instance.GetBlockData(worldId, chunkLocation);
