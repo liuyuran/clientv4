@@ -13,7 +13,7 @@ config_version=5
 config/name="UnlimitedCube"
 config/version="0.0.1-beta"
 run/main_scene="uid://2v7krsjntfq"
-config/features=PackedStringArray("4.4", "C#", "Double Precision", "Forward Plus")
+config/features=PackedStringArray("4.5", "C#", "Double Precision", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
 
