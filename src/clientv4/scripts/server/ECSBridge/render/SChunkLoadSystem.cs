@@ -30,10 +30,15 @@ public class SChunkLoadSystem : QuerySystem<CNodeLink, CGridIndex> {
     
     private IEnumerable<Vector3I> GetRequiredChunkCoordinates(Vector3 playerPosition) {
         var centerChunk = playerPosition.ToChunkPosition();
+        // block nearest by player will be loaded first
+        // then load other chunks in a square spiral order
+        yield return centerChunk;
         for (var x = centerChunk.X - Config.ChunkRenderDistance; x <= centerChunk.X + Config.ChunkRenderDistance; x++)
         for (var y = centerChunk.Y - Config.ChunkRenderDistance; y <= centerChunk.Y + Config.ChunkRenderDistance; y++)
-        for (var z = centerChunk.Z - Config.ChunkRenderDistance; z <= centerChunk.Z + Config.ChunkRenderDistance; z++)
+        for (var z = centerChunk.Z - Config.ChunkRenderDistance; z <= centerChunk.Z + Config.ChunkRenderDistance; z++) {
+            if (x == centerChunk.X && y == centerChunk.Y && z == centerChunk.Z) continue;
             yield return new Vector3I(x, y, z);
+        }
     }
 
     private void OnInstanceOnOnBlockChanged(int worldId, Vector3 position, ulong blockId, Direction direction) {
@@ -72,10 +77,10 @@ public class SChunkLoadSystem : QuerySystem<CNodeLink, CGridIndex> {
             _loadedChunks.TryAdd(chunkCoord, 1);
             // don't create too many chunks in one frame
             createCount++;
-            if (createCount > 1) break;
-            // create block entity
+            if (createCount > 4) break;
+            // create a block entity
             var chunkPos = new Vector3I(chunkCoord.Y, chunkCoord.Z, chunkCoord.W);
-            var chunkData = MapManager.instance.GetBlockData(chunkCoord.X, chunkPos);
+            var chunkData = MapManager.instance.GetBlockData(chunkCoord.X, chunkPos, true, false);
             for (var x = 0; x < Config.ChunkSize; x++) {
                 for (var y = 0; y < Config.ChunkSize; y++) {
                     for (var z = 0; z < Config.ChunkSize; z++) {

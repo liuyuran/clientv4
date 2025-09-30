@@ -218,10 +218,15 @@ public class SChunkRenderSystem(EntityStore world) : QuerySystem<CNodeLink, CGri
         var chunkLocation = new Vector3I(position.Y, position.Z, position.W);
         var worldContainer = GameNodeReference.WorldContainer.GetSubViewport(worldId);
         var chunkNode = new MeshInstance3D();
-        worldContainer.AddChild(chunkNode);
+        if (!shouldNotUpdateRender) {
+            worldContainer.CallDeferred(Node.MethodName.AddChild, chunkNode);
+            chunkNode.CallDeferred(Node3D.MethodName.SetGlobalPosition, new Vector3(chunkLocation.X * Config.ChunkSize, chunkLocation.Y * Config.ChunkSize, chunkLocation.Z * Config.ChunkSize));
+        }
         chunkNode.Name = $"Chunk_Render_{chunkLocation}";
         var staticBody = new StaticBody3D();
-        staticBody.Name = "ChunkStaticBody";
+        staticBody.Name = $"ChunkStaticBody_{chunkLocation}";
+        worldContainer.CallDeferred(Node.MethodName.AddChild, staticBody);
+        staticBody.CallDeferred(Node3D.MethodName.SetGlobalPosition, new Vector3(chunkLocation.X * Config.ChunkSize, chunkLocation.Y * Config.ChunkSize, chunkLocation.Z * Config.ChunkSize));
         var link = new CNodeLink {
             ClientNode = shouldNotUpdateRender ? null : chunkNode,
             ServerNode = staticBody,
