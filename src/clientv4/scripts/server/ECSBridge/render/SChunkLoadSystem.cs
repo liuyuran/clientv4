@@ -70,14 +70,10 @@ public class SChunkLoadSystem : QuerySystem<CNodeLink, CGridIndex> {
         }
 
         // load can be load, if not data, wait next tick
-        var createCount = 0;
         var commandBuffer = CommandBuffer;
         var loadedChunks = _loadedChunks.Keys.ToHashSet();
         foreach (var chunkCoord in requiredChunks.Except(loadedChunks)) {
             _loadedChunks.TryAdd(chunkCoord, 1);
-            // don't create too many chunks in one frame
-            createCount++;
-            if (createCount > 4) break;
             // create a block entity
             var chunkPos = new Vector3I(chunkCoord.Y, chunkCoord.Z, chunkCoord.W);
             var chunkData = MapManager.instance.GetBlockData(chunkCoord.X, chunkPos, true, false);
